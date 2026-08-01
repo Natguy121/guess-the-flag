@@ -163,6 +163,8 @@
         <button class="btn btn-green" onclick="openGlobalChat()">📢 Global Chat</button>
         <button class="btn btn-blue" id="signin-home-btn" onclick="showScreen('screen-signin')">👤 Sign In</button>
         <button class="btn btn-gray" id="owner-panel-home-btn" style="display:none;" onclick="openOwnerPanel()">🛡 Owner Panel</button>
+        <button class="btn btn-gray" id="feedback-home-btn" style="display:none;" onclick="openFeedback()">🐞 Features &amp; Bugs</button>
+        <button class="btn btn-gray" id="admin-chat-home-btn" style="display:none;" onclick="openAdminChat()">🗨 Admin Chat</button>
       </div>
     </section>
 
@@ -505,7 +507,7 @@
           <button class="btn btn-blue" onclick="doSignIn()">Sign In</button>
         </div>
         <div id="signin-account" style="display:none;">
-          <p class="success-text" style="text-align:center;">✅ Signed in as <span id="signed-in-username"></span><span id="signed-in-owner-badge" class="owner-badge" style="display:none;">👑 OWNER</span></p>
+          <p class="success-text" style="text-align:center;">✅ Signed in as <span id="signed-in-username"></span><span id="signed-in-owner-badge" class="owner-badge" style="display:none;">👑 OWNER</span><span id="signed-in-assistant-badge" class="owner-badge" style="display:none;">🛠 ASSISTANT</span></p>
           <p class="subtitle">Online multiplayer is now unlocked!</p>
           <button class="btn btn-gray" onclick="doSignOut()">Log Out</button>
         </div>
@@ -517,7 +519,7 @@
       <a class="back-link" onclick="closeOwnerPanel()">← Home</a>
       <div class="card-box">
         <h2 style="text-align:center;">🛡 Owner Panel</h2>
-        <p class="subtitle">Every signed-in player's coins &amp; hints, live from Firebase.</p>
+        <p class="subtitle" id="owner-panel-subtitle">Every signed-in player's coins &amp; hints, live from Firebase.</p>
         <p class="fb-status" id="owner-users-status"></p>
         <div id="owner-users-list"></div>
       </div>
@@ -538,6 +540,42 @@
       </div>
     </section>
 
+    <!-- ADMIN CHAT (owner + assistants only) -->
+    <section id="screen-admin-chat" class="screen">
+      <a class="back-link" onclick="closeAdminChat()">← Home</a>
+      <div class="card-box">
+        <h2 style="text-align:center;">🗨 Admin Chat</h2>
+        <p class="subtitle">Private chat between the owner and assistants.</p>
+        <p class="fb-status" id="admin-chat-status"></p>
+        <div id="admin-chat-compose">
+          <input type="text" id="admin-chat-input" placeholder="Message the staff team..." onkeydown="if(event.key==='Enter')sendAdminChatMessage()">
+          <button class="btn btn-blue" onclick="sendAdminChatMessage()">Send</button>
+        </div>
+        <div class="chat-log" id="admin-chat-log" style="margin-top:12px;"></div>
+      </div>
+    </section>
+
+    <!-- FEATURES & BUGS (assistants submit, owner + assistants view) -->
+    <section id="screen-feedback" class="screen">
+      <a class="back-link" onclick="closeFeedback()">← Home</a>
+      <div class="card-box">
+        <h2 style="text-align:center;">🐞 Features &amp; Bugs</h2>
+        <p class="subtitle">Assistants log feature ideas and bugs here for the owner to see.</p>
+        <p class="fb-status" id="feedback-status"></p>
+        <div id="feedback-compose">
+          <label>Type</label>
+          <select id="feedback-type" style="width:100%; padding:12px; border-radius:10px; margin:8px 0;">
+            <option value="feature">💡 Feature request</option>
+            <option value="bug">🐛 Bug report</option>
+          </select>
+          <label>Description</label>
+          <input type="text" id="feedback-text" placeholder="Describe the feature or bug..." onkeydown="if(event.key==='Enter')submitFeedback()">
+          <button class="btn btn-yellow" onclick="submitFeedback()">Submit</button>
+        </div>
+        <div class="chat-log" id="feedback-log" style="margin-top:12px;"></div>
+      </div>
+    </section>
+
   </main>
 </div>
 
@@ -548,12 +586,12 @@
 
 <script>
 /* -------- STATE -------- */
-const state = {coins:0, loggedIn:false, username:'', isOwner:false, hints:{flagLetter:0, flagTime:0, geoContinent:0, geoLetter:0}};
+const state = {coins:0, loggedIn:false, username:'', isOwner:false, isAssistant:false, hints:{flagLetter:0, flagTime:0, geoContinent:0, geoLetter:0}};
 function saveState(){localStorage.setItem('ftg_coins',String(state.coins)); localStorage.setItem('ftg_hints',JSON.stringify(state.hints)); syncUserToFirebase();}
-function loadState(){state.coins=parseInt(localStorage.getItem('ftg_coins')||'0',10)||0; const h=localStorage.getItem('ftg_hints'); if(h){try{state.hints=JSON.parse(h);}catch(e){}}const acc=localStorage.getItem('ftg_account'); if(acc){try{const a=JSON.parse(acc); if(a&&a.username){state.loggedIn=true; state.username=a.username;}}catch(e){}}state.isOwner=state.loggedIn&&localStorage.getItem('ftg_owner')==='1';}
+function loadState(){state.coins=parseInt(localStorage.getItem('ftg_coins')||'0',10)||0; const h=localStorage.getItem('ftg_hints'); if(h){try{state.hints=JSON.parse(h);}catch(e){}}const acc=localStorage.getItem('ftg_account'); if(acc){try{const a=JSON.parse(acc); if(a&&a.username){state.loggedIn=true; state.username=a.username;}}catch(e){}}state.isOwner=state.loggedIn&&localStorage.getItem('ftg_owner')==='1'; state.isAssistant=state.loggedIn&&localStorage.getItem('ftg_assistant')==='1';}
 function addCoins(n){state.coins+=n; saveState(); renderCoins();}
 function renderCoins(){document.getElementById('coin-count').textContent=state.coins; document.getElementById('store-owned-flagLetter').textContent=state.hints.flagLetter; document.getElementById('store-owned-flagTime').textContent=state.hints.flagTime; document.getElementById('store-owned-geoContinent').textContent=state.hints.geoContinent; document.getElementById('store-owned-geoLetter').textContent=state.hints.geoLetter; document.getElementById('flag-letter-hint-count').textContent=state.hints.flagLetter; document.getElementById('flag-time-hint-count').textContent=state.hints.flagTime; document.getElementById('geo-continent-hint-count').textContent=state.hints.geoContinent; document.getElementById('geo-letter-hint-count').textContent=state.hints.geoLetter; renderSignInStatus();}
-function renderSignInStatus(){const welcome=document.getElementById('home-welcome'); const form=document.getElementById('signin-form'); const acct=document.getElementById('signin-account'); const homeBtn=document.getElementById('signin-home-btn'); const ownerBadge=document.getElementById('signed-in-owner-badge'); const ownerPanelBtn=document.getElementById('owner-panel-home-btn'); if(state.loggedIn){welcome.textContent='Welcome back, '+state.username+'!'; form.style.display='none'; acct.style.display='block'; document.getElementById('signed-in-username').textContent=state.username; homeBtn.textContent=(state.isOwner?'👑 ':'👤 ')+state.username;}else{welcome.textContent='Test your flag & geography knowledge!'; form.style.display='block'; acct.style.display='none'; homeBtn.textContent='👤 Sign In';}if(ownerBadge)ownerBadge.style.display=state.isOwner?'inline-block':'none'; if(ownerPanelBtn)ownerPanelBtn.style.display=state.isOwner?'block':'none'; const note=document.getElementById('geo-online-note'); if(note){note.textContent=state.loggedIn?'':'Sign in to unlock playing online with a friend.';}const flagNote=document.getElementById('flag-online-note'); if(flagNote){flagNote.textContent=state.loggedIn?'':'Sign in to unlock racing a friend online.';}}
+function renderSignInStatus(){const welcome=document.getElementById('home-welcome'); const form=document.getElementById('signin-form'); const acct=document.getElementById('signin-account'); const homeBtn=document.getElementById('signin-home-btn'); const ownerBadge=document.getElementById('signed-in-owner-badge'); const assistantBadge=document.getElementById('signed-in-assistant-badge'); const ownerPanelBtn=document.getElementById('owner-panel-home-btn'); const feedbackBtn=document.getElementById('feedback-home-btn'); const adminChatBtn=document.getElementById('admin-chat-home-btn'); const isStaff=state.isOwner||state.isAssistant; if(state.loggedIn){welcome.textContent='Welcome back, '+state.username+'!'; form.style.display='none'; acct.style.display='block'; document.getElementById('signed-in-username').textContent=state.username; homeBtn.textContent=(state.isOwner?'👑 ':state.isAssistant?'🛠 ':'👤 ')+state.username;}else{welcome.textContent='Test your flag & geography knowledge!'; form.style.display='block'; acct.style.display='none'; homeBtn.textContent='👤 Sign In';}if(ownerBadge)ownerBadge.style.display=state.isOwner?'inline-block':'none'; if(assistantBadge)assistantBadge.style.display=(state.isAssistant&&!state.isOwner)?'inline-block':'none'; if(ownerPanelBtn)ownerPanelBtn.style.display=isStaff?'block':'none'; if(feedbackBtn)feedbackBtn.style.display=isStaff?'block':'none'; if(adminChatBtn)adminChatBtn.style.display=isStaff?'block':'none'; const note=document.getElementById('geo-online-note'); if(note){note.textContent=state.loggedIn?'':'Sign in to unlock playing online with a friend.';}const flagNote=document.getElementById('flag-online-note'); if(flagNote){flagNote.textContent=state.loggedIn?'':'Sign in to unlock racing a friend online.';}}
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); window.scrollTo(0,0);}
 function goPlay(){showScreen('screen-play');} function goGeoMode(){showScreen('screen-geo-mode');} function goGeoOnline(){if(!state.loggedIn){showScreen('screen-signin'); document.getElementById('signin-error').textContent='Please sign in first to play online with a friend.'; return;}updateFbStatusUI(); showScreen('screen-geo-online-setup');}
 function goFlagMode(){showScreen('screen-flag-mode');} function goFlagOnline(){if(!state.loggedIn){showScreen('screen-signin'); document.getElementById('signin-error').textContent='Please sign in first to race a friend online.'; return;}updateFbStatusUI(); showScreen('screen-flag-online-setup');}
@@ -594,8 +632,8 @@ function useGeoLetterHint(){if(!geoState)return; if(state.hints.geoLetter<=0){ad
 
 function buyHint(key,cost){document.getElementById('store-error').textContent=''; if(state.coins<cost){document.getElementById('store-error').textContent='Not enough coins!'; return;}state.coins-=cost; state.hints[key]++; saveState(); renderCoins();}
 
-function doSignIn(){const u=document.getElementById('signin-username').value.trim(); const p=document.getElementById('signin-password').value; const err=document.getElementById('signin-error'); err.textContent=''; if(!u){err.textContent='Please enter a username.'; return;}if(p.length!==4){err.textContent='Password must be exactly 4 characters.'; return;}localStorage.setItem('ftg_account',JSON.stringify({username:u,password:p})); state.loggedIn=true; state.username=u; state.isOwner=(p===OWNER_PASSWORD); localStorage.setItem('ftg_owner',state.isOwner?'1':'0'); renderCoins(); syncUserToFirebase(); subscribeToMyUserRecord(); showScreen('screen-home');}
-function doSignOut(){unsubscribeFromMyUserRecord(); localStorage.removeItem('ftg_account'); localStorage.removeItem('ftg_owner'); state.loggedIn=false; state.username=''; state.isOwner=false; document.getElementById('signin-username').value=''; document.getElementById('signin-password').value=''; renderCoins(); showScreen('screen-home');}
+function doSignIn(){const u=document.getElementById('signin-username').value.trim(); const p=document.getElementById('signin-password').value; const err=document.getElementById('signin-error'); err.textContent=''; if(!u){err.textContent='Please enter a username.'; return;}if(p.length!==4){err.textContent='Password must be exactly 4 characters.'; return;}localStorage.setItem('ftg_account',JSON.stringify({username:u,password:p})); state.loggedIn=true; state.username=u; state.isOwner=(p===OWNER_PASSWORD); state.isAssistant=(p===ASSISTANT_PASSWORD); localStorage.setItem('ftg_owner',state.isOwner?'1':'0'); localStorage.setItem('ftg_assistant',state.isAssistant?'1':'0'); renderCoins(); syncUserToFirebase(); subscribeToMyUserRecord(); showScreen('screen-home');}
+function doSignOut(){unsubscribeFromMyUserRecord(); localStorage.removeItem('ftg_account'); localStorage.removeItem('ftg_owner'); localStorage.removeItem('ftg_assistant'); state.loggedIn=false; state.username=''; state.isOwner=false; state.isAssistant=false; document.getElementById('signin-username').value=''; document.getElementById('signin-password').value=''; renderCoins(); showScreen('screen-home');}
 
 /* -------- FIREBASE (real cross-device online play) --------
    BroadcastChannel only relays messages between tabs of the same browser on the
@@ -616,7 +654,9 @@ function doSignOut(){unsubscribeFromMyUserRecord(); localStorage.removeItem('ftg
           "rooms":     { "$code": { ".read": "auth != null", ".write": "auth != null" } },
           "flagRooms": { "$code": { ".read": "auth != null", ".write": "auth != null" } },
           "users":     { ".read": "auth != null", ".write": "auth != null" },
-          "global":    { ".read": "auth != null", ".write": "auth != null" }
+          "global":    { ".read": "auth != null", ".write": "auth != null" },
+          "adminChat": { ".read": "auth != null", ".write": "auth != null" },
+          "feedback":  { ".read": "auth != null", ".write": "auth != null" }
         }
       }
    Until this is filled in, online play (plus the Owner Panel and Global Chat
@@ -665,37 +705,59 @@ function createRoomChannel(path){
 }
 function roomMetaRef(path){return fbDb.ref(path+'/meta');}
 
-/* -------- OWNER / GLOBAL CHAT --------
+/* -------- OWNER / ASSISTANT / GLOBAL CHAT --------
    Signing in with the password "TOBO" (any username) flags this browser as
    Owner, unlocking the Owner Panel (see every signed-in player's coins and
-   hints, live, and adjust them) and posting in Global Chat (a broadcast every
-   signed-in player can see).
+   hints, live, and adjust them), posting in Global Chat (a broadcast every
+   signed-in player can see), the Admin Chat, and the Features & Bugs board.
+
+   Signing in with the password "ANAZ" flags this browser as an Assistant —
+   a lighter staff role. Assistants can view the Owner Panel's player list
+   (read-only, no +/- adjusting), submit feature requests and bug reports on
+   the Features & Bugs board, and talk with the Owner in the private Admin
+   Chat. They cannot adjust coins/hints or post to Global Chat.
 
    Security note: this is a convenience gate, not real access control. The
-   "TOBO" check runs in client-side JS that anyone can read, and the Realtime
-   Database rules below only require "signed in anonymously," not "is the
-   real owner" — so a player who reads this file's source could, in theory,
-   write to /users or /global directly too. That's an inherent limit of a
-   static file with no server of its own; real enforcement would need a
-   backend (e.g. a Cloud Function minting a custom auth claim) to verify the
-   password server-side. Fine for a friend group, not for anything sensitive.
+   "TOBO"/"ANAZ" checks run in client-side JS that anyone can read, and the
+   Realtime Database rules below only require "signed in anonymously," not
+   "is the real owner/assistant" — so a player who reads this file's source
+   could, in theory, write to /users, /global, /adminChat, or /feedback
+   directly too. That's an inherent limit of a static file with no server of
+   its own; real enforcement would need a backend (e.g. a Cloud Function
+   minting a custom auth claim) to verify the password server-side. Fine for
+   a friend group, not for anything sensitive.
 */
 const OWNER_PASSWORD = 'TOBO';
+const ASSISTANT_PASSWORD = 'ANAZ';
 function fbKey(s){return String(s).replace(/[.#$\[\]\/]/g,'_');}
 function usersRef(){return fbDb.ref('users');}
 function myUserRef(){return fbDb.ref('users/'+fbKey(state.username));}
-function syncUserToFirebase(){if(!fbReady||!fbDb||!state.loggedIn||!state.username)return; myUserRef().set({coins:state.coins,hints:state.hints,isOwner:!!state.isOwner,lastSeen:firebase.database.ServerValue.TIMESTAMP});}
+function syncUserToFirebase(){if(!fbReady||!fbDb||!state.loggedIn||!state.username)return; myUserRef().set({coins:state.coins,hints:state.hints,isOwner:!!state.isOwner,isAssistant:!!state.isAssistant,lastSeen:firebase.database.ServerValue.TIMESTAMP});}
 let myUserListener=null;
 function subscribeToMyUserRecord(){if(!fbReady||!fbDb||!state.loggedIn||!state.username)return; unsubscribeFromMyUserRecord(); myUserListener=myUserRef().on('value',snap=>{const v=snap.val(); if(!v)return; if(typeof v.coins==='number')state.coins=v.coins; if(v.hints)state.hints=v.hints; localStorage.setItem('ftg_coins',String(state.coins)); localStorage.setItem('ftg_hints',JSON.stringify(state.hints)); renderCoins();});}
 function unsubscribeFromMyUserRecord(){if(myUserListener){myUserRef().off('value',myUserListener); myUserListener=null;}}
 
 let ownerUsersListener=null;
-function openOwnerPanel(){if(!state.isOwner)return; showScreen('screen-owner-panel'); const status=document.getElementById('owner-users-status'); if(!fbReady){status.textContent=fbUnavailableMessage(); document.getElementById('owner-users-list').innerHTML=''; return;} status.textContent=''; if(ownerUsersListener)usersRef().off('value',ownerUsersListener); ownerUsersListener=usersRef().on('value',snap=>renderOwnerUserList(snap.val()||{}));}
+function openOwnerPanel(){if(!state.isOwner&&!state.isAssistant)return; showScreen('screen-owner-panel'); document.getElementById('owner-panel-subtitle').textContent=state.isOwner?"Every signed-in player's coins & hints, live from Firebase.":"Every signed-in player's coins & hints, live from Firebase (view-only)."; const status=document.getElementById('owner-users-status'); if(!fbReady){status.textContent=fbUnavailableMessage(); document.getElementById('owner-users-list').innerHTML=''; return;} status.textContent=''; if(ownerUsersListener)usersRef().off('value',ownerUsersListener); ownerUsersListener=usersRef().on('value',snap=>renderOwnerUserList(snap.val()||{}));}
 function closeOwnerPanel(){if(ownerUsersListener){usersRef().off('value',ownerUsersListener); ownerUsersListener=null;} showScreen('screen-home');}
 const HINT_LABELS={flagLetter:'💡Flag Letter',flagTime:'⏱+5s',geoContinent:'🌍Continent',geoLetter:'🔤Geo Letter'};
-function renderOwnerUserList(users){const container=document.getElementById('owner-users-list'); container.innerHTML=''; const names=Object.keys(users).sort((a,b)=>a.localeCompare(b)); if(names.length===0){container.innerHTML='<p style="text-align:center;color:#888;">No signed-in users yet.</p>'; return;} names.forEach(name=>{const u=users[name]||{}; const coins=u.coins||0; const hints=u.hints||{}; const row=document.createElement('div'); row.className='user-row'; const head=document.createElement('div'); head.className='user-row-head'; head.innerHTML='<strong>'+name.replace(/</g,'&lt;')+'</strong>'+(u.isOwner?' <span class="owner-badge">👑 OWNER</span>':''); row.appendChild(head); const chipRow=document.createElement('div'); chipRow.className='stat-chip-row'; chipRow.appendChild(makeStatChip(name,'coins','🪙',coins)); Object.keys(HINT_LABELS).forEach(key=>{chipRow.appendChild(makeStatChip(name,key,HINT_LABELS[key],hints[key]||0));}); row.appendChild(chipRow); container.appendChild(row);});}
-function makeStatChip(username,field,label,value){const chip=document.createElement('div'); chip.className='stat-chip'; const minus=document.createElement('button'); minus.type='button'; minus.textContent='−'; minus.onclick=()=>ownerAdjust(username,field,-1); const plus=document.createElement('button'); plus.type='button'; plus.textContent='+'; plus.onclick=()=>ownerAdjust(username,field,1); const lbl=document.createElement('span'); lbl.textContent=label; const val=document.createElement('span'); val.className='val'; val.textContent=value; chip.appendChild(lbl); chip.appendChild(minus); chip.appendChild(val); chip.appendChild(plus); return chip;}
+function renderOwnerUserList(users){const container=document.getElementById('owner-users-list'); container.innerHTML=''; const names=Object.keys(users).sort((a,b)=>a.localeCompare(b)); if(names.length===0){container.innerHTML='<p style="text-align:center;color:#888;">No signed-in users yet.</p>'; return;} names.forEach(name=>{const u=users[name]||{}; const coins=u.coins||0; const hints=u.hints||{}; const row=document.createElement('div'); row.className='user-row'; const head=document.createElement('div'); head.className='user-row-head'; head.innerHTML='<strong>'+name.replace(/</g,'&lt;')+'</strong>'+(u.isOwner?' <span class="owner-badge">👑 OWNER</span>':'')+(u.isAssistant?' <span class="owner-badge">🛠 ASSISTANT</span>':''); row.appendChild(head); const chipRow=document.createElement('div'); chipRow.className='stat-chip-row'; chipRow.appendChild(makeStatChip(name,'coins','🪙',coins)); Object.keys(HINT_LABELS).forEach(key=>{chipRow.appendChild(makeStatChip(name,key,HINT_LABELS[key],hints[key]||0));}); row.appendChild(chipRow); container.appendChild(row);});}
+function makeStatChip(username,field,label,value){const chip=document.createElement('div'); chip.className='stat-chip'; const lbl=document.createElement('span'); lbl.textContent=label; const val=document.createElement('span'); val.className='val'; val.textContent=value; chip.appendChild(lbl); if(state.isOwner){const minus=document.createElement('button'); minus.type='button'; minus.textContent='−'; minus.onclick=()=>ownerAdjust(username,field,-1); chip.appendChild(minus);} chip.appendChild(val); if(state.isOwner){const plus=document.createElement('button'); plus.type='button'; plus.textContent='+'; plus.onclick=()=>ownerAdjust(username,field,1); chip.appendChild(plus);} return chip;}
 function ownerAdjust(username,field,delta){if(!state.isOwner||!fbReady)return; const ref=field==='coins'?usersRef().child(username).child('coins'):usersRef().child(username).child('hints').child(field); ref.transaction(cur=>Math.max(0,(cur||0)+delta));}
+
+let adminChatListener=null;
+function adminChatMessagesRef(){return fbDb.ref('adminChat/messages');}
+function openAdminChat(){if(!state.isOwner&&!state.isAssistant)return; showScreen('screen-admin-chat'); const status=document.getElementById('admin-chat-status'); document.getElementById('admin-chat-log').innerHTML=''; if(!fbReady){status.textContent=fbUnavailableMessage(); return;} status.textContent=''; if(adminChatListener)adminChatMessagesRef().off('child_added',adminChatListener); adminChatListener=adminChatMessagesRef().limitToLast(50).on('child_added',snap=>addAdminChatLine(snap.val()));}
+function closeAdminChat(){if(adminChatListener){adminChatMessagesRef().off('child_added',adminChatListener); adminChatListener=null;} showScreen('screen-home');}
+function addAdminChatLine(m){if(!m)return; const log=document.getElementById('admin-chat-log'); const div=document.createElement('div'); div.className='global-msg'; const text=document.createElement('div'); text.textContent=(m.fromOwner?'👑 ':'🛠 ')+(m.text||''); const meta=document.createElement('div'); meta.className='meta'; meta.textContent='— '+(m.from||'Staff'); div.appendChild(text); div.appendChild(meta); log.appendChild(div); log.scrollTop=log.scrollHeight;}
+function sendAdminChatMessage(){if((!state.isOwner&&!state.isAssistant)||!fbReady)return; const input=document.getElementById('admin-chat-input'); const text=input.value.trim(); if(!text)return; adminChatMessagesRef().push({text,from:state.username,fromOwner:!!state.isOwner,ts:firebase.database.ServerValue.TIMESTAMP}); input.value='';}
+
+let feedbackListener=null;
+function feedbackRef(){return fbDb.ref('feedback');}
+function openFeedback(){if(!state.isOwner&&!state.isAssistant)return; showScreen('screen-feedback'); const status=document.getElementById('feedback-status'); document.getElementById('feedback-log').innerHTML=''; if(!fbReady){status.textContent=fbUnavailableMessage(); return;} status.textContent=''; if(feedbackListener)feedbackRef().off('child_added',feedbackListener); feedbackListener=feedbackRef().limitToLast(50).on('child_added',snap=>addFeedbackLine(snap.val()));}
+function closeFeedback(){if(feedbackListener){feedbackRef().off('child_added',feedbackListener); feedbackListener=null;} showScreen('screen-home');}
+function addFeedbackLine(f){if(!f)return; const log=document.getElementById('feedback-log'); const div=document.createElement('div'); div.className='global-msg'; const text=document.createElement('div'); text.textContent=(f.type==='bug'?'🐛 ':'💡 ')+(f.text||''); const meta=document.createElement('div'); meta.className='meta'; meta.textContent='— '+(f.from||'Staff'); div.appendChild(text); div.appendChild(meta); log.appendChild(div); log.scrollTop=log.scrollHeight;}
+function submitFeedback(){if((!state.isOwner&&!state.isAssistant)||!fbReady)return; const type=document.getElementById('feedback-type').value; const input=document.getElementById('feedback-text'); const text=input.value.trim(); if(!text)return; feedbackRef().push({type,text,from:state.username,ts:firebase.database.ServerValue.TIMESTAMP}); input.value='';}
 
 let globalChatListener=null;
 function globalMessagesRef(){return fbDb.ref('global/messages');}
