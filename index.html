@@ -86,6 +86,13 @@
   .diff-medium{ background:linear-gradient(135deg,#fb8500,#ffb703); color:#3a2900; }
   .diff-hard{ background:linear-gradient(135deg,#e63946,#a4133c); }
 
+  .color-toggle-row{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin:14px 0 20px; }
+  .color-opt{ display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:12px; border:2px solid #ccc;
+    background:white; cursor:pointer; font-weight:bold; color:#333; }
+  .color-opt .swatch{ width:16px; height:16px; border-radius:50%; border:1px solid rgba(0,0,0,0.25); display:inline-block; }
+  .color-opt.selected{ background:var(--blue); color:white; border-color:var(--blue); }
+  .color-opt.selected .swatch{ border-color:rgba(255,255,255,0.6); }
+
   .progress-text{ text-align:center; font-weight:bold; color:#333; margin-bottom:6px; }
   #flag-timer, #geo-timer, #flag-race-timer{ text-align:center; font-size:1.6em; font-weight:bold; margin:6px 0 16px; color:var(--red); }
   .score-box{ flex:1; text-align:center; background:#f0f0f0; border-radius:10px; padding:8px 10px; }
@@ -183,6 +190,7 @@
         <h2 style="text-align:center;" data-i18n="choose_game">Choose a Game</h2>
         <button class="btn btn-green" onclick="goFlagMode()" data-i18n="game_flag">🚩 Guess The Flag</button>
         <button class="btn btn-blue" onclick="goGeoMode()" data-i18n="game_geo">🌍 Ask The Geography Questions</button>
+        <button class="btn btn-yellow" onclick="goColorMode()" data-i18n="game_colors">🎨 Guess The Flag Colors</button>
       </div>
     </section>
 
@@ -310,6 +318,54 @@
         <div class="btn-row">
           <button class="btn btn-blue" onclick="leaveFlagRoomToHome()" data-i18n="btn_home">Home</button>
           <button class="btn btn-green" onclick="showScreen('screen-flag-online-setup')" data-i18n="new_room">New Room</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- COLOR DIFFICULTY -->
+    <section id="screen-color-diff" class="screen">
+      <a class="back-link" onclick="showScreen('screen-play')" data-i18n="back">← Back</a>
+      <div class="card-box">
+        <h2 style="text-align:center;" data-i18n="colors_mode_title">🎨 Guess The Flag Colors</h2>
+        <p class="subtitle" data-i18n="colors_mode_sub">Look at each flag and select every color you see in it. Nothing is revealed until the end — then your accuracy over 10 flags decides your coins.</p>
+        <div class="diff-card diff-easy" onclick="startColorGame('easy')">
+          <h3 data-i18n="easy">Easy</h3>
+          <p data-i18n="colors_easy_desc">Well-known flags</p>
+          <p data-i18n="colors_reward_note">Reward: 1-3 coins based on your accuracy over all 10</p>
+        </div>
+        <div class="diff-card diff-medium" onclick="startColorGame('medium')">
+          <h3 data-i18n="medium">Medium</h3>
+          <p data-i18n="colors_medium_desc">Moderately known flags</p>
+          <p data-i18n="colors_reward_note">Reward: 1-3 coins based on your accuracy over all 10</p>
+        </div>
+        <div class="diff-card diff-hard" onclick="startColorGame('hard')">
+          <h3 data-i18n="hard">Hard</h3>
+          <p data-i18n="colors_hard_desc">Tricky, lesser-known flags</p>
+          <p data-i18n="colors_reward_note">Reward: 1-3 coins based on your accuracy over all 10</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- COLOR GAME -->
+    <section id="screen-color-game" class="screen">
+      <div class="card-box">
+        <div class="progress-text" id="color-progress">Flag 1 / 10</div>
+        <div class="flag-wrap"><img id="color-img" class="flag-big" src="" alt="flag" decoding="async" fetchpriority="high"></div>
+        <label data-i18n="choose_colors_label">Which colors are in this flag?</label>
+        <div class="color-toggle-row" id="color-options"></div>
+        <button class="btn btn-red" onclick="submitColorAnswer()" data-i18n="btn_submit">Submit</button>
+      </div>
+    </section>
+
+    <!-- COLOR RESULT -->
+    <section id="screen-color-result" class="screen">
+      <div class="card-box">
+        <div class="result-emoji" id="color-result-emoji">🎨</div>
+        <div class="result-msg" id="color-result-msg"></div>
+        <div class="result-sub" id="color-result-sub"></div>
+        <div class="btn-row">
+          <button class="btn btn-blue" onclick="showScreen('screen-home')" data-i18n="btn_home">Home</button>
+          <button class="btn btn-green" onclick="restartColorGame()" data-i18n="btn_restart">Restart</button>
         </div>
       </div>
     </section>
@@ -790,7 +846,15 @@ en:{
   btn_ranking:"🏆 Global Ranking", ranking_title:"🏆 Global Ranking",
   ranking_sub:"Every coin you've ever earned counts as a permanent point — spending coins in the Store never loses you rank.",
   no_ranking:"No players yet.", points_label:"pts",
-  err_signin_ranking:"Please sign in first to view the Global Ranking."
+  err_signin_ranking:"Please sign in first to view the Global Ranking.",
+  game_colors:"🎨 Guess The Flag Colors", colors_mode_title:"🎨 Guess The Flag Colors",
+  colors_mode_sub:"Look at each flag and select every color you see in it. Nothing is revealed until the end — then your accuracy over 10 flags decides your coins.",
+  colors_easy_desc:"Well-known flags", colors_medium_desc:"Moderately known flags", colors_hard_desc:"Tricky, lesser-known flags",
+  colors_reward_note:"Reward: 1-3 coins based on your accuracy over all 10",
+  choose_colors_label:"Which colors are in this flag?",
+  accuracy_label:"Accuracy: {p}%", no_coins_msg:"Keep practicing — no coins this round.",
+  color_red:"Red", color_blue:"Blue", color_green:"Green", color_yellow:"Yellow",
+  color_white:"White", color_black:"Black", color_orange:"Orange", color_purple:"Purple"
 },
 fr:{
   doc_title:"Devine Le Drapeau", logo:"🏁 DEVINE LE DRAPEAU", app_title:"Devine Le Drapeau",
@@ -937,7 +1001,15 @@ fr:{
   btn_ranking:"🏆 Classement Mondial", ranking_title:"🏆 Classement Mondial",
   ranking_sub:"Chaque pièce jamais gagnée compte comme un point permanent — dépenser des pièces dans la Boutique ne te fait jamais perdre de rang.",
   no_ranking:"Aucun joueur pour l'instant.", points_label:"pts",
-  err_signin_ranking:"Connecte-toi d'abord pour voir le Classement Mondial."
+  err_signin_ranking:"Connecte-toi d'abord pour voir le Classement Mondial.",
+  game_colors:"🎨 Devine les Couleurs du Drapeau", colors_mode_title:"🎨 Devine les Couleurs du Drapeau",
+  colors_mode_sub:"Regarde chaque drapeau et sélectionne toutes les couleurs que tu y vois. Rien n'est révélé avant la fin — ta précision sur 10 drapeaux détermine ensuite tes pièces.",
+  colors_easy_desc:"Drapeaux bien connus", colors_medium_desc:"Drapeaux moyennement connus", colors_hard_desc:"Drapeaux difficiles et peu connus",
+  colors_reward_note:"Récompense : 1 à 3 pièces selon ta précision sur les 10",
+  choose_colors_label:"Quelles couleurs sont dans ce drapeau ?",
+  accuracy_label:"Précision : {p} %", no_coins_msg:"Continue à t'entraîner — aucune pièce cette manche.",
+  color_red:"Rouge", color_blue:"Bleu", color_green:"Vert", color_yellow:"Jaune",
+  color_white:"Blanc", color_black:"Noir", color_orange:"Orange", color_purple:"Violet"
 }};
 
 function tr(key,vars){
@@ -1210,6 +1282,25 @@ function useFlagTimeHint(){if(!flagState)return; if(state.hints.flagTime<=0){doc
 
 const GEO_POOLS={easy:[{name:'United States',continent:'North America',hemisphere:'N',landlocked:false,island:false,popMillions:335,areaCategory:'large',colors:['red','white','blue'],capital:'Washington',borders:2,language:'English',climate:'temperate',aliases:['usa','us','america']},{name:'France',continent:'Europe',hemisphere:'N',landlocked:false,island:false,popMillions:68,areaCategory:'medium',colors:['blue','white','red'],capital:'Paris',borders:8,language:'French',climate:'temperate',aliases:[]},{name:'Japan',continent:'Asia',hemisphere:'N',landlocked:false,island:true,popMillions:124,areaCategory:'medium',colors:['red','white'],capital:'Tokyo',borders:0,language:'Japanese',climate:'temperate',aliases:[]},{name:'Brazil',continent:'South America',hemisphere:'S',landlocked:false,island:false,popMillions:216,areaCategory:'large',colors:['green','yellow','blue','white'],capital:'Brasilia',borders:10,language:'Portuguese',climate:'hot',aliases:[]},{name:'Australia',continent:'Oceania',hemisphere:'S',landlocked:false,island:true,popMillions:26,areaCategory:'large',colors:['blue','white','red'],capital:'Canberra',borders:0,language:'English',climate:'hot',aliases:[]},{name:'Egypt',continent:'Africa',hemisphere:'N',landlocked:false,island:false,popMillions:112,areaCategory:'medium',colors:['red','white','black'],capital:'Cairo',borders:4,language:'Arabic',climate:'hot',aliases:[]},{name:'Canada',continent:'North America',hemisphere:'N',landlocked:false,island:false,popMillions:39,areaCategory:'large',colors:['red','white'],capital:'Ottawa',borders:1,language:'English',climate:'cold',aliases:[]},{name:'China',continent:'Asia',hemisphere:'N',landlocked:false,island:false,popMillions:1412,areaCategory:'large',colors:['red','yellow'],capital:'Beijing',borders:14,language:'Chinese',climate:'temperate',aliases:[]},{name:'India',continent:'Asia',hemisphere:'N',landlocked:false,island:false,popMillions:1428,areaCategory:'large',colors:['orange','white','green'],capital:'New Delhi',borders:6,language:'Hindi',climate:'hot',aliases:[]},{name:'Germany',continent:'Europe',hemisphere:'N',landlocked:false,island:false,popMillions:84,areaCategory:'medium',colors:['black','red','yellow'],capital:'Berlin',borders:9,language:'German',climate:'temperate',aliases:[]},{name:'Mexico',continent:'North America',hemisphere:'N',landlocked:false,island:false,popMillions:128,areaCategory:'large',colors:['green','white','red'],capital:'Mexico City',borders:3,language:'Spanish',climate:'hot',aliases:[]},{name:'United Kingdom',continent:'Europe',hemisphere:'N',landlocked:false,island:true,popMillions:68,areaCategory:'medium',colors:['red','white','blue'],capital:'London',borders:1,language:'English',climate:'temperate',aliases:['uk','britain']}],medium:[{name:'Argentina',continent:'South America',hemisphere:'S',landlocked:false,island:false,popMillions:46,areaCategory:'large',colors:['blue','white','yellow'],capital:'Buenos Aires',borders:5,language:'Spanish',climate:'temperate',aliases:[]},{name:'South Africa',continent:'Africa',hemisphere:'S',landlocked:false,island:false,popMillions:60,areaCategory:'medium',colors:['red','white','blue','green','black','yellow'],capital:'Pretoria',borders:6,language:'English',climate:'temperate',aliases:[]},{name:'Sweden',continent:'Europe',hemisphere:'N',landlocked:false,island:false,popMillions:10,areaCategory:'medium',colors:['blue','yellow'],capital:'Stockholm',borders:2,language:'Swedish',climate:'cold',aliases:[]},{name:'Turkey',continent:'Asia',hemisphere:'N',landlocked:false,island:false,popMillions:85,areaCategory:'medium',colors:['red','white'],capital:'Ankara',borders:8,language:'Turkish',climate:'temperate',aliases:['turkiye']},{name:'Netherlands',continent:'Europe',hemisphere:'N',landlocked:false,island:false,popMillions:17,areaCategory:'small',colors:['red','white','blue'],capital:'Amsterdam',borders:2,language:'Dutch',climate:'temperate',aliases:['holland']},{name:'Thailand',continent:'Asia',hemisphere:'N',landlocked:false,island:false,popMillions:71,areaCategory:'medium',colors:['red','white','blue'],capital:'Bangkok',borders:4,language:'Thai',climate:'hot',aliases:[]},{name:'Poland',continent:'Europe',hemisphere:'N',landlocked:false,island:false,popMillions:37,areaCategory:'medium',colors:['white','red'],capital:'Warsaw',borders:7,language:'Polish',climate:'cold',aliases:[]},{name:'Greece',continent:'Europe',hemisphere:'N',landlocked:false,island:false,popMillions:10,areaCategory:'small',colors:['blue','white'],capital:'Athens',borders:4,language:'Greek',climate:'temperate',aliases:[]},{name:'Nigeria',continent:'Africa',hemisphere:'N',landlocked:false,island:false,popMillions:223,areaCategory:'medium',colors:['green','white'],capital:'Abuja',borders:4,language:'English',climate:'hot',aliases:[]},{name:'Vietnam',continent:'Asia',hemisphere:'N',landlocked:false,island:false,popMillions:98,areaCategory:'medium',colors:['red','yellow'],capital:'Hanoi',borders:3,language:'Vietnamese',climate:'hot',aliases:[]},{name:'Chile',continent:'South America',hemisphere:'S',landlocked:false,island:false,popMillions:19,areaCategory:'medium',colors:['red','white','blue'],capital:'Santiago',borders:3,language:'Spanish',climate:'temperate',aliases:[]},{name:'Norway',continent:'Europe',hemisphere:'N',landlocked:false,island:false,popMillions:5,areaCategory:'medium',colors:['red','white','blue'],capital:'Oslo',borders:3,language:'Norwegian',climate:'cold',aliases:[]}],hard:[{name:'Nepal',continent:'Asia',hemisphere:'N',landlocked:true,island:false,popMillions:30,areaCategory:'small',colors:['red','blue'],capital:'Kathmandu',borders:2,language:'Nepali',climate:'cold',aliases:[]},{name:'Bhutan',continent:'Asia',hemisphere:'N',landlocked:true,island:false,popMillions:0.8,areaCategory:'small',colors:['yellow','orange'],capital:'Thimphu',borders:2,language:'Dzongkha',climate:'cold',aliases:[]},{name:'Mongolia',continent:'Asia',hemisphere:'N',landlocked:true,island:false,popMillions:3.3,areaCategory:'medium',colors:['red','blue','yellow'],capital:'Ulaanbaatar',borders:2,language:'Mongolian',climate:'cold',aliases:[]},{name:'Kazakhstan',continent:'Asia',hemisphere:'N',landlocked:true,island:false,popMillions:19,areaCategory:'large',colors:['blue','yellow'],capital:'Astana',borders:5,language:'Kazakh',climate:'cold',aliases:[]},{name:'Paraguay',continent:'South America',hemisphere:'S',landlocked:true,island:false,popMillions:6.8,areaCategory:'medium',colors:['red','white','blue'],capital:'Asuncion',borders:2,language:'Spanish',climate:'hot',aliases:[]},{name:'Uruguay',continent:'South America',hemisphere:'S',landlocked:false,island:false,popMillions:3.4,areaCategory:'small',colors:['blue','white','yellow'],capital:'Montevideo',borders:2,language:'Spanish',climate:'temperate',aliases:[]},{name:'Laos',continent:'Asia',hemisphere:'N',landlocked:true,island:false,popMillions:7.5,areaCategory:'small',colors:['red','blue','white'],capital:'Vientiane',borders:5,language:'Lao',climate:'hot',aliases:[]},{name:'Jordan',continent:'Asia',hemisphere:'N',landlocked:false,island:false,popMillions:11,areaCategory:'small',colors:['red','white','black','green'],capital:'Amman',borders:4,language:'Arabic',climate:'hot',aliases:[]},{name:'Tunisia',continent:'Africa',hemisphere:'N',landlocked:false,island:false,popMillions:12,areaCategory:'small',colors:['red','white'],capital:'Tunis',borders:2,language:'Arabic',climate:'hot',aliases:[]},{name:'Kyrgyzstan',continent:'Asia',hemisphere:'N',landlocked:true,island:false,popMillions:6.7,areaCategory:'small',colors:['red','yellow'],capital:'Bishkek',borders:4,language:'Kyrgyz',climate:'cold',aliases:[]},{name:'Namibia',continent:'Africa',hemisphere:'S',landlocked:false,island:false,popMillions:2.6,areaCategory:'medium',colors:['blue','red','green','white','yellow'],capital:'Windhoek',borders:4,language:'English',climate:'hot',aliases:[]},{name:'Madagascar',continent:'Africa',hemisphere:'S',landlocked:false,island:true,popMillions:30,areaCategory:'medium',colors:['red','white','green'],capital:'Antananarivo',borders:0,language:'Malagasy',climate:'hot',aliases:[]}]};
 const GEO_DIFF={easy:{reward:1},medium:{reward:2},hard:{reward:4}}; const GEO_TIME_LIMIT=600;
+
+/* -------- GUESS THE FLAG COLORS --------
+   Reuses GEO_POOLS' curated `colors` arrays (rather than re-typing color data
+   for all 195 flags) and looks each country's flagcdn code up from
+   FLAG_POOLS by name, so this game shares data with the other two instead
+   of duplicating it. No feedback is shown per round — right or wrong only
+   surfaces as the final accuracy percentage, which sets the coin reward. */
+const FLAG_CODE_BY_NAME={}; [...FLAG_POOLS.easy,...FLAG_POOLS.medium,...FLAG_POOLS.hard].forEach(c=>{FLAG_CODE_BY_NAME[c.name]=c.code;});
+const COLOR_POOLS={}; ['easy','medium','hard'].forEach(diff=>{COLOR_POOLS[diff]=GEO_POOLS[diff].map(c=>({name:c.name,code:FLAG_CODE_BY_NAME[c.name],colors:c.colors})).filter(c=>c.code);});
+const COLOR_OPTIONS=['red','blue','green','yellow','white','black','orange','purple'];
+let colorState=null;
+function goColorMode(){showScreen('screen-color-diff');}
+function startColorGame(diff){colorState={diff, list:shuffle(COLOR_POOLS[diff]).slice(0,10), index:0, correctCount:0, selected:new Set()}; preloadFlagImages(colorState.list); showScreen('screen-color-game'); renderColorRound();}
+function restartColorGame(){startColorGame(colorState.diff);}
+function renderColorRound(){const c=colorState.list[colorState.index]; colorState.selected=new Set(); document.getElementById('color-progress').textContent=tr('flag_progress',{n:colorState.index+1}); const imgEl=document.getElementById('color-img'); imgEl.onerror=function(){imgEl.onerror=null; imgEl.src=flagUrl(c.code,'png');}; imgEl.src=flagUrl(c.code); renderColorOptions();}
+function renderColorOptions(){const container=document.getElementById('color-options'); container.innerHTML=''; COLOR_OPTIONS.forEach(col=>{const btn=document.createElement('button'); btn.type='button'; btn.className='color-opt'+(colorState.selected.has(col)?' selected':''); const swatch=document.createElement('span'); swatch.className='swatch'; swatch.style.background=col; const lbl=document.createElement('span'); lbl.textContent=tr('color_'+col); btn.appendChild(swatch); btn.appendChild(lbl); btn.onclick=()=>toggleColorOption(col); container.appendChild(btn);});}
+function toggleColorOption(col){if(colorState.selected.has(col))colorState.selected.delete(col); else colorState.selected.add(col); renderColorOptions();}
+function submitColorAnswer(){if(!colorState)return; const c=colorState.list[colorState.index]; const actual=new Set(c.colors); const sel=colorState.selected; const exact=sel.size===actual.size&&[...sel].every(x=>actual.has(x)); if(exact)colorState.correctCount++; colorState.index++; if(colorState.index>=10){endColorGame();}else{renderColorRound();}}
+function endColorGame(){const pct=Math.round((colorState.correctCount/10)*100); let reward=0; if(pct>=70)reward=3; else if(pct>=50)reward=2; else if(pct>=30)reward=1; if(reward>0)addCoins(reward); document.getElementById('color-result-msg').textContent=tr('accuracy_label',{p:pct}); document.getElementById('color-result-sub').textContent=reward>0?tr('earned_coins',{n:reward,s:plural(reward)}):tr('no_coins_msg'); showScreen('screen-color-result');}
 /* Capitals whose French name differs from the English one (only these need a
    mapping; the rest are spelled identically in both languages). */
 const CAPITAL_FR={"Cairo":"Le Caire","Beijing":"Pékin","London":"Londres","Warsaw":"Varsovie","Athens":"Athènes","Mexico City":"Mexico","Hanoi":"Hanoï","Kathmandu":"Katmandou","Ulaanbaatar":"Oulan-Bator","Asuncion":"Asunción","Brasilia":"Brasília","Moscow":"Moscou","Lisbon":"Lisbonne","Vienna":"Vienne","Copenhagen":"Copenhague","Bucharest":"Bucarest","Algiers":"Alger"};

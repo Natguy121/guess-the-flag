@@ -93,6 +93,30 @@ rooms over time. For casual use this is harmless (rooms are tiny), but you
 can periodically clear them from the Firebase console, or add a scheduled
 Cloud Function if you want automatic cleanup.
 
+## Guess The Flag Colors
+
+The third solo game mode (Home → Play → 🎨 Guess The Flag Colors): for each
+of 10 flags, pick every color you see in it from an 8-swatch palette (red,
+blue, green, yellow, white, black, orange, purple), then Submit. Nothing is
+revealed as you go — no right/wrong feedback per flag — only your final
+**accuracy** over all 10 rounds, shown as a percentage, and that accuracy
+sets your coin reward:
+
+| Accuracy    | Reward   |
+|-------------|----------|
+| Below 30%   | 0 coins  |
+| 30% – 49%   | 1 coin   |
+| 50% – 69%   | 2 coins  |
+| 70% – 100%  | 3 coins  |
+
+A round only counts as correct if your selected colors are an *exact* match
+for the flag's actual colors (no missing colors, no extra ones).
+
+`COLOR_POOLS` (in `index.html`) doesn't duplicate flag-color data: it's
+built at load time from `GEO_POOLS`' existing `colors` arrays, matched up
+with each country's flagcdn code from `FLAG_POOLS` by name — so all three
+games share the same underlying data instead of maintaining it three times.
+
 ## Global Ranking
 
 **🏆 Global Ranking** on the Home screen (any signed-in player can open it,
