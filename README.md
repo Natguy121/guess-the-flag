@@ -98,11 +98,18 @@ Cloud Function if you want automatic cleanup.
 The third solo game mode (Home → Play → 🎨 Guess The Flag Colors): for each
 of 10 rounds you're shown the country's name, its flag image, and that
 flag's colors laid out as a palette below it — except one swatch is blanked
-out (a dashed "?" tile). Pick the missing color from the 8-swatch option row
-(red, blue, green, yellow, white, black, orange, purple) and Submit. Nothing
-is confirmed as you go — no right/wrong feedback per round — only your
-final **accuracy** over all 10 rounds, shown as a percentage, and that
-accuracy sets your coin reward:
+out (a dashed "?" tile). Instead of picking from a fixed set of swatches,
+you mix the missing color yourself in a native color-picker (`<input
+type="color">`, so you get the full spectrum, not 8 presets) from memory,
+then Submit.
+
+There's no right/wrong per round — each guess is scored by **closeness**,
+not an exact match: `colorCloseness()` compares the RGB you picked against
+the canonical RGB for the actual missing color (Euclidean distance in RGB
+space, normalized to 0–1) as a percentage, so picking a near-miss shade
+still earns partial credit instead of nothing. Nothing is shown as you go;
+only your **average closeness across all 10 rounds**, shown as a percentage
+at the end, and that's what sets your coin reward:
 
 | Accuracy    | Reward   |
 |-------------|----------|
@@ -114,8 +121,11 @@ accuracy sets your coin reward:
 `COLOR_POOLS` (in `index.html`) doesn't duplicate flag-color data: it's
 built at load time from `GEO_POOLS`' existing `colors` arrays, matched up
 with each country's flagcdn code from `FLAG_POOLS` by name — so all three
-games share the same underlying data instead of
-maintaining it three times.
+games share the same underlying data instead of maintaining it three times.
+`COLOR_RGB` maps each of the 8 named colors to the same RGB values CSS
+itself resolves those keywords to, so the "known" palette swatches (which
+still use CSS color names for their backgrounds) and the closeness scoring
+are always measuring against the same reference.
 
 ## Global Ranking
 
