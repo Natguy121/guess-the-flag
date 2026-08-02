@@ -93,6 +93,31 @@ rooms over time. For casual use this is harmless (rooms are tiny), but you
 can periodically clear them from the Firebase console, or add a scheduled
 Cloud Function if you want automatic cleanup.
 
+## Global Ranking
+
+**🏆 Global Ranking** on the Home screen (any signed-in player can open it,
+same sign-in gate as Global Chat) is a leaderboard sorted by lifetime points,
+read from the same `users/` node the Owner Panel uses.
+
+Points work differently from coins on purpose: **every coin a player has
+ever earned adds a point, permanently.** Spending coins in the Store never
+removes points, and points can't go down — not from spending, not from an
+Owner taking coins away in the Owner Panel, not even from a stale/late
+Firebase update (`subscribeToMyUserRecord()` takes `Math.max()` of the local
+and remote point totals rather than overwriting, specifically so a race
+between two updates can only ever raise a player's total). The only way
+points go up is `addCoins()` (winning a game) or an Owner *adding* coins to
+someone in the Owner Panel — Owner grants count toward rank too, but Owner
+deductions never subtract from it.
+
+Existing players who signed in before this feature shipped have their point
+total seeded from whatever coins they already had, the first time
+`loadState()` runs after the update, so nobody starts at zero.
+
+The Owner Panel also shows each player's points as a 🏆 chip alongside their
+coins and hints — unlike those, it has no +/− buttons, because points aren't
+meant to be directly editable by anyone, Owner included.
+
 ## Owner mode, Assistant mode & Global Chat
 
 Signing in unlocks two staff roles, based on the 4-character password used

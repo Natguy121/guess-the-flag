@@ -167,6 +167,7 @@
         <button class="btn btn-red" onclick="goPlay()" data-i18n="btn_play">▶ Play</button>
         <button class="btn btn-yellow" onclick="showScreen('screen-store')" data-i18n="btn_store">🛒 Store</button>
         <button class="btn btn-green" onclick="openGlobalChat()" data-i18n="btn_global_chat">📢 Global Chat</button>
+        <button class="btn btn-yellow" onclick="openRanking()" data-i18n="btn_ranking">🏆 Global Ranking</button>
         <button class="btn btn-blue" id="signin-home-btn" onclick="showScreen('screen-signin')">👤 Sign In</button>
         <button class="btn btn-gray" id="owner-panel-home-btn" style="display:none;" onclick="openOwnerPanel()" data-i18n="btn_owner_panel">🛡 Owner Panel</button>
         <button class="btn btn-gray" id="feedback-home-btn" style="display:none;" onclick="openFeedback()" data-i18n="btn_feedback">🐞 Features &amp; Bugs</button>
@@ -547,6 +548,17 @@
       </div>
     </section>
 
+    <!-- GLOBAL RANKING (any signed-in player, read-only) -->
+    <section id="screen-ranking" class="screen">
+      <a class="back-link" onclick="closeRanking()" data-i18n="back_home">← Home</a>
+      <div class="card-box">
+        <h2 style="text-align:center;" data-i18n="ranking_title">🏆 Global Ranking</h2>
+        <p class="subtitle" data-i18n="ranking_sub">Every coin you've ever earned counts as a permanent point — spending coins in the Store never loses you rank.</p>
+        <p class="fb-status" id="ranking-status"></p>
+        <div id="ranking-list"></div>
+      </div>
+    </section>
+
     <!-- ADMIN CHAT (owner + assistants only) -->
     <section id="screen-admin-chat" class="screen">
       <a class="back-link" onclick="closeAdminChat()" data-i18n="back_home">← Home</a>
@@ -774,7 +786,11 @@ en:{
   kicked_msg:"A staff member closed this room.",
   spec_ev_join:"A friend joined the room.", spec_ev_start:"The game started.",
   spec_ev_guess:"Guess: {g}", spec_ev_correct:"Correct: {name}",
-  spec_ev_flag_start:"Flag race started.", spec_ev_flag_over:"Flag race finished."
+  spec_ev_flag_start:"Flag race started.", spec_ev_flag_over:"Flag race finished.",
+  btn_ranking:"🏆 Global Ranking", ranking_title:"🏆 Global Ranking",
+  ranking_sub:"Every coin you've ever earned counts as a permanent point — spending coins in the Store never loses you rank.",
+  no_ranking:"No players yet.", points_label:"pts",
+  err_signin_ranking:"Please sign in first to view the Global Ranking."
 },
 fr:{
   doc_title:"Devine Le Drapeau", logo:"🏁 DEVINE LE DRAPEAU", app_title:"Devine Le Drapeau",
@@ -917,7 +933,11 @@ fr:{
   kicked_msg:"Un membre du staff a fermé ce salon.",
   spec_ev_join:"Un ami a rejoint le salon.", spec_ev_start:"La partie a commencé.",
   spec_ev_guess:"Réponse : {g}", spec_ev_correct:"Correct : {name}",
-  spec_ev_flag_start:"La course de drapeaux a commencé.", spec_ev_flag_over:"La course de drapeaux est terminée."
+  spec_ev_flag_start:"La course de drapeaux a commencé.", spec_ev_flag_over:"La course de drapeaux est terminée.",
+  btn_ranking:"🏆 Classement Mondial", ranking_title:"🏆 Classement Mondial",
+  ranking_sub:"Chaque pièce jamais gagnée compte comme un point permanent — dépenser des pièces dans la Boutique ne te fait jamais perdre de rang.",
+  no_ranking:"Aucun joueur pour l'instant.", points_label:"pts",
+  err_signin_ranking:"Connecte-toi d'abord pour voir le Classement Mondial."
 }};
 
 function tr(key,vars){
@@ -1154,10 +1174,10 @@ function setLanguage(lang){if(LANGS.indexOf(lang)===-1)return; state.lang=lang; 
 function toggleLanguage(){setLanguage(state.lang==='fr'?'en':'fr');}
 
 /* -------- STATE -------- */
-const state = {lang:'en', coins:0, loggedIn:false, username:'', isOwner:false, isAssistant:false, hints:{flagLetter:0, flagTime:0, geoContinent:0, geoLetter:0}};
-function saveState(){localStorage.setItem('ftg_coins',String(state.coins)); localStorage.setItem('ftg_hints',JSON.stringify(state.hints)); syncUserToFirebase();}
-function loadState(){state.lang=localStorage.getItem('ftg_lang')||'en'; if(LANGS.indexOf(state.lang)===-1)state.lang='en'; state.coins=parseInt(localStorage.getItem('ftg_coins')||'0',10)||0; const h=localStorage.getItem('ftg_hints'); if(h){try{state.hints=JSON.parse(h);}catch(e){}}const acc=localStorage.getItem('ftg_account'); if(acc){try{const a=JSON.parse(acc); if(a&&a.username){state.loggedIn=true; state.username=a.username;}}catch(e){}}state.isOwner=state.loggedIn&&localStorage.getItem('ftg_owner')==='1'; state.isAssistant=state.loggedIn&&localStorage.getItem('ftg_assistant')==='1';}
-function addCoins(n){state.coins+=n; saveState(); renderCoins();}
+const state = {lang:'en', coins:0, points:0, loggedIn:false, username:'', isOwner:false, isAssistant:false, hints:{flagLetter:0, flagTime:0, geoContinent:0, geoLetter:0}};
+function saveState(){localStorage.setItem('ftg_coins',String(state.coins)); localStorage.setItem('ftg_points',String(state.points)); localStorage.setItem('ftg_hints',JSON.stringify(state.hints)); syncUserToFirebase();}
+function loadState(){state.lang=localStorage.getItem('ftg_lang')||'en'; if(LANGS.indexOf(state.lang)===-1)state.lang='en'; state.coins=parseInt(localStorage.getItem('ftg_coins')||'0',10)||0; const storedPoints=localStorage.getItem('ftg_points'); state.points=storedPoints!==null?(parseInt(storedPoints,10)||0):state.coins; const h=localStorage.getItem('ftg_hints'); if(h){try{state.hints=JSON.parse(h);}catch(e){}}const acc=localStorage.getItem('ftg_account'); if(acc){try{const a=JSON.parse(acc); if(a&&a.username){state.loggedIn=true; state.username=a.username;}}catch(e){}}state.isOwner=state.loggedIn&&localStorage.getItem('ftg_owner')==='1'; state.isAssistant=state.loggedIn&&localStorage.getItem('ftg_assistant')==='1';}
+function addCoins(n){state.coins+=n; state.points+=n; saveState(); renderCoins();}
 function renderCoins(){document.getElementById('coin-count').textContent=state.coins; document.getElementById('store-owned-flagLetter').textContent=state.hints.flagLetter; document.getElementById('store-owned-flagTime').textContent=state.hints.flagTime; document.getElementById('store-owned-geoContinent').textContent=state.hints.geoContinent; document.getElementById('store-owned-geoLetter').textContent=state.hints.geoLetter; document.getElementById('flag-letter-hint-count').textContent=state.hints.flagLetter; document.getElementById('flag-time-hint-count').textContent=state.hints.flagTime; document.getElementById('geo-continent-hint-count').textContent=state.hints.geoContinent; document.getElementById('geo-letter-hint-count').textContent=state.hints.geoLetter; renderSignInStatus();}
 function renderSignInStatus(){const welcome=document.getElementById('home-welcome'); const form=document.getElementById('signin-form'); const acct=document.getElementById('signin-account'); const homeBtn=document.getElementById('signin-home-btn'); const ownerBadge=document.getElementById('signed-in-owner-badge'); const assistantBadge=document.getElementById('signed-in-assistant-badge'); const ownerPanelBtn=document.getElementById('owner-panel-home-btn'); const feedbackBtn=document.getElementById('feedback-home-btn'); const adminChatBtn=document.getElementById('admin-chat-home-btn'); const serversBtn=document.getElementById('servers-home-btn'); const isStaff=state.isOwner||state.isAssistant; if(state.loggedIn){welcome.textContent=tr('welcome_back',{name:state.username}); form.style.display='none'; acct.style.display='block'; document.getElementById('signed-in-username').textContent=state.username; homeBtn.textContent=(state.isOwner?'👑 ':state.isAssistant?'🛠 ':'👤 ')+state.username;}else{welcome.textContent=tr('home_welcome'); form.style.display='block'; acct.style.display='none'; homeBtn.textContent=tr('btn_signin');}if(ownerBadge)ownerBadge.style.display=state.isOwner?'inline-block':'none'; if(assistantBadge)assistantBadge.style.display=(state.isAssistant&&!state.isOwner)?'inline-block':'none'; if(ownerPanelBtn)ownerPanelBtn.style.display=isStaff?'block':'none'; if(feedbackBtn)feedbackBtn.style.display=isStaff?'block':'none'; if(adminChatBtn)adminChatBtn.style.display=isStaff?'block':'none'; if(serversBtn)serversBtn.style.display=isStaff?'block':'none'; const note=document.getElementById('geo-online-note'); if(note){note.textContent=state.loggedIn?'':tr('note_signin_online');}const flagNote=document.getElementById('flag-online-note'); if(flagNote){flagNote.textContent=state.loggedIn?'':tr('note_signin_race');}}
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); window.scrollTo(0,0);}
@@ -1400,18 +1420,18 @@ const ASSISTANT_PASSWORD = 'ANAZ';
 function fbKey(s){return String(s).replace(/[.#$\[\]\/]/g,'_');}
 function usersRef(){return fbDb.ref('users');}
 function myUserRef(){return fbDb.ref('users/'+fbKey(state.username));}
-function syncUserToFirebase(){if(!fbReady||!fbDb||!state.loggedIn||!state.username)return; myUserRef().set({coins:state.coins,hints:state.hints,isOwner:!!state.isOwner,isAssistant:!!state.isAssistant,lastSeen:firebase.database.ServerValue.TIMESTAMP});}
+function syncUserToFirebase(){if(!fbReady||!fbDb||!state.loggedIn||!state.username)return; myUserRef().set({coins:state.coins,points:state.points,hints:state.hints,isOwner:!!state.isOwner,isAssistant:!!state.isAssistant,lastSeen:firebase.database.ServerValue.TIMESTAMP});}
 let myUserListener=null;
-function subscribeToMyUserRecord(){if(!fbReady||!fbDb||!state.loggedIn||!state.username)return; unsubscribeFromMyUserRecord(); myUserListener=myUserRef().on('value',snap=>{const v=snap.val(); if(!v)return; if(typeof v.coins==='number')state.coins=v.coins; if(v.hints)state.hints=v.hints; localStorage.setItem('ftg_coins',String(state.coins)); localStorage.setItem('ftg_hints',JSON.stringify(state.hints)); renderCoins();});}
+function subscribeToMyUserRecord(){if(!fbReady||!fbDb||!state.loggedIn||!state.username)return; unsubscribeFromMyUserRecord(); myUserListener=myUserRef().on('value',snap=>{const v=snap.val(); if(!v)return; if(typeof v.coins==='number')state.coins=v.coins; if(typeof v.points==='number')state.points=Math.max(state.points,v.points); if(v.hints)state.hints=v.hints; localStorage.setItem('ftg_coins',String(state.coins)); localStorage.setItem('ftg_points',String(state.points)); localStorage.setItem('ftg_hints',JSON.stringify(state.hints)); renderCoins();});}
 function unsubscribeFromMyUserRecord(){if(myUserListener){myUserRef().off('value',myUserListener); myUserListener=null;}}
 
 let ownerUsersListener=null;
 function openOwnerPanel(){if(!state.isOwner&&!state.isAssistant)return; showScreen('screen-owner-panel'); document.getElementById('owner-panel-subtitle').textContent=state.isOwner?tr('owner_panel_sub'):tr('owner_panel_sub_ro'); const status=document.getElementById('owner-users-status'); if(!fbReady){status.textContent=fbUnavailableMessage(); document.getElementById('owner-users-list').innerHTML=''; return;} status.textContent=''; if(ownerUsersListener)usersRef().off('value',ownerUsersListener); ownerUsersListener=usersRef().on('value',snap=>renderOwnerUserList(snap.val()||{}));}
 function closeOwnerPanel(){if(ownerUsersListener){usersRef().off('value',ownerUsersListener); ownerUsersListener=null;} showScreen('screen-home');}
 const HINT_LABELS={flagLetter:'💡Flag Letter',flagTime:'⏱+5s',geoContinent:'🌍Continent',geoLetter:'🔤Geo Letter'};
-function renderOwnerUserList(users){const container=document.getElementById('owner-users-list'); container.innerHTML=''; const names=Object.keys(users).sort((a,b)=>a.localeCompare(b)); if(names.length===0){container.innerHTML='<p style="text-align:center;color:#888;">'+tr('no_users')+'</p>'; return;} names.forEach(name=>{const u=users[name]||{}; const coins=u.coins||0; const hints=u.hints||{}; const row=document.createElement('div'); row.className='user-row'; const head=document.createElement('div'); head.className='user-row-head'; head.innerHTML='<strong>'+name.replace(/</g,'&lt;')+'</strong>'+(u.isOwner?' <span class="owner-badge">'+tr('badge_owner')+'</span>':'')+(u.isAssistant?' <span class="owner-badge">'+tr('badge_assistant')+'</span>':''); row.appendChild(head); const chipRow=document.createElement('div'); chipRow.className='stat-chip-row'; chipRow.appendChild(makeStatChip(name,'coins','🪙',coins)); Object.keys(HINT_LABELS).forEach(key=>{chipRow.appendChild(makeStatChip(name,key,HINT_LABELS[key],hints[key]||0));}); row.appendChild(chipRow); container.appendChild(row);});}
-function makeStatChip(username,field,label,value){const chip=document.createElement('div'); chip.className='stat-chip'; const lbl=document.createElement('span'); lbl.textContent=label; const val=document.createElement('span'); val.className='val'; val.textContent=value; chip.appendChild(lbl); if(state.isOwner){const minus=document.createElement('button'); minus.type='button'; minus.textContent='−'; minus.onclick=()=>ownerAdjust(username,field,-1); chip.appendChild(minus);} chip.appendChild(val); if(state.isOwner){const plus=document.createElement('button'); plus.type='button'; plus.textContent='+'; plus.onclick=()=>ownerAdjust(username,field,1); chip.appendChild(plus);} return chip;}
-function ownerAdjust(username,field,delta){if(!state.isOwner||!fbReady)return; const ref=field==='coins'?usersRef().child(username).child('coins'):usersRef().child(username).child('hints').child(field); ref.transaction(cur=>Math.max(0,(cur||0)+delta));}
+function renderOwnerUserList(users){const container=document.getElementById('owner-users-list'); container.innerHTML=''; const names=Object.keys(users).sort((a,b)=>a.localeCompare(b)); if(names.length===0){container.innerHTML='<p style="text-align:center;color:#888;">'+tr('no_users')+'</p>'; return;} names.forEach(name=>{const u=users[name]||{}; const coins=u.coins||0; const hints=u.hints||{}; const row=document.createElement('div'); row.className='user-row'; const head=document.createElement('div'); head.className='user-row-head'; head.innerHTML='<strong>'+name.replace(/</g,'&lt;')+'</strong>'+(u.isOwner?' <span class="owner-badge">'+tr('badge_owner')+'</span>':'')+(u.isAssistant?' <span class="owner-badge">'+tr('badge_assistant')+'</span>':''); row.appendChild(head); const chipRow=document.createElement('div'); chipRow.className='stat-chip-row'; chipRow.appendChild(makeStatChip(name,'coins','🪙',coins)); chipRow.appendChild(makeStatChip(name,'points','🏆',u.points||0,true)); Object.keys(HINT_LABELS).forEach(key=>{chipRow.appendChild(makeStatChip(name,key,HINT_LABELS[key],hints[key]||0));}); row.appendChild(chipRow); container.appendChild(row);});}
+function makeStatChip(username,field,label,value,readonly){const chip=document.createElement('div'); chip.className='stat-chip'; const lbl=document.createElement('span'); lbl.textContent=label; const val=document.createElement('span'); val.className='val'; val.textContent=value; chip.appendChild(lbl); if(state.isOwner&&!readonly){const minus=document.createElement('button'); minus.type='button'; minus.textContent='−'; minus.onclick=()=>ownerAdjust(username,field,-1); chip.appendChild(minus);} chip.appendChild(val); if(state.isOwner&&!readonly){const plus=document.createElement('button'); plus.type='button'; plus.textContent='+'; plus.onclick=()=>ownerAdjust(username,field,1); chip.appendChild(plus);} return chip;}
+function ownerAdjust(username,field,delta){if(!state.isOwner||!fbReady)return; const ref=field==='coins'?usersRef().child(username).child('coins'):usersRef().child(username).child('hints').child(field); ref.transaction(cur=>Math.max(0,(cur||0)+delta)); if(field==='coins'&&delta>0){usersRef().child(username).child('points').transaction(cur=>(cur||0)+delta);}}
 
 let serversGeoListener=null, serversFlagListener=null, serversRoomsCache={geo:{},flag:{}};
 function openServers(){if(!isStaffMember())return; showScreen('screen-servers'); const status=document.getElementById('servers-status'); if(!fbReady){status.textContent=fbUnavailableMessage(); document.getElementById('servers-geo-list').innerHTML=''; document.getElementById('servers-flag-list').innerHTML=''; return;} status.textContent=''; if(serversGeoListener)activeRoomsRef('geo').off('value',serversGeoListener); if(serversFlagListener)activeRoomsRef('flag').off('value',serversFlagListener); serversGeoListener=activeRoomsRef('geo').on('value',snap=>{serversRoomsCache.geo=snap.val()||{}; renderServerList('geo');}); serversFlagListener=activeRoomsRef('flag').on('value',snap=>{serversRoomsCache.flag=snap.val()||{}; renderServerList('flag');});}
@@ -1455,6 +1475,11 @@ function openFeedback(){if(!state.isOwner&&!state.isAssistant)return; showScreen
 function closeFeedback(){if(feedbackListener){feedbackRef().off('child_added',feedbackListener); feedbackListener=null;} showScreen('screen-home');}
 function addFeedbackLine(f){if(!f)return; const log=document.getElementById('feedback-log'); const div=document.createElement('div'); div.className='global-msg'; const text=document.createElement('div'); text.textContent=(f.type==='bug'?'🐛 ':'💡 ')+(f.text||''); const meta=document.createElement('div'); meta.className='meta'; meta.textContent='— '+(f.from||tr('word_staff')); div.appendChild(text); div.appendChild(meta); log.appendChild(div); log.scrollTop=log.scrollHeight;}
 function submitFeedback(){if((!state.isOwner&&!state.isAssistant)||!fbReady)return; const type=document.getElementById('feedback-type').value; const input=document.getElementById('feedback-text'); const text=input.value.trim(); if(!text)return; feedbackRef().push({type,text,from:state.username,ts:firebase.database.ServerValue.TIMESTAMP}); input.value='';}
+
+let rankingListener=null;
+function openRanking(){if(!state.loggedIn){showScreen('screen-signin'); document.getElementById('signin-error').textContent=tr('err_signin_ranking'); return;} showScreen('screen-ranking'); const status=document.getElementById('ranking-status'); document.getElementById('ranking-list').innerHTML=''; if(!fbReady){status.textContent=fbUnavailableMessage(); return;} status.textContent=''; if(rankingListener)usersRef().off('value',rankingListener); rankingListener=usersRef().on('value',snap=>renderRankingList(snap.val()||{}));}
+function closeRanking(){if(rankingListener){usersRef().off('value',rankingListener); rankingListener=null;} showScreen('screen-home');}
+function renderRankingList(users){const container=document.getElementById('ranking-list'); container.innerHTML=''; const names=Object.keys(users).sort((a,b)=>(users[b].points||0)-(users[a].points||0)); if(names.length===0){container.innerHTML='<p style="text-align:center;color:#888;">'+tr('no_ranking')+'</p>'; return;} names.forEach((name,i)=>{const u=users[name]||{}; const row=document.createElement('div'); row.className='user-row'; const head=document.createElement('div'); head.className='user-row-head'; head.innerHTML='<strong>#'+(i+1)+' '+name.replace(/</g,'&lt;')+'</strong>'+(u.isOwner?' <span class="owner-badge">'+tr('badge_owner')+'</span>':'')+(u.isAssistant?' <span class="owner-badge">'+tr('badge_assistant')+'</span>':''); row.appendChild(head); const chipRow=document.createElement('div'); chipRow.className='stat-chip-row'; const chip=document.createElement('div'); chip.className='stat-chip'; const lbl=document.createElement('span'); lbl.textContent='🏆'; const val=document.createElement('span'); val.className='val'; val.textContent=(u.points||0)+' '+tr('points_label'); chip.appendChild(lbl); chip.appendChild(val); chipRow.appendChild(chip); row.appendChild(chipRow); container.appendChild(row);});}
 
 let globalChatListener=null;
 function globalMessagesRef(){return fbDb.ref('global/messages');}
