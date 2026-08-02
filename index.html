@@ -92,6 +92,9 @@
   .color-opt .swatch{ width:16px; height:16px; border-radius:50%; border:1px solid rgba(0,0,0,0.25); display:inline-block; }
   .color-opt.selected{ background:var(--blue); color:white; border-color:var(--blue); }
   .color-opt.selected .swatch{ border-color:rgba(255,255,255,0.6); }
+  .color-opt.revealed{ cursor:default; }
+  .color-opt.missing{ cursor:default; background:repeating-linear-gradient(45deg,#f4f4f4,#f4f4f4 6px,#e8e8e8 6px,#e8e8e8 12px); border-style:dashed; color:#999; }
+  .color-opt.missing .swatch{ background:transparent; display:flex; align-items:center; justify-content:center; font-weight:bold; color:#999; border-style:dashed; }
 
   .progress-text{ text-align:center; font-weight:bold; color:#333; margin-bottom:6px; }
   #flag-timer, #geo-timer, #flag-race-timer{ text-align:center; font-size:1.6em; font-weight:bold; margin:6px 0 16px; color:var(--red); }
@@ -327,7 +330,7 @@
       <a class="back-link" onclick="showScreen('screen-play')" data-i18n="back">← Back</a>
       <div class="card-box">
         <h2 style="text-align:center;" data-i18n="colors_mode_title">🎨 Guess The Flag Colors</h2>
-        <p class="subtitle" data-i18n="colors_mode_sub">Look at each flag and select every color you see in it. Nothing is revealed until the end — then your accuracy over 10 flags decides your coins.</p>
+        <p class="subtitle" data-i18n="colors_mode_sub">You'll see each flag's country and its colors as a palette — but one color is missing. Pick the right one to fill the gap. Nothing is confirmed until the end — then your accuracy over 10 rounds decides your coins.</p>
         <div class="diff-card diff-easy" onclick="startColorGame('easy')">
           <h3 data-i18n="easy">Easy</h3>
           <p data-i18n="colors_easy_desc">Well-known flags</p>
@@ -350,8 +353,10 @@
     <section id="screen-color-game" class="screen">
       <div class="card-box">
         <div class="progress-text" id="color-progress">Flag 1 / 10</div>
-        <div class="flag-wrap"><img id="color-img" class="flag-big" src="" alt="flag" decoding="async" fetchpriority="high"></div>
-        <label data-i18n="choose_colors_label">Which colors are in this flag?</label>
+        <h3 style="text-align:center;" id="color-country-name"></h3>
+        <label data-i18n="colors_palette_label">This flag's colors — one is missing:</label>
+        <div class="color-toggle-row" id="color-palette"></div>
+        <label data-i18n="choose_colors_label">Which color is missing?</label>
         <div class="color-toggle-row" id="color-options"></div>
         <button class="btn btn-red" onclick="submitColorAnswer()" data-i18n="btn_submit">Submit</button>
       </div>
@@ -848,10 +853,10 @@ en:{
   no_ranking:"No players yet.", points_label:"pts",
   err_signin_ranking:"Please sign in first to view the Global Ranking.",
   game_colors:"🎨 Guess The Flag Colors", colors_mode_title:"🎨 Guess The Flag Colors",
-  colors_mode_sub:"Look at each flag and select every color you see in it. Nothing is revealed until the end — then your accuracy over 10 flags decides your coins.",
+  colors_mode_sub:"You'll see each flag's country and its colors as a palette — but one color is missing. Pick the right one to fill the gap. Nothing is confirmed until the end — then your accuracy over 10 rounds decides your coins.",
   colors_easy_desc:"Well-known flags", colors_medium_desc:"Moderately known flags", colors_hard_desc:"Tricky, lesser-known flags",
   colors_reward_note:"Reward: 1-3 coins based on your accuracy over all 10",
-  choose_colors_label:"Which colors are in this flag?",
+  choose_colors_label:"Which color is missing?", colors_palette_label:"This flag's colors — one is missing:",
   accuracy_label:"Accuracy: {p}%", no_coins_msg:"Keep practicing — no coins this round.",
   color_red:"Red", color_blue:"Blue", color_green:"Green", color_yellow:"Yellow",
   color_white:"White", color_black:"Black", color_orange:"Orange", color_purple:"Purple"
@@ -1003,10 +1008,10 @@ fr:{
   no_ranking:"Aucun joueur pour l'instant.", points_label:"pts",
   err_signin_ranking:"Connecte-toi d'abord pour voir le Classement Mondial.",
   game_colors:"🎨 Devine les Couleurs du Drapeau", colors_mode_title:"🎨 Devine les Couleurs du Drapeau",
-  colors_mode_sub:"Regarde chaque drapeau et sélectionne toutes les couleurs que tu y vois. Rien n'est révélé avant la fin — ta précision sur 10 drapeaux détermine ensuite tes pièces.",
+  colors_mode_sub:"Tu verras le pays de chaque drapeau et ses couleurs sous forme de palette — mais une couleur manque. Choisis la bonne pour compléter la palette. Rien n'est confirmé avant la fin — ta précision sur 10 manches détermine ensuite tes pièces.",
   colors_easy_desc:"Drapeaux bien connus", colors_medium_desc:"Drapeaux moyennement connus", colors_hard_desc:"Drapeaux difficiles et peu connus",
   colors_reward_note:"Récompense : 1 à 3 pièces selon ta précision sur les 10",
-  choose_colors_label:"Quelles couleurs sont dans ce drapeau ?",
+  choose_colors_label:"Quelle couleur manque ?", colors_palette_label:"Les couleurs de ce drapeau — une manque :",
   accuracy_label:"Précision : {p} %", no_coins_msg:"Continue à t'entraîner — aucune pièce cette manche.",
   color_red:"Rouge", color_blue:"Bleu", color_green:"Vert", color_yellow:"Jaune",
   color_white:"Blanc", color_black:"Noir", color_orange:"Orange", color_purple:"Violet"
@@ -1294,12 +1299,13 @@ const COLOR_POOLS={}; ['easy','medium','hard'].forEach(diff=>{COLOR_POOLS[diff]=
 const COLOR_OPTIONS=['red','blue','green','yellow','white','black','orange','purple'];
 let colorState=null;
 function goColorMode(){showScreen('screen-color-diff');}
-function startColorGame(diff){colorState={diff, list:shuffle(COLOR_POOLS[diff]).slice(0,10), index:0, correctCount:0, selected:new Set()}; preloadFlagImages(colorState.list); showScreen('screen-color-game'); renderColorRound();}
+function startColorGame(diff){colorState={diff, list:shuffle(COLOR_POOLS[diff]).slice(0,10), index:0, correctCount:0, missingColor:null, missingIdx:-1, selectedColor:null}; showScreen('screen-color-game'); renderColorRound();}
 function restartColorGame(){startColorGame(colorState.diff);}
-function renderColorRound(){const c=colorState.list[colorState.index]; colorState.selected=new Set(); document.getElementById('color-progress').textContent=tr('flag_progress',{n:colorState.index+1}); const imgEl=document.getElementById('color-img'); imgEl.onerror=function(){imgEl.onerror=null; imgEl.src=flagUrl(c.code,'png');}; imgEl.src=flagUrl(c.code); renderColorOptions();}
-function renderColorOptions(){const container=document.getElementById('color-options'); container.innerHTML=''; COLOR_OPTIONS.forEach(col=>{const btn=document.createElement('button'); btn.type='button'; btn.className='color-opt'+(colorState.selected.has(col)?' selected':''); const swatch=document.createElement('span'); swatch.className='swatch'; swatch.style.background=col; const lbl=document.createElement('span'); lbl.textContent=tr('color_'+col); btn.appendChild(swatch); btn.appendChild(lbl); btn.onclick=()=>toggleColorOption(col); container.appendChild(btn);});}
-function toggleColorOption(col){if(colorState.selected.has(col))colorState.selected.delete(col); else colorState.selected.add(col); renderColorOptions();}
-function submitColorAnswer(){if(!colorState)return; const c=colorState.list[colorState.index]; const actual=new Set(c.colors); const sel=colorState.selected; const exact=sel.size===actual.size&&[...sel].every(x=>actual.has(x)); if(exact)colorState.correctCount++; colorState.index++; if(colorState.index>=10){endColorGame();}else{renderColorRound();}}
+function renderColorRound(){const c=colorState.list[colorState.index]; colorState.missingIdx=Math.floor(Math.random()*c.colors.length); colorState.missingColor=c.colors[colorState.missingIdx]; colorState.selectedColor=null; document.getElementById('color-progress').textContent=tr('flag_progress',{n:colorState.index+1}); document.getElementById('color-country-name').textContent=countryLabel(c.name); renderColorPalette(); renderColorOptions();}
+function renderColorPalette(){const c=colorState.list[colorState.index]; const container=document.getElementById('color-palette'); container.innerHTML=''; c.colors.forEach((col,i)=>{const chip=document.createElement('div'); const isMissing=i===colorState.missingIdx; chip.className='color-opt'+(isMissing?' missing':' revealed'); const swatch=document.createElement('span'); swatch.className='swatch'; if(isMissing){swatch.textContent='?';}else{swatch.style.background=col;} const lbl=document.createElement('span'); lbl.textContent=isMissing?'?':tr('color_'+col); chip.appendChild(swatch); chip.appendChild(lbl); container.appendChild(chip);});}
+function renderColorOptions(){const container=document.getElementById('color-options'); container.innerHTML=''; COLOR_OPTIONS.forEach(col=>{const btn=document.createElement('button'); btn.type='button'; btn.className='color-opt'+(colorState.selectedColor===col?' selected':''); const swatch=document.createElement('span'); swatch.className='swatch'; swatch.style.background=col; const lbl=document.createElement('span'); lbl.textContent=tr('color_'+col); btn.appendChild(swatch); btn.appendChild(lbl); btn.onclick=()=>toggleColorOption(col); container.appendChild(btn);});}
+function toggleColorOption(col){colorState.selectedColor=(colorState.selectedColor===col)?null:col; renderColorOptions();}
+function submitColorAnswer(){if(!colorState)return; if(colorState.selectedColor===colorState.missingColor)colorState.correctCount++; colorState.index++; if(colorState.index>=10){endColorGame();}else{renderColorRound();}}
 function endColorGame(){const pct=Math.round((colorState.correctCount/10)*100); let reward=0; if(pct>=70)reward=3; else if(pct>=50)reward=2; else if(pct>=30)reward=1; if(reward>0)addCoins(reward); document.getElementById('color-result-msg').textContent=tr('accuracy_label',{p:pct}); document.getElementById('color-result-sub').textContent=reward>0?tr('earned_coins',{n:reward,s:plural(reward)}):tr('no_coins_msg'); showScreen('screen-color-result');}
 /* Capitals whose French name differs from the English one (only these need a
    mapping; the rest are spelled identically in both languages). */

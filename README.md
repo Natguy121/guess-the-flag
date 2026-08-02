@@ -96,11 +96,12 @@ Cloud Function if you want automatic cleanup.
 ## Guess The Flag Colors
 
 The third solo game mode (Home → Play → 🎨 Guess The Flag Colors): for each
-of 10 flags, pick every color you see in it from an 8-swatch palette (red,
-blue, green, yellow, white, black, orange, purple), then Submit. Nothing is
-revealed as you go — no right/wrong feedback per flag — only your final
-**accuracy** over all 10 rounds, shown as a percentage, and that accuracy
-sets your coin reward:
+of 10 rounds you're shown a country name and its flag's colors laid out as a
+palette — except one swatch is blanked out (a dashed "?" tile). Pick the
+missing color from the 8-swatch option row below (red, blue, green, yellow,
+white, black, orange, purple) and Submit. Nothing is confirmed as you go —
+no right/wrong feedback per round — only your final **accuracy** over all 10
+rounds, shown as a percentage, and that accuracy sets your coin reward:
 
 | Accuracy    | Reward   |
 |-------------|----------|
@@ -109,13 +110,16 @@ sets your coin reward:
 | 50% – 69%   | 2 coins  |
 | 70% – 100%  | 3 coins  |
 
-A round only counts as correct if your selected colors are an *exact* match
-for the flag's actual colors (no missing colors, no extra ones).
+The flag's actual image is deliberately not shown — that would give away the
+missing color at a glance — so this mode tests recall of each flag's colors
+rather than visual matching, unlike the other two games.
 
 `COLOR_POOLS` (in `index.html`) doesn't duplicate flag-color data: it's
 built at load time from `GEO_POOLS`' existing `colors` arrays, matched up
-with each country's flagcdn code from `FLAG_POOLS` by name — so all three
-games share the same underlying data instead of maintaining it three times.
+with each country's flagcdn code from `FLAG_POOLS` by name (the code isn't
+used by this mode itself, only carried along for consistency with the other
+games) — so all three games share the same underlying data instead of
+maintaining it three times.
 
 ## Global Ranking
 
