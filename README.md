@@ -96,18 +96,20 @@ Cloud Function if you want automatic cleanup.
 ## Guess The Flag Colors
 
 The third solo game mode (Home → Play → 🎨 Guess The Flag Colors): for each
-of 10 rounds you're shown the country's name, its flag image, and that
-flag's colors laid out as a palette below it — except one swatch is blanked
-out (a dashed "?" tile). Instead of picking from a fixed set of swatches,
-you mix the missing color yourself in a native color-picker (`<input
-type="color">`, so you get the full spectrum, not 8 presets) from memory,
-then Submit.
+of 10 rounds you're shown the country's name and its flag — rendered as
+horizontal stripes built directly from that country's actual `colors` list,
+one stripe per color — except one stripe is blanked out (a "?" mark). Real
+flag photos can't be recolored one region at a time without per-flag layout
+data, so `renderMiniFlag()` draws the flag itself out of the same color data
+the game already tracks, which makes the missing stripe directly bindable
+to the picker.
 
-The picker starts each round on a random color rather than a fixed gray,
-and the missing tile in the flag's own palette repaints live as you drag —
-so you're directly editing "the flag," not a separate swatch off to the
-side (`updateColorPickerPreview()` keeps the picker's own preview dot and
-the palette's `#color-missing-swatch` in sync on every `input` event).
+Instead of picking from a fixed set of swatches, you mix the missing color
+yourself in a native color-picker (`<input type="color">`, the full
+spectrum, not presets) from memory. The picker starts each round on a
+random color, and **the missing stripe on the flag itself repaints live as
+you drag** (`updateMissingStripe()` runs on every `input` event) — you're
+directly recoloring the flag, not watching a separate preview box.
 
 There's no right/wrong per round — each guess is scored by **closeness**,
 not an exact match: `colorCloseness()` compares the RGB you picked against

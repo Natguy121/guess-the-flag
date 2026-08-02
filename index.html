@@ -94,7 +94,11 @@
   .color-opt.selected .swatch{ border-color:rgba(255,255,255,0.6); }
   .color-picker-row{ display:flex; align-items:center; gap:14px; justify-content:center; margin:14px 0 20px; }
   .color-picker-row input[type=color]{ width:70px; height:56px; border:2px solid #ccc; border-radius:12px; padding:2px; cursor:pointer; background:white; }
-  .color-picker-preview{ width:56px; height:56px; border-radius:12px; border:2px solid #ccc; }
+  .mini-flag{ display:flex; flex-direction:column; width:100%; max-width:320px; aspect-ratio:3/2; margin:0 auto;
+    border-radius:12px; overflow:hidden; border:6px solid white; box-shadow:0 10px 26px rgba(0,0,0,0.35); }
+  .mini-flag .stripe{ flex:1; position:relative; }
+  .mini-flag .stripe.missing::after{ content:'?'; position:absolute; inset:0; display:flex; align-items:center;
+    justify-content:center; font-weight:bold; font-size:1.6em; color:rgba(0,0,0,0.32); text-shadow:0 1px 0 rgba(255,255,255,0.4); }
   .color-opt.revealed{ cursor:default; }
   .color-opt.missing{ cursor:default; background:repeating-linear-gradient(45deg,#f4f4f4,#f4f4f4 6px,#e8e8e8 6px,#e8e8e8 12px); border-style:dashed; color:#999; }
   .color-opt.missing .swatch{ background:transparent; display:flex; align-items:center; justify-content:center; font-weight:bold; color:#999; border-style:dashed; }
@@ -357,13 +361,11 @@
       <div class="card-box">
         <div class="progress-text" id="color-progress">Flag 1 / 10</div>
         <h3 style="text-align:center;" id="color-country-name"></h3>
-        <div class="flag-wrap"><img id="color-img" class="flag-big" src="" alt="flag" decoding="async" fetchpriority="high"></div>
         <label data-i18n="colors_palette_label">This flag's colors — one is missing:</label>
-        <div class="color-toggle-row" id="color-palette"></div>
+        <div class="flag-wrap"><div class="mini-flag" id="color-mini-flag"></div></div>
         <label data-i18n="choose_colors_label">Pick the missing color as closely as you can:</label>
         <div class="color-picker-row">
           <input type="color" id="color-picker" value="#808080">
-          <span class="color-picker-preview" id="color-picker-preview"></span>
         </div>
         <button class="btn btn-red" onclick="submitColorAnswer()" data-i18n="btn_submit">Submit</button>
       </div>
@@ -1313,15 +1315,16 @@ function hexToRgb(hex){const n=parseInt(hex.replace('#',''),16); return[(n>>16)&
 function colorCloseness(hex,colorName){const[r1,g1,b1]=hexToRgb(hex); const[r2,g2,b2]=COLOR_RGB[colorName]; const dist=Math.sqrt((r1-r2)**2+(g1-g2)**2+(b1-b2)**2); return Math.max(0,1-dist/MAX_COLOR_DIST);}
 let colorState=null;
 function goColorMode(){showScreen('screen-color-diff');}
-function startColorGame(diff){colorState={diff, list:shuffle(COLOR_POOLS[diff]).slice(0,10), index:0, closenessSum:0, missingColor:null, missingIdx:-1}; preloadFlagImages(colorState.list); showScreen('screen-color-game'); renderColorRound();}
+function startColorGame(diff){colorState={diff, list:shuffle(COLOR_POOLS[diff]).slice(0,10), index:0, closenessSum:0, missingColor:null, missingIdx:-1}; showScreen('screen-color-game'); renderColorRound();}
 function restartColorGame(){startColorGame(colorState.diff);}
 function randomHexColor(){const n=Math.floor(Math.random()*0x1000000); return'#'+n.toString(16).padStart(6,'0');}
-function renderColorRound(){const c=colorState.list[colorState.index]; colorState.missingIdx=Math.floor(Math.random()*c.colors.length); colorState.missingColor=c.colors[colorState.missingIdx]; document.getElementById('color-progress').textContent=tr('flag_progress',{n:colorState.index+1}); document.getElementById('color-country-name').textContent=countryLabel(c.name); const imgEl=document.getElementById('color-img'); imgEl.onerror=function(){imgEl.onerror=null; imgEl.src=flagUrl(c.code,'png');}; imgEl.src=flagUrl(c.code); renderColorPalette(); const picker=document.getElementById('color-picker'); picker.value=randomHexColor(); updateColorPickerPreview(); picker.oninput=updateColorPickerPreview;}
-// Keeps the picker's live swatch AND the missing tile in the flag's own
-// color palette in sync, so dragging the picker visibly repaints "the flag"
-// itself rather than just a separate preview box.
-function updateColorPickerPreview(){const hex=document.getElementById('color-picker').value; document.getElementById('color-picker-preview').style.background=hex; const missingSwatch=document.getElementById('color-missing-swatch'); if(missingSwatch)missingSwatch.style.background=hex;}
-function renderColorPalette(){const c=colorState.list[colorState.index]; const container=document.getElementById('color-palette'); container.innerHTML=''; c.colors.forEach((col,i)=>{const chip=document.createElement('div'); const isMissing=i===colorState.missingIdx; chip.className='color-opt'+(isMissing?' missing':' revealed'); const swatch=document.createElement('span'); swatch.className='swatch'; if(isMissing)swatch.id='color-missing-swatch'; else swatch.style.background=col; const lbl=document.createElement('span'); lbl.textContent=isMissing?'?':tr('color_'+col); chip.appendChild(swatch); chip.appendChild(lbl); container.appendChild(chip);});}
+function renderColorRound(){const c=colorState.list[colorState.index]; colorState.missingIdx=Math.floor(Math.random()*c.colors.length); colorState.missingColor=c.colors[colorState.missingIdx]; document.getElementById('color-progress').textContent=tr('flag_progress',{n:colorState.index+1}); document.getElementById('color-country-name').textContent=countryLabel(c.name); renderMiniFlag(c); const picker=document.getElementById('color-picker'); picker.value=randomHexColor(); updateMissingStripe(); picker.oninput=updateMissingStripe;}
+// The flag itself is built from its actual color list as horizontal
+// stripes (real photos can't be recolored one region at a time without
+// per-flag layout data), so the missing stripe can be bound directly to
+// the picker: dragging it repaints the flag itself, not a separate swatch.
+function renderMiniFlag(c){const flagEl=document.getElementById('color-mini-flag'); flagEl.innerHTML=''; c.colors.forEach((col,i)=>{const stripe=document.createElement('div'); const isMissing=i===colorState.missingIdx; stripe.className='stripe'+(isMissing?' missing':''); if(isMissing)stripe.id='color-missing-stripe'; else stripe.style.background=col; flagEl.appendChild(stripe);});}
+function updateMissingStripe(){const stripe=document.getElementById('color-missing-stripe'); if(stripe)stripe.style.background=document.getElementById('color-picker').value;}
 function submitColorAnswer(){if(!colorState)return; const hex=document.getElementById('color-picker').value; colorState.closenessSum+=colorCloseness(hex,colorState.missingColor); colorState.index++; if(colorState.index>=10){endColorGame();}else{renderColorRound();}}
 function endColorGame(){const pct=Math.round((colorState.closenessSum/10)*100); let reward=0; if(pct>=70)reward=3; else if(pct>=50)reward=2; else if(pct>=30)reward=1; if(reward>0)addCoins(reward); document.getElementById('color-result-msg').textContent=tr('accuracy_label',{p:pct}); document.getElementById('color-result-sub').textContent=reward>0?tr('earned_coins',{n:reward,s:plural(reward)}):tr('no_coins_msg'); showScreen('screen-color-result');}
 /* Capitals whose French name differs from the English one (only these need a
