@@ -5,6 +5,35 @@ A single-file HTML/CSS/JS game: guess flags against the clock, or play a
 earned from wins buy hints in the store. Just open `index.html` in a browser
 — no build step, no server required for solo/vs-AI play.
 
+## Languages (English / Français)
+
+The whole game ships in both English and French. The **FR / EN** button in the
+top bar switches everything — menus, buttons, placeholders, hints, results,
+chat labels, the store, the owner/assistant screens and the geography Q&A —
+and the choice is remembered in `localStorage` (`ftg_lang`) across reloads.
+
+Country names are translated too. All 195 flags and every geography country
+display in French (Allemagne, Brésil, Côte d'Ivoire, Îles Salomon…), and
+continents and the differing capital names (Le Caire, Pékin, Londres,
+Varsovie…) follow the language as well.
+
+**Typing answers works in either language, always.** `matchesCountry()`
+accepts a country's English name, its French name, and the aliases of both, no
+matter which language the interface is set to — so "Germany", "Allemagne" and
+"allemagne" are all correct. Accents and hyphens are optional: "Brésil" and
+"bresil", "États-Unis" and "etats unis" all match. This also means a French
+player and an English player can share the same online room and both answer
+naturally.
+
+The geography question parser understands French too — "Est-ce en Asie ?",
+"Est-ce enclavé ?", "Le drapeau est-il rouge ?", "A-t-il plus de 100 millions
+d'habitants ?" — alongside the original English phrasings, with or without
+accents.
+
+To add another language, add a block to the `I18N` object in `index.html`
+(the keys are shared across languages), extend `LANGS`, and add a name map
+alongside `COUNTRY_FR`.
+
 ## Online play with a friend
 
 Two modes support playing with a friend: the flag-guessing race and the

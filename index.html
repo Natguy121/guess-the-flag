@@ -142,73 +142,79 @@
   .stat-chip .val{ min-width:1.4em; text-align:center; font-weight:bold; }
   .global-msg{ background:#fff3cd; border:1px solid #ffe69c; border-radius:10px; padding:10px 12px; margin:6px 0; font-size:.95em; }
   .global-msg .meta{ font-size:.75em; color:#888; margin-top:2px; }
+  #lang-toggle{ background:rgba(255,255,255,0.18); color:white; border:1px solid rgba(255,255,255,0.45);
+    border-radius:20px; padding:6px 12px; font-weight:bold; font-size:.9em; cursor:pointer; letter-spacing:1px; }
+  #lang-toggle:hover{ background:rgba(255,255,255,0.32); }
 </style>
 </head>
 <body>
 <div id="app">
   <div id="topbar">
-    <div class="logo">🏁 GUESS THE FLAG</div>
-    <div id="coin-display"><span class="coin-icon"></span><span id="coin-count">0</span></div>
+    <div class="logo" data-i18n="logo">🏁 GUESS THE FLAG</div>
+    <div style="display:flex; align-items:center; gap:10px;">
+      <button id="lang-toggle" onclick="toggleLanguage()" title="Passer en français">FR</button>
+      <div id="coin-display"><span class="coin-icon"></span><span id="coin-count">0</span></div>
+    </div>
   </div>
   <main>
 
     <!-- HOME -->
     <section id="screen-home" class="screen active">
       <div class="card-box">
-        <h1 class="title">Guess The Flag</h1>
+        <h1 class="title" data-i18n="app_title">Guess The Flag</h1>
         <div class="stripe-bar"></div>
         <p class="subtitle" id="home-welcome">Test your flag &amp; geography knowledge!</p>
-        <button class="btn btn-red" onclick="goPlay()">▶ Play</button>
-        <button class="btn btn-yellow" onclick="showScreen('screen-store')">🛒 Store</button>
-        <button class="btn btn-green" onclick="openGlobalChat()">📢 Global Chat</button>
+        <button class="btn btn-red" onclick="goPlay()" data-i18n="btn_play">▶ Play</button>
+        <button class="btn btn-yellow" onclick="showScreen('screen-store')" data-i18n="btn_store">🛒 Store</button>
+        <button class="btn btn-green" onclick="openGlobalChat()" data-i18n="btn_global_chat">📢 Global Chat</button>
         <button class="btn btn-blue" id="signin-home-btn" onclick="showScreen('screen-signin')">👤 Sign In</button>
-        <button class="btn btn-gray" id="owner-panel-home-btn" style="display:none;" onclick="openOwnerPanel()">🛡 Owner Panel</button>
-        <button class="btn btn-gray" id="feedback-home-btn" style="display:none;" onclick="openFeedback()">🐞 Features &amp; Bugs</button>
-        <button class="btn btn-gray" id="admin-chat-home-btn" style="display:none;" onclick="openAdminChat()">🗨 Admin Chat</button>
+        <button class="btn btn-gray" id="owner-panel-home-btn" style="display:none;" onclick="openOwnerPanel()" data-i18n="btn_owner_panel">🛡 Owner Panel</button>
+        <button class="btn btn-gray" id="feedback-home-btn" style="display:none;" onclick="openFeedback()" data-i18n="btn_feedback">🐞 Features &amp; Bugs</button>
+        <button class="btn btn-gray" id="admin-chat-home-btn" style="display:none;" onclick="openAdminChat()" data-i18n="btn_admin_chat">🗨 Admin Chat</button>
       </div>
     </section>
 
     <!-- PLAY MENU -->
     <section id="screen-play" class="screen">
-      <a class="back-link" onclick="showScreen('screen-home')">← Home</a>
+      <a class="back-link" onclick="showScreen('screen-home')" data-i18n="back_home">← Home</a>
       <div class="card-box">
-        <h2 style="text-align:center;">Choose a Game</h2>
-        <button class="btn btn-green" onclick="goFlagMode()">🚩 Guess The Flag</button>
-        <button class="btn btn-blue" onclick="goGeoMode()">🌍 Ask The Geography Questions</button>
+        <h2 style="text-align:center;" data-i18n="choose_game">Choose a Game</h2>
+        <button class="btn btn-green" onclick="goFlagMode()" data-i18n="game_flag">🚩 Guess The Flag</button>
+        <button class="btn btn-blue" onclick="goGeoMode()" data-i18n="game_geo">🌍 Ask The Geography Questions</button>
       </div>
     </section>
 
     <!-- FLAG MODE CHOICE -->
     <section id="screen-flag-mode" class="screen">
-      <a class="back-link" onclick="showScreen('screen-play')">← Back</a>
+      <a class="back-link" onclick="showScreen('screen-play')" data-i18n="back">← Back</a>
       <div class="card-box">
-        <h2 style="text-align:center;">Guess The Flag</h2>
-        <p class="subtitle">Race through 10 flags solo, or race a friend to see who's fastest.</p>
-        <button class="btn btn-green" onclick="showScreen('screen-flag-diff')">🚩 Play Solo</button>
-        <button class="btn btn-blue" onclick="goFlagOnline()">👥 Race a Friend Online</button>
+        <h2 style="text-align:center;" data-i18n="flag_mode_title">Guess The Flag</h2>
+        <p class="subtitle" data-i18n="flag_mode_sub">Race through 10 flags solo, or race a friend to see who's fastest.</p>
+        <button class="btn btn-green" onclick="showScreen('screen-flag-diff')" data-i18n="flag_play_solo">🚩 Play Solo</button>
+        <button class="btn btn-blue" onclick="goFlagOnline()" data-i18n="flag_race_friend">👥 Race a Friend Online</button>
         <small class="muted" id="flag-online-note"></small>
       </div>
     </section>
 
     <!-- FLAG DIFFICULTY -->
     <section id="screen-flag-diff" class="screen">
-      <a class="back-link" onclick="showScreen('screen-flag-mode')">← Back</a>
+      <a class="back-link" onclick="showScreen('screen-flag-mode')" data-i18n="back">← Back</a>
       <div class="card-box">
-        <h2 style="text-align:center;">Choose Difficulty</h2>
+        <h2 style="text-align:center;" data-i18n="choose_difficulty">Choose Difficulty</h2>
         <div class="diff-card diff-easy" onclick="startFlagGame('easy')">
-          <h3>Easy</h3>
-          <p>Well-known flags · 10 seconds per flag</p>
-          <p>Reward: 1 coin for completing all 10</p>
+          <h3 data-i18n="easy">Easy</h3>
+          <p data-i18n="flag_easy_desc">Well-known flags · 10 seconds per flag</p>
+          <p data-i18n="flag_reward_1">Reward: 1 coin for completing all 10</p>
         </div>
         <div class="diff-card diff-medium" onclick="startFlagGame('medium')">
-          <h3>Medium</h3>
-          <p>Slightly harder flags · 20 seconds per flag</p>
-          <p>Reward: 2 coins for completing all 10</p>
+          <h3 data-i18n="medium">Medium</h3>
+          <p data-i18n="flag_medium_desc">Slightly harder flags · 20 seconds per flag</p>
+          <p data-i18n="flag_reward_2">Reward: 2 coins for completing all 10</p>
         </div>
         <div class="diff-card diff-hard" onclick="startFlagGame('hard')">
-          <h3>Hard</h3>
-          <p>Tough, obscure flags · 30 seconds per flag</p>
-          <p>Reward: 4 coins for completing all 10</p>
+          <h3 data-i18n="hard">Hard</h3>
+          <p data-i18n="flag_hard_desc">Tough, obscure flags · 30 seconds per flag</p>
+          <p data-i18n="flag_reward_4">Reward: 4 coins for completing all 10</p>
         </div>
       </div>
     </section>
@@ -219,11 +225,11 @@
         <div class="progress-text" id="flag-progress">Flag 1 / 10</div>
         <div id="flag-timer">10</div>
         <div class="flag-wrap"><img id="flag-img" class="flag-big" src="" alt="flag" decoding="async" fetchpriority="high"></div>
-        <input type="text" id="flag-input" placeholder="Type the country name..." autocomplete="off" onkeydown="if(event.key==='Enter')submitFlagAnswer()">
-        <button class="btn btn-red" onclick="submitFlagAnswer()">Submit</button>
+        <input type="text" id="flag-input" data-i18n-ph="ph_type_country" placeholder="Type the country name..." autocomplete="off" onkeydown="if(event.key==='Enter')submitFlagAnswer()">
+        <button class="btn btn-red" onclick="submitFlagAnswer()" data-i18n="btn_submit">Submit</button>
         <div class="hint-row">
-          <button class="btn-small btn btn-yellow" style="width:auto;" onclick="useFlagLetterHint()">💡 Reveal Letter (<span id="flag-letter-hint-count">0</span> owned)</button>
-          <button class="btn-small btn btn-yellow" style="width:auto;" onclick="useFlagTimeHint()">⏱ +5 Seconds (<span id="flag-time-hint-count">0</span> owned)</button>
+          <button class="btn-small btn btn-yellow" style="width:auto;" onclick="useFlagLetterHint()" data-i18n-html="hint_letter_btn">💡 Reveal Letter (<span id="flag-letter-hint-count">0</span> owned)</button>
+          <button class="btn-small btn btn-yellow" style="width:auto;" onclick="useFlagTimeHint()" data-i18n-html="hint_time_btn">⏱ +5 Seconds (<span id="flag-time-hint-count">0</span> owned)</button>
         </div>
         <div class="error-text" id="flag-hint-msg"></div>
       </div>
@@ -236,32 +242,32 @@
         <div class="result-msg" id="flag-result-msg"></div>
         <div class="result-sub" id="flag-result-sub"></div>
         <div class="btn-row">
-          <button class="btn btn-blue" onclick="showScreen('screen-home')">Home</button>
-          <button class="btn btn-green" id="flag-restart-btn" onclick="restartFlagGame()">Restart</button>
+          <button class="btn btn-blue" onclick="showScreen('screen-home')" data-i18n="btn_home">Home</button>
+          <button class="btn btn-green" id="flag-restart-btn" onclick="restartFlagGame()" data-i18n="btn_restart">Restart</button>
         </div>
       </div>
     </section>
 
     <!-- FLAG ONLINE SETUP -->
     <section id="screen-flag-online-setup" class="screen">
-      <a class="back-link" onclick="showScreen('screen-flag-mode')">← Back</a>
+      <a class="back-link" onclick="showScreen('screen-flag-mode')" data-i18n="back">← Back</a>
       <div class="card-box">
-        <h2 style="text-align:center;">Race a Friend</h2>
-        <p class="subtitle">Same 10 flags, same time limit — first to type the right country wins the point. Most correct out of 10 wins 2 coins! Works with a friend on any device — just share the room code.</p>
+        <h2 style="text-align:center;" data-i18n="race_title">Race a Friend</h2>
+        <p class="subtitle" data-i18n="race_sub">Same 10 flags, same time limit — first to type the right country wins the point. Most correct out of 10 wins 2 coins! Works with a friend on any device — just share the room code.</p>
         <p class="fb-status" id="flag-online-fb-status"></p>
-        <h3>Create a Room</h3>
-        <label>Difficulty</label>
+        <h3 data-i18n="create_room_h">Create a Room</h3>
+        <label data-i18n="difficulty">Difficulty</label>
         <select id="flag-online-create-diff" style="width:100%; padding:12px; border-radius:10px; margin:8px 0;">
-          <option value="easy">Easy (10s per flag)</option>
-          <option value="medium">Medium (20s per flag)</option>
-          <option value="hard">Hard (30s per flag)</option>
+          <option value="easy" data-i18n="opt_easy_10s">Easy (10s per flag)</option>
+          <option value="medium" data-i18n="opt_medium_20s">Medium (20s per flag)</option>
+          <option value="hard" data-i18n="opt_hard_30s">Hard (30s per flag)</option>
         </select>
-        <button class="btn btn-green" onclick="createFlagRoom()">Create Room</button>
+        <button class="btn btn-green" onclick="createFlagRoom()" data-i18n="btn_create_room">Create Room</button>
         <hr style="margin:22px 0; border:none; border-top:2px dashed #ddd;">
-        <h3>Join a Room</h3>
-        <label>Room Code</label>
-        <input type="text" id="flag-online-join-code" placeholder="Enter code from your friend" style="text-transform:uppercase;">
-        <button class="btn btn-blue" onclick="joinFlagRoom()">Join Room</button>
+        <h3 data-i18n="join_room_h">Join a Room</h3>
+        <label data-i18n="room_code">Room Code</label>
+        <input type="text" id="flag-online-join-code" data-i18n-ph="ph_enter_code" placeholder="Enter code from your friend" style="text-transform:uppercase;">
+        <button class="btn btn-blue" onclick="joinFlagRoom()" data-i18n="btn_join_room">Join Room</button>
         <div class="error-text" id="flag-online-setup-error"></div>
       </div>
     </section>
@@ -269,11 +275,11 @@
     <!-- FLAG ONLINE HOST WAIT -->
     <section id="screen-flag-host-wait" class="screen">
       <div class="card-box">
-        <span class="role-tag">Race Host</span>
-        <h3>Share this code with your friend:</h3>
+        <span class="role-tag" data-i18n="race_host">Race Host</span>
+        <h3 data-i18n="share_code">Share this code with your friend:</h3>
         <div class="code-box" id="flag-host-room-code">XXXXX</div>
-        <p id="flag-host-wait-msg" style="text-align:center; font-weight:bold;">Waiting for your friend to join...</p>
-        <button class="btn btn-red" id="flag-host-start-btn" style="display:none;" onclick="hostStartFlagRace()">Start Race!</button>
+        <p id="flag-host-wait-msg" style="text-align:center; font-weight:bold;" data-i18n="waiting_join">Waiting for your friend to join...</p>
+        <button class="btn btn-red" id="flag-host-start-btn" style="display:none;" onclick="hostStartFlagRace()" data-i18n="btn_start_race">Start Race!</button>
       </div>
     </section>
 
@@ -281,14 +287,14 @@
     <section id="screen-flag-online-race" class="screen">
       <div class="card-box">
         <div class="btn-row" style="margin-bottom:12px;">
-          <div class="score-box"><strong>You</strong><span id="flag-race-my-score">0</span></div>
-          <div class="score-box"><strong>Friend</strong><span id="flag-race-friend-score">0</span></div>
+          <div class="score-box"><strong data-i18n="you">You</strong><span id="flag-race-my-score">0</span></div>
+          <div class="score-box"><strong data-i18n="friend">Friend</strong><span id="flag-race-friend-score">0</span></div>
         </div>
         <div class="progress-text" id="flag-race-progress">Flag 1 / 10</div>
         <div id="flag-race-timer">10</div>
         <div class="flag-wrap"><img id="flag-race-img" class="flag-big" src="" alt="flag" decoding="async" fetchpriority="high"></div>
-        <input type="text" id="flag-race-input" placeholder="Type the country name..." autocomplete="off" onkeydown="if(event.key==='Enter')submitFlagRaceAnswer()">
-        <button class="btn btn-red" onclick="submitFlagRaceAnswer()">Submit</button>
+        <input type="text" id="flag-race-input" data-i18n-ph="ph_type_country" placeholder="Type the country name..." autocomplete="off" onkeydown="if(event.key==='Enter')submitFlagRaceAnswer()">
+        <button class="btn btn-red" onclick="submitFlagRaceAnswer()" data-i18n="btn_submit">Submit</button>
         <div class="error-text" id="flag-race-status"></div>
       </div>
     </section>
@@ -300,39 +306,39 @@
         <div class="result-msg" id="flag-online-result-msg"></div>
         <div class="result-sub" id="flag-online-result-sub"></div>
         <div class="btn-row">
-          <button class="btn btn-blue" onclick="leaveFlagRoomToHome()">Home</button>
-          <button class="btn btn-green" onclick="showScreen('screen-flag-online-setup')">New Room</button>
+          <button class="btn btn-blue" onclick="leaveFlagRoomToHome()" data-i18n="btn_home">Home</button>
+          <button class="btn btn-green" onclick="showScreen('screen-flag-online-setup')" data-i18n="new_room">New Room</button>
         </div>
       </div>
     </section>
 
     <!-- GEO MODE CHOICE -->
     <section id="screen-geo-mode" class="screen">
-      <a class="back-link" onclick="showScreen('screen-play')">← Back</a>
+      <a class="back-link" onclick="showScreen('screen-play')" data-i18n="back">← Back</a>
       <div class="card-box">
-        <h2 style="text-align:center;">Ask The Geography Questions</h2>
-        <p class="subtitle">Pick yes/no questions to figure out the mystery country in 10 minutes.</p>
-        <button class="btn btn-blue" onclick="showScreen('screen-geo-diff')">🤖 Play vs AI</button>
-        <button class="btn btn-green" onclick="goGeoOnline()">👥 Play Online with a Friend</button>
+        <h2 style="text-align:center;" data-i18n="geo_title">Ask The Geography Questions</h2>
+        <p class="subtitle" data-i18n="geo_sub">Pick yes/no questions to figure out the mystery country in 10 minutes.</p>
+        <button class="btn btn-blue" onclick="showScreen('screen-geo-diff')" data-i18n="geo_vs_ai">🤖 Play vs AI</button>
+        <button class="btn btn-green" onclick="goGeoOnline()" data-i18n="geo_online">👥 Play Online with a Friend</button>
         <small class="muted" id="geo-online-note"></small>
       </div>
     </section>
 
     <!-- GEO DIFFICULTY (AI) -->
     <section id="screen-geo-diff" class="screen">
-      <a class="back-link" onclick="showScreen('screen-geo-mode')">← Back</a>
+      <a class="back-link" onclick="showScreen('screen-geo-mode')" data-i18n="back">← Back</a>
       <div class="card-box">
-        <h2 style="text-align:center;">Choose Difficulty</h2>
+        <h2 style="text-align:center;" data-i18n="choose_difficulty">Choose Difficulty</h2>
         <div class="diff-card diff-easy" onclick="startGeoAI('easy')">
-          <h3>Easy</h3><p>Well-known countries</p><p>Reward: 1 coin</p>
+          <h3 data-i18n="easy">Easy</h3><p data-i18n="geo_easy_desc">Well-known countries</p><p data-i18n="geo_reward_1">Reward: 1 coin</p>
         </div>
         <div class="diff-card diff-medium" onclick="startGeoAI('medium')">
-          <h3>Medium</h3><p>Moderately known countries</p><p>Reward: 2 coins</p>
+          <h3 data-i18n="medium">Medium</h3><p data-i18n="geo_medium_desc">Moderately known countries</p><p data-i18n="geo_reward_2">Reward: 2 coins</p>
         </div>
         <div class="diff-card diff-hard" onclick="startGeoAI('hard')">
-          <h3>Hard</h3><p>Tricky, lesser-known countries</p><p>Reward: 4 coins</p>
+          <h3 data-i18n="hard">Hard</h3><p data-i18n="geo_hard_desc">Tricky, lesser-known countries</p><p data-i18n="geo_reward_4">Reward: 4 coins</p>
         </div>
-        <p style="text-align:center; color:#666; font-size:.9em;">You'll have 10 minutes to ask yes/no questions and guess the country.</p>
+        <p style="text-align:center; color:#666; font-size:.9em;" data-i18n="geo_time_note">You'll have 10 minutes to ask yes/no questions and guess the country.</p>
       </div>
     </section>
 
@@ -341,17 +347,17 @@
       <div class="card-box">
         <div id="geo-timer">10:00</div>
         <div class="chat-log" id="geo-chat-log"></div>
-        <label>Ask a yes/no question</label>
-        <input type="text" id="geo-question-input" placeholder="e.g. Is it in Europe?" onkeydown="if(event.key==='Enter')askGeoQuestion()">
-        <button class="btn btn-blue" onclick="askGeoQuestion()">Ask</button>
-        <label>Guess the country</label>
-        <input type="text" id="geo-guess-input" placeholder="Type your final guess..." onkeydown="if(event.key==='Enter')guessGeoCountry()">
-        <button class="btn btn-red" onclick="guessGeoCountry()">Guess</button>
+        <label data-i18n="ask_yn">Ask a yes/no question</label>
+        <input type="text" id="geo-question-input" data-i18n-ph="ph_ask_example" placeholder="e.g. Is it in Europe?" onkeydown="if(event.key==='Enter')askGeoQuestion()">
+        <button class="btn btn-blue" onclick="askGeoQuestion()" data-i18n="btn_ask">Ask</button>
+        <label data-i18n="guess_country">Guess the country</label>
+        <input type="text" id="geo-guess-input" data-i18n-ph="ph_final_guess" placeholder="Type your final guess..." onkeydown="if(event.key==='Enter')guessGeoCountry()">
+        <button class="btn btn-red" onclick="guessGeoCountry()" data-i18n="btn_guess">Guess</button>
         <div class="hint-row">
-          <button class="btn-small btn btn-yellow" style="width:auto;" onclick="useGeoContinentHint()">💡 Reveal Continent (<span id="geo-continent-hint-count">0</span> owned)</button>
-          <button class="btn-small btn btn-yellow" style="width:auto;" onclick="useGeoLetterHint()">💡 Reveal First Letter (<span id="geo-letter-hint-count">0</span> owned)</button>
+          <button class="btn-small btn btn-yellow" style="width:auto;" onclick="useGeoContinentHint()" data-i18n-html="hint_continent_btn">💡 Reveal Continent (<span id="geo-continent-hint-count">0</span> owned)</button>
+          <button class="btn-small btn btn-yellow" style="width:auto;" onclick="useGeoLetterHint()" data-i18n-html="hint_geo_letter_btn">💡 Reveal First Letter (<span id="geo-letter-hint-count">0</span> owned)</button>
         </div>
-        <button class="btn btn-gray" onclick="giveUpGeoAI()">🏳 Give Up</button>
+        <button class="btn btn-gray" onclick="giveUpGeoAI()" data-i18n="btn_give_up">🏳 Give Up</button>
       </div>
     </section>
 
@@ -362,32 +368,32 @@
         <div class="result-msg" id="geo-result-msg"></div>
         <div class="result-sub" id="geo-result-sub"></div>
         <div class="btn-row">
-          <button class="btn btn-blue" onclick="showScreen('screen-home')">Home</button>
-          <button class="btn btn-green" onclick="restartGeoAI()">Restart</button>
+          <button class="btn btn-blue" onclick="showScreen('screen-home')" data-i18n="btn_home">Home</button>
+          <button class="btn btn-green" onclick="restartGeoAI()" data-i18n="btn_restart">Restart</button>
         </div>
       </div>
     </section>
 
     <!-- ONLINE SETUP -->
     <section id="screen-geo-online-setup" class="screen">
-      <a class="back-link" onclick="showScreen('screen-geo-mode')">← Back</a>
+      <a class="back-link" onclick="showScreen('screen-geo-mode')" data-i18n="back">← Back</a>
       <div class="card-box">
-        <h2 style="text-align:center;">Play Online</h2>
-        <p class="subtitle">Create a room and share the code, or join a friend's room. Works with a friend on any device — just share the room code.</p>
+        <h2 style="text-align:center;" data-i18n="play_online_title">Play Online</h2>
+        <p class="subtitle" data-i18n="geo_online_sub">Create a room and share the code, or join a friend's room. Works with a friend on any device — just share the room code.</p>
         <p class="fb-status" id="online-fb-status"></p>
-        <h3>Create a Room</h3>
-        <label>Difficulty (country pool for your friend to pick from)</label>
+        <h3 data-i18n="create_room_h">Create a Room</h3>
+        <label data-i18n="diff_pool_label">Difficulty (country pool for your friend to pick from)</label>
         <select id="online-create-diff" style="width:100%; padding:12px; border-radius:10px; margin:8px 0;">
-          <option value="easy">Easy</option>
-          <option value="medium">Medium</option>
-          <option value="hard">Hard</option>
+          <option value="easy" data-i18n="easy">Easy</option>
+          <option value="medium" data-i18n="medium">Medium</option>
+          <option value="hard" data-i18n="hard">Hard</option>
         </select>
-        <button class="btn btn-green" onclick="createRoom()">Create Room (I'll be the Picker)</button>
+        <button class="btn btn-green" onclick="createRoom()" data-i18n="btn_create_picker">Create Room (I'll be the Picker)</button>
         <hr style="margin:22px 0; border:none; border-top:2px dashed #ddd;">
-        <h3>Join a Room</h3>
-        <label>Room Code</label>
-        <input type="text" id="online-join-code" placeholder="Enter code from your friend" style="text-transform:uppercase;">
-        <button class="btn btn-blue" onclick="joinRoom()">Join Room (I'll be the Guesser)</button>
+        <h3 data-i18n="join_room_h">Join a Room</h3>
+        <label data-i18n="room_code">Room Code</label>
+        <input type="text" id="online-join-code" data-i18n-ph="ph_enter_code" placeholder="Enter code from your friend" style="text-transform:uppercase;">
+        <button class="btn btn-blue" onclick="joinRoom()" data-i18n="btn_join_guesser">Join Room (I'll be the Guesser)</button>
         <div class="error-text" id="online-setup-error"></div>
       </div>
     </section>
@@ -395,14 +401,14 @@
     <!-- ONLINE PICKER WAIT / PICK -->
     <section id="screen-geo-picker-setup" class="screen">
       <div class="card-box">
-        <span class="role-tag">You are the Picker</span>
-        <h3>Share this code with your friend:</h3>
+        <span class="role-tag" data-i18n="you_are_picker">You are the Picker</span>
+        <h3 data-i18n="share_code">Share this code with your friend:</h3>
         <div class="code-box" id="picker-room-code">XXXXX</div>
-        <p id="picker-wait-msg" style="text-align:center; font-weight:bold;">Waiting for your friend to join...</p>
+        <p id="picker-wait-msg" style="text-align:center; font-weight:bold;" data-i18n="waiting_join">Waiting for your friend to join...</p>
         <div id="picker-pick-area" style="display:none;">
-          <label>Pick your secret country</label>
+          <label data-i18n="pick_secret">Pick your secret country</label>
           <select id="picker-secret-select" style="width:100%; padding:12px; border-radius:10px; margin:8px 0;"></select>
-          <button class="btn btn-red" onclick="pickerStartGame()">Start Game</button>
+          <button class="btn btn-red" onclick="pickerStartGame()" data-i18n="btn_start_game">Start Game</button>
         </div>
       </div>
     </section>
@@ -416,17 +422,17 @@
 
         <!-- Guesser controls -->
         <div id="guesser-controls" style="display:none;">
-          <label>Ask a yes/no question</label>
-          <input type="text" id="online-question-input" placeholder="e.g. Is it landlocked?" onkeydown="if(event.key==='Enter')sendOnlineQuestion()">
-          <button class="btn btn-blue" onclick="sendOnlineQuestion()">Ask</button>
-          <label>Guess the country</label>
-          <input type="text" id="online-guess-input" placeholder="Type your final guess..." onkeydown="if(event.key==='Enter')sendOnlineGuess()">
-          <button class="btn btn-red" onclick="sendOnlineGuess()">Guess</button>
+          <label data-i18n="ask_yn">Ask a yes/no question</label>
+          <input type="text" id="online-question-input" data-i18n-ph="ph_ask_example" placeholder="e.g. Is it landlocked?" onkeydown="if(event.key==='Enter')sendOnlineQuestion()">
+          <button class="btn btn-blue" onclick="sendOnlineQuestion()" data-i18n="btn_ask">Ask</button>
+          <label data-i18n="guess_country">Guess the country</label>
+          <input type="text" id="online-guess-input" data-i18n-ph="ph_final_guess" placeholder="Type your final guess..." onkeydown="if(event.key==='Enter')sendOnlineGuess()">
+          <button class="btn btn-red" onclick="sendOnlineGuess()" data-i18n="btn_guess">Guess</button>
         </div>
 
         <!-- Picker controls -->
         <div id="picker-controls" style="display:none;">
-          <p style="text-align:center; color:#666;">Answer your friend's questions below.</p>
+          <p style="text-align:center; color:#666;" data-i18n="answer_friend_qs">Answer your friend's questions below.</p>
           <div id="picker-pending-list"></div>
         </div>
       </div>
@@ -439,53 +445,53 @@
         <div class="result-msg" id="online-result-msg"></div>
         <div class="result-sub" id="online-result-sub"></div>
         <div class="btn-row">
-          <button class="btn btn-blue" onclick="leaveRoomToHome()">Home</button>
-          <button class="btn btn-green" onclick="showScreen('screen-geo-online-setup')">New Room</button>
+          <button class="btn btn-blue" onclick="leaveRoomToHome()" data-i18n="btn_home">Home</button>
+          <button class="btn btn-green" onclick="showScreen('screen-geo-online-setup')" data-i18n="new_room">New Room</button>
         </div>
       </div>
     </section>
 
     <!-- STORE -->
     <section id="screen-store" class="screen">
-      <a class="back-link" onclick="showScreen('screen-home')">← Home</a>
+      <a class="back-link" onclick="showScreen('screen-home')" data-i18n="back_home">← Home</a>
       <div class="card-box">
-        <h2 style="text-align:center;">🛒 Store</h2>
-        <p class="subtitle">Spend coins on hints to help you win.</p>
+        <h2 style="text-align:center;" data-i18n="store_title">🛒 Store</h2>
+        <p class="subtitle" data-i18n="store_sub">Spend coins on hints to help you win.</p>
 
         <div class="store-item">
           <div>
-            <div class="name">💡 Letter Reveal (Flag Game)</div>
-            <div class="desc">Reveals the first letter of the current flag's country.</div>
-            <div class="owned">Owned: <span id="store-owned-flagLetter">0</span></div>
+            <div class="name" data-i18n="item_flagLetter">💡 Letter Reveal (Flag Game)</div>
+            <div class="desc" data-i18n="item_flagLetter_desc">Reveals the first letter of the current flag's country.</div>
+            <div class="owned" data-i18n-html="owned_flagLetter">Owned: <span id="store-owned-flagLetter">0</span></div>
           </div>
-          <button class="buy-btn" onclick="buyHint('flagLetter',3)">Buy - 3 🪙</button>
+          <button class="buy-btn" onclick="buyHint('flagLetter',3)" data-i18n="buy_3">Buy - 3 🪙</button>
         </div>
 
         <div class="store-item">
           <div>
-            <div class="name">⏱ +5 Seconds (Flag Game)</div>
-            <div class="desc">Adds 5 seconds to the timer for the current flag.</div>
-            <div class="owned">Owned: <span id="store-owned-flagTime">0</span></div>
+            <div class="name" data-i18n="item_flagTime">⏱ +5 Seconds (Flag Game)</div>
+            <div class="desc" data-i18n="item_flagTime_desc">Adds 5 seconds to the timer for the current flag.</div>
+            <div class="owned" data-i18n-html="owned_flagTime">Owned: <span id="store-owned-flagTime">0</span></div>
           </div>
-          <button class="buy-btn" onclick="buyHint('flagTime',2)">Buy - 2 🪙</button>
+          <button class="buy-btn" onclick="buyHint('flagTime',2)" data-i18n="buy_2">Buy - 2 🪙</button>
         </div>
 
         <div class="store-item">
           <div>
-            <div class="name">🌍 Continent Reveal (Geography)</div>
-            <div class="desc">Reveals the mystery country's continent.</div>
-            <div class="owned">Owned: <span id="store-owned-geoContinent">0</span></div>
+            <div class="name" data-i18n="item_geoContinent">🌍 Continent Reveal (Geography)</div>
+            <div class="desc" data-i18n="item_geoContinent_desc">Reveals the mystery country's continent.</div>
+            <div class="owned" data-i18n-html="owned_geoContinent">Owned: <span id="store-owned-geoContinent">0</span></div>
           </div>
-          <button class="buy-btn" onclick="buyHint('geoContinent',3)">Buy - 3 🪙</button>
+          <button class="buy-btn" onclick="buyHint('geoContinent',3)" data-i18n="buy_3">Buy - 3 🪙</button>
         </div>
 
         <div class="store-item">
           <div>
-            <div class="name">🔤 First Letter Reveal (Geography)</div>
-            <div class="desc">Reveals the first letter of the mystery country.</div>
-            <div class="owned">Owned: <span id="store-owned-geoLetter">0</span></div>
+            <div class="name" data-i18n="item_geoLetter">🔤 First Letter Reveal (Geography)</div>
+            <div class="desc" data-i18n="item_geoLetter_desc">Reveals the first letter of the mystery country.</div>
+            <div class="owned" data-i18n-html="owned_geoLetter">Owned: <span id="store-owned-geoLetter">0</span></div>
           </div>
-          <button class="buy-btn" onclick="buyHint('geoLetter',4)">Buy - 4 🪙</button>
+          <button class="buy-btn" onclick="buyHint('geoLetter',4)" data-i18n="buy_4">Buy - 4 🪙</button>
         </div>
 
         <div class="error-text" id="store-error"></div>
@@ -494,31 +500,31 @@
 
     <!-- SIGN IN -->
     <section id="screen-signin" class="screen">
-      <a class="back-link" onclick="showScreen('screen-home')">← Home</a>
+      <a class="back-link" onclick="showScreen('screen-home')" data-i18n="back_home">← Home</a>
       <div class="card-box">
-        <h2 style="text-align:center;">👤 Sign In</h2>
+        <h2 style="text-align:center;" data-i18n="signin_title">👤 Sign In</h2>
         <div id="signin-form">
-          <p class="subtitle">Create or access your account to unlock online play with friends.</p>
-          <label>Username</label>
-          <input type="text" id="signin-username" placeholder="Choose a username" autocomplete="off">
-          <label>Password (exactly 4 characters)</label>
-          <input type="password" id="signin-password" maxlength="4" placeholder="4 characters">
+          <p class="subtitle" data-i18n="signin_sub">Create or access your account to unlock online play with friends.</p>
+          <label data-i18n="username">Username</label>
+          <input type="text" id="signin-username" data-i18n-ph="ph_username" placeholder="Choose a username" autocomplete="off">
+          <label data-i18n="password_label">Password (exactly 4 characters)</label>
+          <input type="password" id="signin-password" maxlength="4" data-i18n-ph="ph_password" placeholder="4 characters">
           <div class="error-text" id="signin-error"></div>
-          <button class="btn btn-blue" onclick="doSignIn()">Sign In</button>
+          <button class="btn btn-blue" onclick="doSignIn()" data-i18n="btn_do_signin">Sign In</button>
         </div>
         <div id="signin-account" style="display:none;">
-          <p class="success-text" style="text-align:center;">✅ Signed in as <span id="signed-in-username"></span><span id="signed-in-owner-badge" class="owner-badge" style="display:none;">👑 OWNER</span><span id="signed-in-assistant-badge" class="owner-badge" style="display:none;">🛠 ASSISTANT</span></p>
-          <p class="subtitle">Online multiplayer is now unlocked!</p>
-          <button class="btn btn-gray" onclick="doSignOut()">Log Out</button>
+          <p class="success-text" style="text-align:center;"><span data-i18n="signed_in_as">✅ Signed in as </span><span id="signed-in-username"></span><span id="signed-in-owner-badge" class="owner-badge" style="display:none;" data-i18n="badge_owner">👑 OWNER</span><span id="signed-in-assistant-badge" class="owner-badge" style="display:none;" data-i18n="badge_assistant">🛠 ASSISTANT</span></p>
+          <p class="subtitle" data-i18n="online_unlocked">Online multiplayer is now unlocked!</p>
+          <button class="btn btn-gray" onclick="doSignOut()" data-i18n="btn_logout">Log Out</button>
         </div>
       </div>
     </section>
 
     <!-- OWNER PANEL -->
     <section id="screen-owner-panel" class="screen">
-      <a class="back-link" onclick="closeOwnerPanel()">← Home</a>
+      <a class="back-link" onclick="closeOwnerPanel()" data-i18n="back_home">← Home</a>
       <div class="card-box">
-        <h2 style="text-align:center;">🛡 Owner Panel</h2>
+        <h2 style="text-align:center;" data-i18n="owner_panel_title">🛡 Owner Panel</h2>
         <p class="subtitle" id="owner-panel-subtitle">Every signed-in player's coins &amp; hints, live from Firebase.</p>
         <p class="fb-status" id="owner-users-status"></p>
         <div id="owner-users-list"></div>
@@ -527,14 +533,14 @@
 
     <!-- GLOBAL CHAT -->
     <section id="screen-global-chat" class="screen">
-      <a class="back-link" onclick="closeGlobalChat()">← Home</a>
+      <a class="back-link" onclick="closeGlobalChat()" data-i18n="back_home">← Home</a>
       <div class="card-box">
-        <h2 style="text-align:center;">📢 Global Chat</h2>
-        <p class="subtitle">Announcements from the owner, visible to everyone signed in.</p>
+        <h2 style="text-align:center;" data-i18n="global_chat_title">📢 Global Chat</h2>
+        <p class="subtitle" data-i18n="global_chat_sub">Announcements from the owner, visible to everyone signed in.</p>
         <p class="fb-status" id="global-chat-status"></p>
         <div id="global-chat-compose" style="display:none;">
-          <input type="text" id="global-chat-input" placeholder="Message the whole world..." onkeydown="if(event.key==='Enter')sendGlobalMessage()">
-          <button class="btn btn-red" onclick="sendGlobalMessage()">Broadcast to Everyone</button>
+          <input type="text" id="global-chat-input" data-i18n-ph="ph_global_msg" placeholder="Message the whole world..." onkeydown="if(event.key==='Enter')sendGlobalMessage()">
+          <button class="btn btn-red" onclick="sendGlobalMessage()" data-i18n="btn_broadcast">Broadcast to Everyone</button>
         </div>
         <div class="chat-log" id="global-chat-log" style="margin-top:12px;"></div>
       </div>
@@ -542,14 +548,14 @@
 
     <!-- ADMIN CHAT (owner + assistants only) -->
     <section id="screen-admin-chat" class="screen">
-      <a class="back-link" onclick="closeAdminChat()">← Home</a>
+      <a class="back-link" onclick="closeAdminChat()" data-i18n="back_home">← Home</a>
       <div class="card-box">
-        <h2 style="text-align:center;">🗨 Admin Chat</h2>
-        <p class="subtitle">Private chat between the owner and assistants.</p>
+        <h2 style="text-align:center;" data-i18n="admin_chat_title">🗨 Admin Chat</h2>
+        <p class="subtitle" data-i18n="admin_chat_sub">Private chat between the owner and assistants.</p>
         <p class="fb-status" id="admin-chat-status"></p>
         <div id="admin-chat-compose">
-          <input type="text" id="admin-chat-input" placeholder="Message the staff team..." onkeydown="if(event.key==='Enter')sendAdminChatMessage()">
-          <button class="btn btn-blue" onclick="sendAdminChatMessage()">Send</button>
+          <input type="text" id="admin-chat-input" data-i18n-ph="ph_admin_msg" placeholder="Message the staff team..." onkeydown="if(event.key==='Enter')sendAdminChatMessage()">
+          <button class="btn btn-blue" onclick="sendAdminChatMessage()" data-i18n="btn_send">Send</button>
         </div>
         <div class="chat-log" id="admin-chat-log" style="margin-top:12px;"></div>
       </div>
@@ -557,20 +563,20 @@
 
     <!-- FEATURES & BUGS (assistants submit, owner + assistants view) -->
     <section id="screen-feedback" class="screen">
-      <a class="back-link" onclick="closeFeedback()">← Home</a>
+      <a class="back-link" onclick="closeFeedback()" data-i18n="back_home">← Home</a>
       <div class="card-box">
-        <h2 style="text-align:center;">🐞 Features &amp; Bugs</h2>
-        <p class="subtitle">Assistants log feature ideas and bugs here for the owner to see.</p>
+        <h2 style="text-align:center;" data-i18n="feedback_title">🐞 Features &amp; Bugs</h2>
+        <p class="subtitle" data-i18n="feedback_sub">Assistants log feature ideas and bugs here for the owner to see.</p>
         <p class="fb-status" id="feedback-status"></p>
         <div id="feedback-compose">
-          <label>Type</label>
+          <label data-i18n="feedback_type">Type</label>
           <select id="feedback-type" style="width:100%; padding:12px; border-radius:10px; margin:8px 0;">
-            <option value="feature">💡 Feature request</option>
-            <option value="bug">🐛 Bug report</option>
+            <option value="feature" data-i18n="opt_feature">💡 Feature request</option>
+            <option value="bug" data-i18n="opt_bug">🐛 Bug report</option>
           </select>
-          <label>Description</label>
-          <input type="text" id="feedback-text" placeholder="Describe the feature or bug..." onkeydown="if(event.key==='Enter')submitFeedback()">
-          <button class="btn btn-yellow" onclick="submitFeedback()">Submit</button>
+          <label data-i18n="feedback_desc">Description</label>
+          <input type="text" id="feedback-text" data-i18n-ph="ph_feedback" placeholder="Describe the feature or bug..." onkeydown="if(event.key==='Enter')submitFeedback()">
+          <button class="btn btn-yellow" onclick="submitFeedback()" data-i18n="btn_feedback_submit">Submit</button>
         </div>
         <div class="chat-log" id="feedback-log" style="margin-top:12px;"></div>
       </div>
@@ -585,18 +591,531 @@
 <script src="https://www.gstatic.com/firebasejs/12.17.0/firebase-database-compat.js"></script>
 
 <script>
+/* -------- I18N (English / French) --------
+   Every user-facing string lives in I18N below, keyed by a short id. Static
+   markup carries data-i18n (textContent), data-i18n-html (innerHTML, for
+   labels that wrap a live <span>) or data-i18n-ph (placeholder) attributes;
+   applyLanguage() rewrites them all on load and whenever the language is
+   toggled. Dynamic strings built in JS go through tr(key, vars).
+
+   Country names are NOT duplicated into the pools: COUNTRY_FR maps each
+   canonical English name to its French name plus extra accepted spellings.
+   countryLabel() picks the display name for the current language, and
+   matchesCountry() accepts EITHER language's spelling at all times, so a
+   French player typing "Allemagne" and an English one typing "Germany" are
+   both right — which also keeps cross-language online rooms fair. */
+const LANGS = ['en','fr'];
+const I18N = {
+en:{
+  doc_title:"Guess The Flag", logo:"🏁 GUESS THE FLAG", app_title:"Guess The Flag",
+  lang_toggle:"FR", lang_toggle_title:"Passer en français",
+  home_welcome:"Test your flag & geography knowledge!", welcome_back:"Welcome back, {name}!",
+  btn_play:"▶ Play", btn_store:"🛒 Store", btn_global_chat:"📢 Global Chat", btn_signin:"👤 Sign In",
+  btn_owner_panel:"🛡 Owner Panel", btn_feedback:"🐞 Features & Bugs", btn_admin_chat:"🗨 Admin Chat",
+  back_home:"← Home", back:"← Back", btn_home:"Home", btn_restart:"Restart", btn_submit:"Submit",
+  choose_game:"Choose a Game", game_flag:"🚩 Guess The Flag", game_geo:"🌍 Ask The Geography Questions",
+  flag_mode_title:"Guess The Flag",
+  flag_mode_sub:"Race through 10 flags solo, or race a friend to see who's fastest.",
+  flag_play_solo:"🚩 Play Solo", flag_race_friend:"👥 Race a Friend Online",
+  note_signin_race:"Sign in to unlock racing a friend online.",
+  note_signin_online:"Sign in to unlock playing online with a friend.",
+  choose_difficulty:"Choose Difficulty", easy:"Easy", medium:"Medium", hard:"Hard",
+  flag_easy_desc:"Well-known flags · 10 seconds per flag",
+  flag_medium_desc:"Slightly harder flags · 20 seconds per flag",
+  flag_hard_desc:"Tough, obscure flags · 30 seconds per flag",
+  flag_reward_1:"Reward: 1 coin for completing all 10",
+  flag_reward_2:"Reward: 2 coins for completing all 10",
+  flag_reward_4:"Reward: 4 coins for completing all 10",
+  flag_progress:"Flag {n} / 10", ph_type_country:"Type the country name...",
+  hint_letter_btn:"💡 Reveal Letter (<span id=\"flag-letter-hint-count\">0</span> owned)",
+  hint_time_btn:"⏱ +5 Seconds (<span id=\"flag-time-hint-count\">0</span> owned)",
+  flag_win_msg:"You guessed all 10 flags!", flag_lose_msg:"Wrong! Better luck next time.",
+  earned_coins:"You earned {n} coin{s}.", correct_answer_was:"The correct answer was {name}.",
+  hint_not_owned:"You don't own this hint. Buy it in the Store!",
+  hint_starts_with:"Hint: starts with \"{L}\"", hint_time_added:"+5 seconds added!",
+  race_title:"Race a Friend",
+  race_sub:"Same 10 flags, same time limit — first to type the right country wins the point. Most correct out of 10 wins 2 coins! Works with a friend on any device — just share the room code.",
+  create_room_h:"Create a Room", join_room_h:"Join a Room", difficulty:"Difficulty",
+  opt_easy_10s:"Easy (10s per flag)", opt_medium_20s:"Medium (20s per flag)", opt_hard_30s:"Hard (30s per flag)",
+  btn_create_room:"Create Room", btn_join_room:"Join Room", room_code:"Room Code",
+  ph_enter_code:"Enter code from your friend",
+  race_host:"Race Host", share_code:"Share this code with your friend:",
+  waiting_join:"Waiting for your friend to join...", btn_start_race:"Start Race!",
+  you:"You", friend:"Friend", new_room:"New Room",
+  friend_joined_ready:"Your friend joined! Ready to race.",
+  waiting_host:"Waiting for host...", waiting_host_start:"Waiting for the host to start the race...",
+  not_quite:"Not quite, try again!",
+  times_up_nobody:"Time's up! Nobody got it — it was {name}.",
+  you_got_first:"You got it first! 🎉 ({name})", friend_got_first:"Your friend got it first! ({name})",
+  its_a_tie:"It's a tie!", tie_sub:"You both got {n} out of 10. No coins awarded this round.",
+  you_won_race:"You won the race!", race_win_sub:"You: {a}  ·  Friend: {b}. You earned 2 coins!",
+  friend_won_race:"Your friend won this race.", race_lose_sub:"You: {a}  ·  Friend: {b}. Better luck next time!",
+  geo_title:"Ask The Geography Questions",
+  geo_sub:"Pick yes/no questions to figure out the mystery country in 10 minutes.",
+  geo_vs_ai:"🤖 Play vs AI", geo_online:"👥 Play Online with a Friend",
+  geo_easy_desc:"Well-known countries", geo_medium_desc:"Moderately known countries",
+  geo_hard_desc:"Tricky, lesser-known countries",
+  geo_reward_1:"Reward: 1 coin", geo_reward_2:"Reward: 2 coins", geo_reward_4:"Reward: 4 coins",
+  geo_time_note:"You'll have 10 minutes to ask yes/no questions and guess the country.",
+  ask_yn:"Ask a yes/no question", ph_ask_example:"e.g. Is it in Europe?", btn_ask:"Ask",
+  guess_country:"Guess the country", ph_final_guess:"Type your final guess...", btn_guess:"Guess",
+  hint_continent_btn:"💡 Reveal Continent (<span id=\"geo-continent-hint-count\">0</span> owned)",
+  hint_geo_letter_btn:"💡 Reveal First Letter (<span id=\"geo-letter-hint-count\">0</span> owned)",
+  btn_give_up:"🏳 Give Up",
+  geo_intro:"I'm thinking of a country. Ask me yes/no questions, then make your final guess!",
+  my_guess:"My guess: {g}", nope_keep_trying:"Nope, keep trying!", times_up:"Time's up!",
+  gave_up_log:"You gave up.", gave_up:"You gave up!",
+  geo_correct:"Correct! It was {name}.", country_was:"The country was {name}.",
+  hint_continent_is:"Hint: The continent is {c}.", hint_geo_starts:"Hint: It starts with \"{L}\".",
+  ans_yes:"Yes.", ans_no:"No.",
+  answer_fallback:"I can only answer yes/no questions about continent, hemisphere, coastline, island status, population, size, flag colors, first letter, capital, borders, language, or climate. Try rephrasing!",
+  play_online_title:"Play Online",
+  geo_online_sub:"Create a room and share the code, or join a friend's room. Works with a friend on any device — just share the room code.",
+  diff_pool_label:"Difficulty (country pool for your friend to pick from)",
+  btn_create_picker:"Create Room (I'll be the Picker)", btn_join_guesser:"Join Room (I'll be the Guesser)",
+  you_are_picker:"You are the Picker", pick_secret:"Pick your secret country", btn_start_game:"Start Game",
+  role:"Role", answer_friend_qs:"Answer your friend's questions below.",
+  friend_joined_pick:"Your friend joined! Pick your secret country below.",
+  guesser_waiting:"You are the Guesser — waiting for host to start...", you_are_guesser:"You are the Guesser",
+  picker_secret_tag:"You are the Picker (secret: {name})",
+  game_started_picker:"Game started! Waiting for questions from your friend.",
+  friend_picked:"Your friend picked a secret country! Start asking yes/no questions.",
+  friend_asked:"Friend asked: {q}", friend_guessed:"Friend guessed: {g}",
+  yn_yes:"Yes", yn_no:"No", yn_unsure:"Unsure",
+  times_up_friend:"Time's up on your friend's side!",
+  friend_guessed_it:"Your friend guessed it: {name}!", nice_round:"Nice round!",
+  better_luck_room:"Better luck in the next room!",
+  err_enter_code:"Please enter a room code.",
+  err_room_not_found:"Room not found. Check the code and try again.",
+  err_no_service:"Could not reach the online service. Try again.",
+  store_title:"🛒 Store", store_sub:"Spend coins on hints to help you win.",
+  item_flagLetter:"💡 Letter Reveal (Flag Game)",
+  item_flagLetter_desc:"Reveals the first letter of the current flag's country.",
+  item_flagTime:"⏱ +5 Seconds (Flag Game)",
+  item_flagTime_desc:"Adds 5 seconds to the timer for the current flag.",
+  item_geoContinent:"🌍 Continent Reveal (Geography)",
+  item_geoContinent_desc:"Reveals the mystery country's continent.",
+  item_geoLetter:"🔤 First Letter Reveal (Geography)",
+  item_geoLetter_desc:"Reveals the first letter of the mystery country.",
+  owned_flagLetter:"Owned: <span id=\"store-owned-flagLetter\">0</span>",
+  owned_flagTime:"Owned: <span id=\"store-owned-flagTime\">0</span>",
+  owned_geoContinent:"Owned: <span id=\"store-owned-geoContinent\">0</span>",
+  owned_geoLetter:"Owned: <span id=\"store-owned-geoLetter\">0</span>",
+  buy_3:"Buy - 3 🪙", buy_2:"Buy - 2 🪙", buy_4:"Buy - 4 🪙",
+  err_not_enough_coins:"Not enough coins!",
+  signin_title:"👤 Sign In",
+  signin_sub:"Create or access your account to unlock online play with friends.",
+  username:"Username", ph_username:"Choose a username",
+  password_label:"Password (exactly 4 characters)", ph_password:"4 characters",
+  btn_do_signin:"Sign In", signed_in_as:"✅ Signed in as ",
+  online_unlocked:"Online multiplayer is now unlocked!", btn_logout:"Log Out",
+  badge_owner:"👑 OWNER", badge_assistant:"🛠 ASSISTANT",
+  err_enter_username:"Please enter a username.",
+  err_password_len:"Password must be exactly 4 characters.",
+  err_signin_online:"Please sign in first to play online with a friend.",
+  err_signin_race:"Please sign in first to race a friend online.",
+  err_signin_chat:"Please sign in first to view Global Chat.",
+  owner_panel_title:"🛡 Owner Panel",
+  owner_panel_sub:"Every signed-in player's coins & hints, live from Firebase.",
+  owner_panel_sub_ro:"Every signed-in player's coins & hints, live from Firebase (view-only).",
+  no_users:"No signed-in users yet.",
+  global_chat_title:"📢 Global Chat",
+  global_chat_sub:"Announcements from the owner, visible to everyone signed in.",
+  ph_global_msg:"Message the whole world...", btn_broadcast:"Broadcast to Everyone",
+  admin_chat_title:"🗨 Admin Chat", admin_chat_sub:"Private chat between the owner and assistants.",
+  ph_admin_msg:"Message the staff team...", btn_send:"Send",
+  feedback_title:"🐞 Features & Bugs",
+  feedback_sub:"Assistants log feature ideas and bugs here for the owner to see.",
+  feedback_type:"Type", opt_feature:"💡 Feature request", opt_bug:"🐛 Bug report",
+  feedback_desc:"Description", ph_feedback:"Describe the feature or bug...", btn_feedback_submit:"Submit",
+  word_owner:"Owner", word_staff:"Staff",
+  fb_needs_config:"Online play needs Firebase configuration — see README.md.",
+  fb_could_not_connect:"Could not connect: {msg}",
+  fb_connecting:"Connecting to the online service...",
+  fb_still_connecting:"Still connecting to the online service — try again in a moment.",
+  fb_connected:"🟢 Connected — ready for online play."
+},
+fr:{
+  doc_title:"Devine Le Drapeau", logo:"🏁 DEVINE LE DRAPEAU", app_title:"Devine Le Drapeau",
+  lang_toggle:"EN", lang_toggle_title:"Switch to English",
+  home_welcome:"Teste tes connaissances en drapeaux et en géographie !", welcome_back:"Bon retour, {name} !",
+  btn_play:"▶ Jouer", btn_store:"🛒 Boutique", btn_global_chat:"📢 Chat Global", btn_signin:"👤 Connexion",
+  btn_owner_panel:"🛡 Panneau Propriétaire", btn_feedback:"🐞 Fonctionnalités et Bugs", btn_admin_chat:"🗨 Chat Admin",
+  back_home:"← Accueil", back:"← Retour", btn_home:"Accueil", btn_restart:"Rejouer", btn_submit:"Valider",
+  choose_game:"Choisis un jeu", game_flag:"🚩 Devine Le Drapeau", game_geo:"🌍 Questions de Géographie",
+  flag_mode_title:"Devine Le Drapeau",
+  flag_mode_sub:"Enchaîne 10 drapeaux en solo, ou affronte un ami pour voir qui est le plus rapide.",
+  flag_play_solo:"🚩 Jouer en Solo", flag_race_friend:"👥 Affronter un Ami en Ligne",
+  note_signin_race:"Connecte-toi pour débloquer les courses en ligne contre un ami.",
+  note_signin_online:"Connecte-toi pour débloquer le jeu en ligne avec un ami.",
+  choose_difficulty:"Choisis la difficulté", easy:"Facile", medium:"Moyen", hard:"Difficile",
+  flag_easy_desc:"Drapeaux connus · 10 secondes par drapeau",
+  flag_medium_desc:"Drapeaux un peu plus durs · 20 secondes par drapeau",
+  flag_hard_desc:"Drapeaux rares et coriaces · 30 secondes par drapeau",
+  flag_reward_1:"Récompense : 1 pièce si tu fais les 10",
+  flag_reward_2:"Récompense : 2 pièces si tu fais les 10",
+  flag_reward_4:"Récompense : 4 pièces si tu fais les 10",
+  flag_progress:"Drapeau {n} / 10", ph_type_country:"Écris le nom du pays...",
+  hint_letter_btn:"💡 Révéler la Lettre (<span id=\"flag-letter-hint-count\">0</span> en stock)",
+  hint_time_btn:"⏱ +5 Secondes (<span id=\"flag-time-hint-count\">0</span> en stock)",
+  flag_win_msg:"Tu as trouvé les 10 drapeaux !", flag_lose_msg:"Raté ! Plus de chance la prochaine fois.",
+  earned_coins:"Tu as gagné {n} pièce{s}.", correct_answer_was:"La bonne réponse était {name}.",
+  hint_not_owned:"Tu ne possèdes pas cet indice. Achète-le dans la Boutique !",
+  hint_starts_with:"Indice : commence par « {L} »", hint_time_added:"+5 secondes ajoutées !",
+  race_title:"Affronter un Ami",
+  race_sub:"Les mêmes 10 drapeaux, le même temps — le premier à écrire le bon pays gagne le point. Le meilleur score sur 10 gagne 2 pièces ! Fonctionne avec un ami sur n'importe quel appareil — il suffit de partager le code du salon.",
+  create_room_h:"Créer un Salon", join_room_h:"Rejoindre un Salon", difficulty:"Difficulté",
+  opt_easy_10s:"Facile (10s par drapeau)", opt_medium_20s:"Moyen (20s par drapeau)", opt_hard_30s:"Difficile (30s par drapeau)",
+  btn_create_room:"Créer le Salon", btn_join_room:"Rejoindre le Salon", room_code:"Code du Salon",
+  ph_enter_code:"Entre le code de ton ami",
+  race_host:"Hôte de la Course", share_code:"Partage ce code avec ton ami :",
+  waiting_join:"En attente de ton ami...", btn_start_race:"Lancer la Course !",
+  you:"Toi", friend:"Ami", new_room:"Nouveau Salon",
+  friend_joined_ready:"Ton ami a rejoint ! Prêt pour la course.",
+  waiting_host:"En attente de l'hôte...", waiting_host_start:"En attente du lancement de la course par l'hôte...",
+  not_quite:"Pas tout à fait, réessaie !",
+  times_up_nobody:"Temps écoulé ! Personne n'a trouvé — c'était {name}.",
+  you_got_first:"Tu l'as eu en premier ! 🎉 ({name})", friend_got_first:"Ton ami l'a eu en premier ! ({name})",
+  its_a_tie:"Égalité !", tie_sub:"Vous avez tous les deux {n} sur 10. Aucune pièce cette manche.",
+  you_won_race:"Tu as gagné la course !", race_win_sub:"Toi : {a}  ·  Ami : {b}. Tu as gagné 2 pièces !",
+  friend_won_race:"Ton ami a gagné cette course.", race_lose_sub:"Toi : {a}  ·  Ami : {b}. Plus de chance la prochaine fois !",
+  geo_title:"Questions de Géographie",
+  geo_sub:"Pose des questions oui/non pour trouver le pays mystère en 10 minutes.",
+  geo_vs_ai:"🤖 Jouer contre l'IA", geo_online:"👥 Jouer en Ligne avec un Ami",
+  geo_easy_desc:"Pays très connus", geo_medium_desc:"Pays moyennement connus",
+  geo_hard_desc:"Pays difficiles et méconnus",
+  geo_reward_1:"Récompense : 1 pièce", geo_reward_2:"Récompense : 2 pièces", geo_reward_4:"Récompense : 4 pièces",
+  geo_time_note:"Tu auras 10 minutes pour poser des questions oui/non et deviner le pays.",
+  ask_yn:"Pose une question oui/non", ph_ask_example:"ex. Est-ce en Europe ?", btn_ask:"Demander",
+  guess_country:"Devine le pays", ph_final_guess:"Écris ta réponse finale...", btn_guess:"Deviner",
+  hint_continent_btn:"💡 Révéler le Continent (<span id=\"geo-continent-hint-count\">0</span> en stock)",
+  hint_geo_letter_btn:"💡 Révéler la 1re Lettre (<span id=\"geo-letter-hint-count\">0</span> en stock)",
+  btn_give_up:"🏳 Abandonner",
+  geo_intro:"Je pense à un pays. Pose-moi des questions oui/non, puis donne ta réponse finale !",
+  my_guess:"Ma réponse : {g}", nope_keep_trying:"Non, continue !", times_up:"Temps écoulé !",
+  gave_up_log:"Tu as abandonné.", gave_up:"Tu as abandonné !",
+  geo_correct:"Correct ! C'était {name}.", country_was:"Le pays était {name}.",
+  hint_continent_is:"Indice : Le continent est {c}.", hint_geo_starts:"Indice : Ça commence par « {L} ».",
+  ans_yes:"Oui.", ans_no:"Non.",
+  answer_fallback:"Je peux seulement répondre par oui/non sur le continent, l'hémisphère, le littoral, le fait d'être une île, la population, la taille, les couleurs du drapeau, la première lettre, la capitale, les frontières, la langue ou le climat. Essaie de reformuler !",
+  play_online_title:"Jouer en Ligne",
+  geo_online_sub:"Crée un salon et partage le code, ou rejoins celui d'un ami. Fonctionne avec un ami sur n'importe quel appareil — il suffit de partager le code du salon.",
+  diff_pool_label:"Difficulté (liste de pays dans laquelle ton ami choisira)",
+  btn_create_picker:"Créer le Salon (je choisis le pays)", btn_join_guesser:"Rejoindre (je devine)",
+  you_are_picker:"Tu choisis le pays", pick_secret:"Choisis ton pays secret", btn_start_game:"Lancer la Partie",
+  role:"Rôle", answer_friend_qs:"Réponds aux questions de ton ami ci-dessous.",
+  friend_joined_pick:"Ton ami a rejoint ! Choisis ton pays secret ci-dessous.",
+  guesser_waiting:"Tu devines — en attente du lancement par l'hôte...", you_are_guesser:"Tu devines",
+  picker_secret_tag:"Tu choisis le pays (secret : {name})",
+  game_started_picker:"Partie lancée ! En attente des questions de ton ami.",
+  friend_picked:"Ton ami a choisi un pays secret ! Commence à poser des questions oui/non.",
+  friend_asked:"Ton ami demande : {q}", friend_guessed:"Ton ami répond : {g}",
+  yn_yes:"Oui", yn_no:"Non", yn_unsure:"Incertain",
+  times_up_friend:"Temps écoulé du côté de ton ami !",
+  friend_guessed_it:"Ton ami a trouvé : {name} !", nice_round:"Belle manche !",
+  better_luck_room:"Plus de chance au prochain salon !",
+  err_enter_code:"Entre un code de salon.",
+  err_room_not_found:"Salon introuvable. Vérifie le code et réessaie.",
+  err_no_service:"Impossible de joindre le service en ligne. Réessaie.",
+  store_title:"🛒 Boutique", store_sub:"Dépense tes pièces en indices pour t'aider à gagner.",
+  item_flagLetter:"💡 Révéler une Lettre (Drapeaux)",
+  item_flagLetter_desc:"Révèle la première lettre du pays du drapeau affiché.",
+  item_flagTime:"⏱ +5 Secondes (Drapeaux)",
+  item_flagTime_desc:"Ajoute 5 secondes au chrono du drapeau en cours.",
+  item_geoContinent:"🌍 Révéler le Continent (Géographie)",
+  item_geoContinent_desc:"Révèle le continent du pays mystère.",
+  item_geoLetter:"🔤 Révéler la 1re Lettre (Géographie)",
+  item_geoLetter_desc:"Révèle la première lettre du pays mystère.",
+  owned_flagLetter:"En stock : <span id=\"store-owned-flagLetter\">0</span>",
+  owned_flagTime:"En stock : <span id=\"store-owned-flagTime\">0</span>",
+  owned_geoContinent:"En stock : <span id=\"store-owned-geoContinent\">0</span>",
+  owned_geoLetter:"En stock : <span id=\"store-owned-geoLetter\">0</span>",
+  buy_3:"Acheter - 3 🪙", buy_2:"Acheter - 2 🪙", buy_4:"Acheter - 4 🪙",
+  err_not_enough_coins:"Pas assez de pièces !",
+  signin_title:"👤 Connexion",
+  signin_sub:"Crée ou retrouve ton compte pour débloquer le jeu en ligne avec tes amis.",
+  username:"Nom d'utilisateur", ph_username:"Choisis un nom d'utilisateur",
+  password_label:"Mot de passe (exactement 4 caractères)", ph_password:"4 caractères",
+  btn_do_signin:"Se connecter", signed_in_as:"✅ Connecté en tant que ",
+  online_unlocked:"Le multijoueur en ligne est débloqué !", btn_logout:"Se déconnecter",
+  badge_owner:"👑 PROPRIÉTAIRE", badge_assistant:"🛠 ASSISTANT",
+  err_enter_username:"Entre un nom d'utilisateur.",
+  err_password_len:"Le mot de passe doit faire exactement 4 caractères.",
+  err_signin_online:"Connecte-toi d'abord pour jouer en ligne avec un ami.",
+  err_signin_race:"Connecte-toi d'abord pour affronter un ami en ligne.",
+  err_signin_chat:"Connecte-toi d'abord pour voir le Chat Global.",
+  owner_panel_title:"🛡 Panneau Propriétaire",
+  owner_panel_sub:"Les pièces et indices de chaque joueur connecté, en direct depuis Firebase.",
+  owner_panel_sub_ro:"Les pièces et indices de chaque joueur connecté, en direct depuis Firebase (lecture seule).",
+  no_users:"Aucun joueur connecté pour l'instant.",
+  global_chat_title:"📢 Chat Global",
+  global_chat_sub:"Annonces du propriétaire, visibles par tous les joueurs connectés.",
+  ph_global_msg:"Écris au monde entier...", btn_broadcast:"Diffuser à Tout le Monde",
+  admin_chat_title:"🗨 Chat Admin", admin_chat_sub:"Discussion privée entre le propriétaire et les assistants.",
+  ph_admin_msg:"Écris à l'équipe...", btn_send:"Envoyer",
+  feedback_title:"🐞 Fonctionnalités et Bugs",
+  feedback_sub:"Les assistants notent ici leurs idées de fonctionnalités et les bugs, pour le propriétaire.",
+  feedback_type:"Type", opt_feature:"💡 Idée de fonctionnalité", opt_bug:"🐛 Rapport de bug",
+  feedback_desc:"Description", ph_feedback:"Décris la fonctionnalité ou le bug...", btn_feedback_submit:"Envoyer",
+  word_owner:"Propriétaire", word_staff:"Équipe",
+  fb_needs_config:"Le jeu en ligne nécessite la configuration Firebase — voir README.md.",
+  fb_could_not_connect:"Connexion impossible : {msg}",
+  fb_connecting:"Connexion au service en ligne...",
+  fb_still_connecting:"Connexion en cours — réessaie dans un instant.",
+  fb_connected:"🟢 Connecté — prêt pour le jeu en ligne."
+}};
+
+function tr(key,vars){
+  const dict=I18N[state.lang]||I18N.en;
+  let s=(dict[key]!==undefined?dict[key]:(I18N.en[key]!==undefined?I18N.en[key]:key));
+  if(vars)Object.keys(vars).forEach(k=>{s=s.split('{'+k+'}').join(vars[k]);});
+  return s;
+}
+// Plural suffix for "coin"/"pièce" — both languages happen to just take an s.
+function plural(n){return n===1?'':'s';}
+
+const CONTINENT_FR={'Europe':'Europe','Asia':'Asie','Africa':'Afrique','North America':'Amérique du Nord','South America':'Amérique du Sud','Oceania':'Océanie','Antarctica':'Antarctique'};
+function continentLabel(c){return state.lang==='fr'?(CONTINENT_FR[c]||c):c;}
+
+/* English canonical name -> French name (+ extra accepted spellings). Used for
+   display AND for accepting French typed answers; see matchesCountry(). */
+const COUNTRY_FR={
+"United States":{name:"États-Unis",aliases:["etats unis","usa","amerique","etats unis d amerique"]},
+"United Kingdom":{name:"Royaume-Uni",aliases:["angleterre","grande bretagne"]},
+"France":{name:"France",aliases:[]},
+"Germany":{name:"Allemagne",aliases:[]},
+"Italy":{name:"Italie",aliases:[]},
+"Spain":{name:"Espagne",aliases:[]},
+"Japan":{name:"Japon",aliases:[]},
+"China":{name:"Chine",aliases:[]},
+"India":{name:"Inde",aliases:[]},
+"Canada":{name:"Canada",aliases:[]},
+"Brazil":{name:"Brésil",aliases:[]},
+"Russia":{name:"Russie",aliases:[]},
+"Australia":{name:"Australie",aliases:[]},
+"Mexico":{name:"Mexique",aliases:[]},
+"South Korea":{name:"Corée du Sud",aliases:["coree"]},
+"North Korea":{name:"Corée du Nord",aliases:[]},
+"Netherlands":{name:"Pays-Bas",aliases:["hollande"]},
+"Switzerland":{name:"Suisse",aliases:[]},
+"Sweden":{name:"Suède",aliases:[]},
+"Norway":{name:"Norvège",aliases:[]},
+"Denmark":{name:"Danemark",aliases:[]},
+"Portugal":{name:"Portugal",aliases:[]},
+"Greece":{name:"Grèce",aliases:[]},
+"Turkey":{name:"Turquie",aliases:[]},
+"Egypt":{name:"Égypte",aliases:[]},
+"South Africa":{name:"Afrique du Sud",aliases:[]},
+"Ireland":{name:"Irlande",aliases:[]},
+"Belgium":{name:"Belgique",aliases:[]},
+"Austria":{name:"Autriche",aliases:[]},
+"Poland":{name:"Pologne",aliases:[]},
+"Argentina":{name:"Argentine",aliases:[]},
+"Colombia":{name:"Colombie",aliases:[]},
+"Chile":{name:"Chili",aliases:[]},
+"Peru":{name:"Pérou",aliases:[]},
+"Venezuela":{name:"Venezuela",aliases:[]},
+"Cuba":{name:"Cuba",aliases:[]},
+"Jamaica":{name:"Jamaïque",aliases:[]},
+"New Zealand":{name:"Nouvelle-Zélande",aliases:[]},
+"Thailand":{name:"Thaïlande",aliases:[]},
+"Vietnam":{name:"Vietnam",aliases:["viet nam"]},
+"Indonesia":{name:"Indonésie",aliases:[]},
+"Philippines":{name:"Philippines",aliases:[]},
+"Malaysia":{name:"Malaisie",aliases:[]},
+"Singapore":{name:"Singapour",aliases:[]},
+"Saudi Arabia":{name:"Arabie saoudite",aliases:["arabie"]},
+"United Arab Emirates":{name:"Émirats arabes unis",aliases:["emirats"]},
+"Israel":{name:"Israël",aliases:[]},
+"Iran":{name:"Iran",aliases:[]},
+"Iraq":{name:"Irak",aliases:[]},
+"Pakistan":{name:"Pakistan",aliases:[]},
+"Ukraine":{name:"Ukraine",aliases:[]},
+"Finland":{name:"Finlande",aliases:[]},
+"Iceland":{name:"Islande",aliases:[]},
+"Czechia":{name:"Tchéquie",aliases:["republique tcheque"]},
+"Hungary":{name:"Hongrie",aliases:[]},
+"Romania":{name:"Roumanie",aliases:[]},
+"Nigeria":{name:"Nigéria",aliases:["nigeria"]},
+"Kenya":{name:"Kenya",aliases:[]},
+"Morocco":{name:"Maroc",aliases:[]},
+"Ethiopia":{name:"Éthiopie",aliases:[]},
+"Ghana":{name:"Ghana",aliases:[]},
+"Cyprus":{name:"Chypre",aliases:[]},
+"Croatia":{name:"Croatie",aliases:[]},
+"Serbia":{name:"Serbie",aliases:[]},
+"Bulgaria":{name:"Bulgarie",aliases:[]},
+"Slovakia":{name:"Slovaquie",aliases:[]},
+"Slovenia":{name:"Slovénie",aliases:[]},
+"Estonia":{name:"Estonie",aliases:[]},
+"Latvia":{name:"Lettonie",aliases:[]},
+"Lithuania":{name:"Lituanie",aliases:[]},
+"Belarus":{name:"Biélorussie",aliases:[]},
+"Moldova":{name:"Moldavie",aliases:[]},
+"Georgia":{name:"Géorgie",aliases:[]},
+"Armenia":{name:"Arménie",aliases:[]},
+"Azerbaijan":{name:"Azerbaïdjan",aliases:[]},
+"Kazakhstan":{name:"Kazakhstan",aliases:[]},
+"Uzbekistan":{name:"Ouzbékistan",aliases:[]},
+"Turkmenistan":{name:"Turkménistan",aliases:[]},
+"Kyrgyzstan":{name:"Kirghizistan",aliases:["kirghizie"]},
+"Tajikistan":{name:"Tadjikistan",aliases:[]},
+"Mongolia":{name:"Mongolie",aliases:[]},
+"Nepal":{name:"Népal",aliases:[]},
+"Bangladesh":{name:"Bangladesh",aliases:[]},
+"Sri Lanka":{name:"Sri Lanka",aliases:[]},
+"Myanmar":{name:"Birmanie",aliases:["myanmar"]},
+"Cambodia":{name:"Cambodge",aliases:[]},
+"Laos":{name:"Laos",aliases:[]},
+"Bhutan":{name:"Bhoutan",aliases:[]},
+"Maldives":{name:"Maldives",aliases:[]},
+"Afghanistan":{name:"Afghanistan",aliases:[]},
+"Syria":{name:"Syrie",aliases:[]},
+"Lebanon":{name:"Liban",aliases:[]},
+"Jordan":{name:"Jordanie",aliases:[]},
+"Kuwait":{name:"Koweït",aliases:[]},
+"Qatar":{name:"Qatar",aliases:[]},
+"Bahrain":{name:"Bahreïn",aliases:[]},
+"Oman":{name:"Oman",aliases:[]},
+"Yemen":{name:"Yémen",aliases:[]},
+"Algeria":{name:"Algérie",aliases:[]},
+"Tunisia":{name:"Tunisie",aliases:[]},
+"Libya":{name:"Libye",aliases:[]},
+"Sudan":{name:"Soudan",aliases:[]},
+"South Sudan":{name:"Soudan du Sud",aliases:[]},
+"Somalia":{name:"Somalie",aliases:[]},
+"Tanzania":{name:"Tanzanie",aliases:[]},
+"Uganda":{name:"Ouganda",aliases:[]},
+"Rwanda":{name:"Rwanda",aliases:[]},
+"Zambia":{name:"Zambie",aliases:[]},
+"Zimbabwe":{name:"Zimbabwe",aliases:[]},
+"Botswana":{name:"Botswana",aliases:[]},
+"Namibia":{name:"Namibie",aliases:[]},
+"Mozambique":{name:"Mozambique",aliases:[]},
+"Angola":{name:"Angola",aliases:[]},
+"Cameroon":{name:"Cameroun",aliases:[]},
+"Senegal":{name:"Sénégal",aliases:[]},
+"Ivory Coast":{name:"Côte d'Ivoire",aliases:["cote divoire"]},
+"Mali":{name:"Mali",aliases:[]},
+"Niger":{name:"Niger",aliases:[]},
+"Chad":{name:"Tchad",aliases:[]},
+"Madagascar":{name:"Madagascar",aliases:[]},
+"Mauritius":{name:"Maurice",aliases:["ile maurice"]},
+"Panama":{name:"Panama",aliases:[]},
+"Costa Rica":{name:"Costa Rica",aliases:[]},
+"Guatemala":{name:"Guatemala",aliases:[]},
+"Honduras":{name:"Honduras",aliases:[]},
+"El Salvador":{name:"Salvador",aliases:["el salvador"]},
+"Nicaragua":{name:"Nicaragua",aliases:[]},
+"Ecuador":{name:"Équateur",aliases:[]},
+"Bolivia":{name:"Bolivie",aliases:[]},
+"Paraguay":{name:"Paraguay",aliases:[]},
+"Uruguay":{name:"Uruguay",aliases:[]},
+"Guyana":{name:"Guyana",aliases:[]},
+"Suriname":{name:"Suriname",aliases:[]},
+"Trinidad and Tobago":{name:"Trinité-et-Tobago",aliases:["trinite"]},
+"Bahamas":{name:"Bahamas",aliases:[]},
+"Barbados":{name:"Barbade",aliases:[]},
+"Haiti":{name:"Haïti",aliases:[]},
+"Dominican Republic":{name:"République dominicaine",aliases:[]},
+"Fiji":{name:"Fidji",aliases:[]},
+"Papua New Guinea":{name:"Papouasie-Nouvelle-Guinée",aliases:[]},
+"Luxembourg":{name:"Luxembourg",aliases:[]},
+"Malta":{name:"Malte",aliases:[]},
+"Monaco":{name:"Monaco",aliases:[]},
+"Albania":{name:"Albanie",aliases:[]},
+"North Macedonia":{name:"Macédoine du Nord",aliases:["macedoine"]},
+"Bosnia and Herzegovina":{name:"Bosnie-Herzégovine",aliases:["bosnie"]},
+"Montenegro":{name:"Monténégro",aliases:[]},
+"Andorra":{name:"Andorre",aliases:[]},
+"Liechtenstein":{name:"Liechtenstein",aliases:[]},
+"San Marino":{name:"Saint-Marin",aliases:[]},
+"Vatican City":{name:"Vatican",aliases:["cite du vatican","saint siege"]},
+"Palestine":{name:"Palestine",aliases:[]},
+"Timor-Leste":{name:"Timor oriental",aliases:["timor leste"]},
+"Brunei":{name:"Brunei",aliases:[]},
+"Eswatini":{name:"Eswatini",aliases:["swaziland"]},
+"Lesotho":{name:"Lesotho",aliases:[]},
+"Malawi":{name:"Malawi",aliases:[]},
+"Burundi":{name:"Burundi",aliases:[]},
+"Djibouti":{name:"Djibouti",aliases:[]},
+"Eritrea":{name:"Érythrée",aliases:[]},
+"Gabon":{name:"Gabon",aliases:[]},
+"Equatorial Guinea":{name:"Guinée équatoriale",aliases:[]},
+"Republic of the Congo":{name:"République du Congo",aliases:["congo","congo brazzaville"]},
+"Democratic Republic of the Congo":{name:"République démocratique du Congo",aliases:["rdc","congo kinshasa"]},
+"Central African Republic":{name:"République centrafricaine",aliases:["centrafrique"]},
+"Guinea":{name:"Guinée",aliases:[]},
+"Guinea-Bissau":{name:"Guinée-Bissau",aliases:[]},
+"Sierra Leone":{name:"Sierra Leone",aliases:[]},
+"Liberia":{name:"Libéria",aliases:["liberia"]},
+"Gambia":{name:"Gambie",aliases:[]},
+"Mauritania":{name:"Mauritanie",aliases:[]},
+"Cabo Verde":{name:"Cap-Vert",aliases:[]},
+"Sao Tome and Principe":{name:"Sao Tomé-et-Principe",aliases:["sao tome"]},
+"Comoros":{name:"Comores",aliases:[]},
+"Seychelles":{name:"Seychelles",aliases:[]},
+"Benin":{name:"Bénin",aliases:[]},
+"Togo":{name:"Togo",aliases:[]},
+"Burkina Faso":{name:"Burkina Faso",aliases:["burkina"]},
+"Belize":{name:"Belize",aliases:[]},
+"Antigua and Barbuda":{name:"Antigua-et-Barbuda",aliases:["antigua"]},
+"Grenada":{name:"Grenade",aliases:[]},
+"Dominica":{name:"Dominique",aliases:[]},
+"Saint Lucia":{name:"Sainte-Lucie",aliases:[]},
+"Saint Kitts and Nevis":{name:"Saint-Christophe-et-Niévès",aliases:["saint kitts et nevis"]},
+"Saint Vincent and the Grenadines":{name:"Saint-Vincent-et-les-Grenadines",aliases:["saint vincent"]},
+"Marshall Islands":{name:"Îles Marshall",aliases:["marshall"]},
+"Micronesia":{name:"Micronésie",aliases:[]},
+"Palau":{name:"Palaos",aliases:["palau"]},
+"Nauru":{name:"Nauru",aliases:[]},
+"Kiribati":{name:"Kiribati",aliases:[]},
+"Tuvalu":{name:"Tuvalu",aliases:[]},
+"Samoa":{name:"Samoa",aliases:[]},
+"Tonga":{name:"Tonga",aliases:[]},
+"Vanuatu":{name:"Vanuatu",aliases:[]},
+"Solomon Islands":{name:"Îles Salomon",aliases:["salomon"]}
+};
+// Display name for a canonical English country name, in the active language.
+function countryLabel(englishName){const e=COUNTRY_FR[englishName]; return (state.lang==='fr'&&e)?e.name:englishName;}
+
+function applyLanguage(){
+  document.documentElement.lang=state.lang;
+  document.title=tr('doc_title');
+  document.querySelectorAll('[data-i18n]').forEach(el=>{el.textContent=tr(el.getAttribute('data-i18n'));});
+  document.querySelectorAll('[data-i18n-html]').forEach(el=>{el.innerHTML=tr(el.getAttribute('data-i18n-html'));});
+  document.querySelectorAll('[data-i18n-ph]').forEach(el=>{el.setAttribute('placeholder',tr(el.getAttribute('data-i18n-ph')));});
+  const tog=document.getElementById('lang-toggle');
+  if(tog){tog.textContent=tr('lang_toggle'); tog.title=tr('lang_toggle_title');}
+  // Re-render the pieces whose text is generated rather than static.
+  renderCoins();
+  updateFbStatusUI();
+  const sel=document.getElementById('picker-secret-select');
+  if(sel&&sel.options.length&&room&&room.diff){const cur=sel.value; populatePickerSelect(room.diff); sel.value=cur;}
+  if(flagState)document.getElementById('flag-progress').textContent=tr('flag_progress',{n:flagState.index+1});
+  if(frace&&frace.list)document.getElementById('flag-race-progress').textContent=tr('flag_progress',{n:frace.currentIndex+1});
+}
+function setLanguage(lang){if(LANGS.indexOf(lang)===-1)return; state.lang=lang; localStorage.setItem('ftg_lang',lang); applyLanguage();}
+function toggleLanguage(){setLanguage(state.lang==='fr'?'en':'fr');}
+
 /* -------- STATE -------- */
-const state = {coins:0, loggedIn:false, username:'', isOwner:false, isAssistant:false, hints:{flagLetter:0, flagTime:0, geoContinent:0, geoLetter:0}};
+const state = {lang:'en', coins:0, loggedIn:false, username:'', isOwner:false, isAssistant:false, hints:{flagLetter:0, flagTime:0, geoContinent:0, geoLetter:0}};
 function saveState(){localStorage.setItem('ftg_coins',String(state.coins)); localStorage.setItem('ftg_hints',JSON.stringify(state.hints)); syncUserToFirebase();}
-function loadState(){state.coins=parseInt(localStorage.getItem('ftg_coins')||'0',10)||0; const h=localStorage.getItem('ftg_hints'); if(h){try{state.hints=JSON.parse(h);}catch(e){}}const acc=localStorage.getItem('ftg_account'); if(acc){try{const a=JSON.parse(acc); if(a&&a.username){state.loggedIn=true; state.username=a.username;}}catch(e){}}state.isOwner=state.loggedIn&&localStorage.getItem('ftg_owner')==='1'; state.isAssistant=state.loggedIn&&localStorage.getItem('ftg_assistant')==='1';}
+function loadState(){state.lang=localStorage.getItem('ftg_lang')||'en'; if(LANGS.indexOf(state.lang)===-1)state.lang='en'; state.coins=parseInt(localStorage.getItem('ftg_coins')||'0',10)||0; const h=localStorage.getItem('ftg_hints'); if(h){try{state.hints=JSON.parse(h);}catch(e){}}const acc=localStorage.getItem('ftg_account'); if(acc){try{const a=JSON.parse(acc); if(a&&a.username){state.loggedIn=true; state.username=a.username;}}catch(e){}}state.isOwner=state.loggedIn&&localStorage.getItem('ftg_owner')==='1'; state.isAssistant=state.loggedIn&&localStorage.getItem('ftg_assistant')==='1';}
 function addCoins(n){state.coins+=n; saveState(); renderCoins();}
 function renderCoins(){document.getElementById('coin-count').textContent=state.coins; document.getElementById('store-owned-flagLetter').textContent=state.hints.flagLetter; document.getElementById('store-owned-flagTime').textContent=state.hints.flagTime; document.getElementById('store-owned-geoContinent').textContent=state.hints.geoContinent; document.getElementById('store-owned-geoLetter').textContent=state.hints.geoLetter; document.getElementById('flag-letter-hint-count').textContent=state.hints.flagLetter; document.getElementById('flag-time-hint-count').textContent=state.hints.flagTime; document.getElementById('geo-continent-hint-count').textContent=state.hints.geoContinent; document.getElementById('geo-letter-hint-count').textContent=state.hints.geoLetter; renderSignInStatus();}
-function renderSignInStatus(){const welcome=document.getElementById('home-welcome'); const form=document.getElementById('signin-form'); const acct=document.getElementById('signin-account'); const homeBtn=document.getElementById('signin-home-btn'); const ownerBadge=document.getElementById('signed-in-owner-badge'); const assistantBadge=document.getElementById('signed-in-assistant-badge'); const ownerPanelBtn=document.getElementById('owner-panel-home-btn'); const feedbackBtn=document.getElementById('feedback-home-btn'); const adminChatBtn=document.getElementById('admin-chat-home-btn'); const isStaff=state.isOwner||state.isAssistant; if(state.loggedIn){welcome.textContent='Welcome back, '+state.username+'!'; form.style.display='none'; acct.style.display='block'; document.getElementById('signed-in-username').textContent=state.username; homeBtn.textContent=(state.isOwner?'👑 ':state.isAssistant?'🛠 ':'👤 ')+state.username;}else{welcome.textContent='Test your flag & geography knowledge!'; form.style.display='block'; acct.style.display='none'; homeBtn.textContent='👤 Sign In';}if(ownerBadge)ownerBadge.style.display=state.isOwner?'inline-block':'none'; if(assistantBadge)assistantBadge.style.display=(state.isAssistant&&!state.isOwner)?'inline-block':'none'; if(ownerPanelBtn)ownerPanelBtn.style.display=isStaff?'block':'none'; if(feedbackBtn)feedbackBtn.style.display=isStaff?'block':'none'; if(adminChatBtn)adminChatBtn.style.display=isStaff?'block':'none'; const note=document.getElementById('geo-online-note'); if(note){note.textContent=state.loggedIn?'':'Sign in to unlock playing online with a friend.';}const flagNote=document.getElementById('flag-online-note'); if(flagNote){flagNote.textContent=state.loggedIn?'':'Sign in to unlock racing a friend online.';}}
+function renderSignInStatus(){const welcome=document.getElementById('home-welcome'); const form=document.getElementById('signin-form'); const acct=document.getElementById('signin-account'); const homeBtn=document.getElementById('signin-home-btn'); const ownerBadge=document.getElementById('signed-in-owner-badge'); const assistantBadge=document.getElementById('signed-in-assistant-badge'); const ownerPanelBtn=document.getElementById('owner-panel-home-btn'); const feedbackBtn=document.getElementById('feedback-home-btn'); const adminChatBtn=document.getElementById('admin-chat-home-btn'); const isStaff=state.isOwner||state.isAssistant; if(state.loggedIn){welcome.textContent=tr('welcome_back',{name:state.username}); form.style.display='none'; acct.style.display='block'; document.getElementById('signed-in-username').textContent=state.username; homeBtn.textContent=(state.isOwner?'👑 ':state.isAssistant?'🛠 ':'👤 ')+state.username;}else{welcome.textContent=tr('home_welcome'); form.style.display='block'; acct.style.display='none'; homeBtn.textContent=tr('btn_signin');}if(ownerBadge)ownerBadge.style.display=state.isOwner?'inline-block':'none'; if(assistantBadge)assistantBadge.style.display=(state.isAssistant&&!state.isOwner)?'inline-block':'none'; if(ownerPanelBtn)ownerPanelBtn.style.display=isStaff?'block':'none'; if(feedbackBtn)feedbackBtn.style.display=isStaff?'block':'none'; if(adminChatBtn)adminChatBtn.style.display=isStaff?'block':'none'; const note=document.getElementById('geo-online-note'); if(note){note.textContent=state.loggedIn?'':tr('note_signin_online');}const flagNote=document.getElementById('flag-online-note'); if(flagNote){flagNote.textContent=state.loggedIn?'':tr('note_signin_race');}}
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); window.scrollTo(0,0);}
-function goPlay(){showScreen('screen-play');} function goGeoMode(){showScreen('screen-geo-mode');} function goGeoOnline(){if(!state.loggedIn){showScreen('screen-signin'); document.getElementById('signin-error').textContent='Please sign in first to play online with a friend.'; return;}updateFbStatusUI(); showScreen('screen-geo-online-setup');}
-function goFlagMode(){showScreen('screen-flag-mode');} function goFlagOnline(){if(!state.loggedIn){showScreen('screen-signin'); document.getElementById('signin-error').textContent='Please sign in first to race a friend online.'; return;}updateFbStatusUI(); showScreen('screen-flag-online-setup');}
-function normalize(str){return String(str).toLowerCase().trim().replace(/^(the|republic of|kingdom of|state of|united states of)\s+/,'').replace(/[^a-z\s]/g,'').replace(/\s+/g,' ').trim();}
-function matchesCountry(input, country){const n=normalize(input); if(!n)return false; if(n===normalize(country.name))return true; if(country.aliases){return country.aliases.some(a=>normalize(a)===n);}return false;}
+function goPlay(){showScreen('screen-play');} function goGeoMode(){showScreen('screen-geo-mode');} function goGeoOnline(){if(!state.loggedIn){showScreen('screen-signin'); document.getElementById('signin-error').textContent=tr('err_signin_online'); return;}updateFbStatusUI(); showScreen('screen-geo-online-setup');}
+function goFlagMode(){showScreen('screen-flag-mode');} function goFlagOnline(){if(!state.loggedIn){showScreen('screen-signin'); document.getElementById('signin-error').textContent=tr('err_signin_race'); return;}updateFbStatusUI(); showScreen('screen-flag-online-setup');}
+// Strips diacritics so "Bresil"/"Brésil" and "Egypte"/"Égypte" compare equal.
+function foldAccents(s){return String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'');}
+function normalize(str){return foldAccents(String(str)).toLowerCase().replace(/^l['\u2019]\s*/,'').replace(/['\u2019]/g,'').replace(/[-\u2013]/g,' ').trim().replace(/^(the|republic of|kingdom of|state of|united states of|le|la|les)\s+/,'').replace(/[^a-z\s]/g,'').replace(/\s+/g,' ').trim();}
+// Every spelling a country answers to: English name + aliases, plus the French
+// name + aliases. Both are always accepted, whatever language the UI is in, so
+// an English and a French player can share the same online room.
+function countryVariants(country){const out=[country.name].concat(country.aliases||[]); const fr=COUNTRY_FR[country.name]; if(fr){out.push(fr.name); if(fr.aliases)out.push.apply(out,fr.aliases);} return out;}
+function matchesCountry(input, country){const n=normalize(input); if(!n)return false; return countryVariants(country).some(v=>normalize(v)===n);}
 function shuffle(arr){const a=arr.slice(); for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]];}return a;}
 function fmtTime(sec){const m=Math.floor(sec/60); const s=sec%60; return(m<10?'0':'')+m+':'+(s<10?'0':'')+s;}
 
@@ -607,32 +1126,101 @@ let flagState=null; const flagImageCache={}; function flagUrl(code,ext){return '
 function preloadFlagImages(list){list.forEach(c=>{if(flagImageCache[c.code])return; const img=new Image(); img.src=flagUrl(c.code); flagImageCache[c.code]=img;});}
 function startFlagGame(diff){flagState={diff, list:shuffle(FLAG_POOLS[diff]).slice(0,10), index:0, timeLeft:FLAG_DIFF[diff].time, interval:null}; preloadFlagImages(flagState.list); showScreen('screen-flag-game'); document.getElementById('flag-hint-msg').textContent=''; renderFlagRound();}
 function restartFlagGame(){startFlagGame(flagState.diff);}
-function renderFlagRound(){const c=flagState.list[flagState.index]; document.getElementById('flag-progress').textContent='Flag '+(flagState.index+1)+' / 10'; const imgEl=document.getElementById('flag-img'); imgEl.onerror=function(){imgEl.onerror=null; imgEl.src=flagUrl(c.code,'png');}; imgEl.src=flagUrl(c.code); document.getElementById('flag-input').value=''; document.getElementById('flag-input').focus(); flagState.timeLeft=FLAG_DIFF[flagState.diff].time; updateFlagTimerDisplay(); clearInterval(flagState.interval); flagState.interval=setInterval(()=>{flagState.timeLeft--; updateFlagTimerDisplay(); if(flagState.timeLeft<=0){clearInterval(flagState.interval); endFlagGame(false);}},1000);}
+function renderFlagRound(){const c=flagState.list[flagState.index]; document.getElementById('flag-progress').textContent=tr('flag_progress',{n:flagState.index+1}); const imgEl=document.getElementById('flag-img'); imgEl.onerror=function(){imgEl.onerror=null; imgEl.src=flagUrl(c.code,'png');}; imgEl.src=flagUrl(c.code); document.getElementById('flag-input').value=''; document.getElementById('flag-input').focus(); flagState.timeLeft=FLAG_DIFF[flagState.diff].time; updateFlagTimerDisplay(); clearInterval(flagState.interval); flagState.interval=setInterval(()=>{flagState.timeLeft--; updateFlagTimerDisplay(); if(flagState.timeLeft<=0){clearInterval(flagState.interval); endFlagGame(false);}},1000);}
 function updateFlagTimerDisplay(){document.getElementById('flag-timer').textContent=flagState.timeLeft;}
 function submitFlagAnswer(){if(!flagState)return; const val=document.getElementById('flag-input').value; const c=flagState.list[flagState.index]; if(matchesCountry(val,c)){clearInterval(flagState.interval); flagState.index++; if(flagState.index>=10){endFlagGame(true);}else{renderFlagRound();}}else{clearInterval(flagState.interval); endFlagGame(false);}}
-function endFlagGame(won){const c=flagState.list[flagState.index]; if(won){const reward=FLAG_DIFF[flagState.diff].reward; addCoins(reward); document.getElementById('flag-result-emoji').textContent='🏆'; document.getElementById('flag-result-msg').textContent='You guessed all 10 flags!'; document.getElementById('flag-result-sub').textContent='You earned '+reward+' coin'+(reward===1?'':'s')+'.';}else{document.getElementById('flag-result-emoji').textContent='❌'; document.getElementById('flag-result-msg').textContent='Wrong! Better luck next time.'; document.getElementById('flag-result-sub').textContent='The correct answer was '+c.name+'.';}showScreen('screen-flag-result');}
-function useFlagLetterHint(){if(!flagState)return; if(state.hints.flagLetter<=0){document.getElementById('flag-hint-msg').textContent="You don't own this hint. Buy it in the Store!"; return;}state.hints.flagLetter--; saveState(); renderCoins(); const c=flagState.list[flagState.index]; document.getElementById('flag-hint-msg').textContent='Hint: starts with "'+c.name[0].toUpperCase()+'"';}
-function useFlagTimeHint(){if(!flagState)return; if(state.hints.flagTime<=0){document.getElementById('flag-hint-msg').textContent="You don't own this hint. Buy it in the Store!"; return;}state.hints.flagTime--; saveState(); renderCoins(); flagState.timeLeft+=5; updateFlagTimerDisplay(); document.getElementById('flag-hint-msg').textContent='+5 seconds added!';}
+function endFlagGame(won){const c=flagState.list[flagState.index]; if(won){const reward=FLAG_DIFF[flagState.diff].reward; addCoins(reward); document.getElementById('flag-result-emoji').textContent='🏆'; document.getElementById('flag-result-msg').textContent=tr('flag_win_msg'); document.getElementById('flag-result-sub').textContent=tr('earned_coins',{n:reward,s:plural(reward)});}else{document.getElementById('flag-result-emoji').textContent='❌'; document.getElementById('flag-result-msg').textContent=tr('flag_lose_msg'); document.getElementById('flag-result-sub').textContent=tr('correct_answer_was',{name:countryLabel(c.name)});}showScreen('screen-flag-result');}
+function useFlagLetterHint(){if(!flagState)return; if(state.hints.flagLetter<=0){document.getElementById('flag-hint-msg').textContent=tr('hint_not_owned'); return;}state.hints.flagLetter--; saveState(); renderCoins(); const c=flagState.list[flagState.index]; document.getElementById('flag-hint-msg').textContent=tr('hint_starts_with',{L:countryLabel(c.name)[0].toUpperCase()});}
+function useFlagTimeHint(){if(!flagState)return; if(state.hints.flagTime<=0){document.getElementById('flag-hint-msg').textContent=tr('hint_not_owned'); return;}state.hints.flagTime--; saveState(); renderCoins(); flagState.timeLeft+=5; updateFlagTimerDisplay(); document.getElementById('flag-hint-msg').textContent=tr('hint_time_added');}
 
 const GEO_POOLS={easy:[{name:'United States',continent:'North America',hemisphere:'N',landlocked:false,island:false,popMillions:335,areaCategory:'large',colors:['red','white','blue'],capital:'Washington',borders:2,language:'English',climate:'temperate',aliases:['usa','us','america']},{name:'France',continent:'Europe',hemisphere:'N',landlocked:false,island:false,popMillions:68,areaCategory:'medium',colors:['blue','white','red'],capital:'Paris',borders:8,language:'French',climate:'temperate',aliases:[]},{name:'Japan',continent:'Asia',hemisphere:'N',landlocked:false,island:true,popMillions:124,areaCategory:'medium',colors:['red','white'],capital:'Tokyo',borders:0,language:'Japanese',climate:'temperate',aliases:[]},{name:'Brazil',continent:'South America',hemisphere:'S',landlocked:false,island:false,popMillions:216,areaCategory:'large',colors:['green','yellow','blue','white'],capital:'Brasilia',borders:10,language:'Portuguese',climate:'hot',aliases:[]},{name:'Australia',continent:'Oceania',hemisphere:'S',landlocked:false,island:true,popMillions:26,areaCategory:'large',colors:['blue','white','red'],capital:'Canberra',borders:0,language:'English',climate:'hot',aliases:[]},{name:'Egypt',continent:'Africa',hemisphere:'N',landlocked:false,island:false,popMillions:112,areaCategory:'medium',colors:['red','white','black'],capital:'Cairo',borders:4,language:'Arabic',climate:'hot',aliases:[]},{name:'Canada',continent:'North America',hemisphere:'N',landlocked:false,island:false,popMillions:39,areaCategory:'large',colors:['red','white'],capital:'Ottawa',borders:1,language:'English',climate:'cold',aliases:[]},{name:'China',continent:'Asia',hemisphere:'N',landlocked:false,island:false,popMillions:1412,areaCategory:'large',colors:['red','yellow'],capital:'Beijing',borders:14,language:'Chinese',climate:'temperate',aliases:[]},{name:'India',continent:'Asia',hemisphere:'N',landlocked:false,island:false,popMillions:1428,areaCategory:'large',colors:['orange','white','green'],capital:'New Delhi',borders:6,language:'Hindi',climate:'hot',aliases:[]},{name:'Germany',continent:'Europe',hemisphere:'N',landlocked:false,island:false,popMillions:84,areaCategory:'medium',colors:['black','red','yellow'],capital:'Berlin',borders:9,language:'German',climate:'temperate',aliases:[]},{name:'Mexico',continent:'North America',hemisphere:'N',landlocked:false,island:false,popMillions:128,areaCategory:'large',colors:['green','white','red'],capital:'Mexico City',borders:3,language:'Spanish',climate:'hot',aliases:[]},{name:'United Kingdom',continent:'Europe',hemisphere:'N',landlocked:false,island:true,popMillions:68,areaCategory:'medium',colors:['red','white','blue'],capital:'London',borders:1,language:'English',climate:'temperate',aliases:['uk','britain']}],medium:[{name:'Argentina',continent:'South America',hemisphere:'S',landlocked:false,island:false,popMillions:46,areaCategory:'large',colors:['blue','white','yellow'],capital:'Buenos Aires',borders:5,language:'Spanish',climate:'temperate',aliases:[]},{name:'South Africa',continent:'Africa',hemisphere:'S',landlocked:false,island:false,popMillions:60,areaCategory:'medium',colors:['red','white','blue','green','black','yellow'],capital:'Pretoria',borders:6,language:'English',climate:'temperate',aliases:[]},{name:'Sweden',continent:'Europe',hemisphere:'N',landlocked:false,island:false,popMillions:10,areaCategory:'medium',colors:['blue','yellow'],capital:'Stockholm',borders:2,language:'Swedish',climate:'cold',aliases:[]},{name:'Turkey',continent:'Asia',hemisphere:'N',landlocked:false,island:false,popMillions:85,areaCategory:'medium',colors:['red','white'],capital:'Ankara',borders:8,language:'Turkish',climate:'temperate',aliases:['turkiye']},{name:'Netherlands',continent:'Europe',hemisphere:'N',landlocked:false,island:false,popMillions:17,areaCategory:'small',colors:['red','white','blue'],capital:'Amsterdam',borders:2,language:'Dutch',climate:'temperate',aliases:['holland']},{name:'Thailand',continent:'Asia',hemisphere:'N',landlocked:false,island:false,popMillions:71,areaCategory:'medium',colors:['red','white','blue'],capital:'Bangkok',borders:4,language:'Thai',climate:'hot',aliases:[]},{name:'Poland',continent:'Europe',hemisphere:'N',landlocked:false,island:false,popMillions:37,areaCategory:'medium',colors:['white','red'],capital:'Warsaw',borders:7,language:'Polish',climate:'cold',aliases:[]},{name:'Greece',continent:'Europe',hemisphere:'N',landlocked:false,island:false,popMillions:10,areaCategory:'small',colors:['blue','white'],capital:'Athens',borders:4,language:'Greek',climate:'temperate',aliases:[]},{name:'Nigeria',continent:'Africa',hemisphere:'N',landlocked:false,island:false,popMillions:223,areaCategory:'medium',colors:['green','white'],capital:'Abuja',borders:4,language:'English',climate:'hot',aliases:[]},{name:'Vietnam',continent:'Asia',hemisphere:'N',landlocked:false,island:false,popMillions:98,areaCategory:'medium',colors:['red','yellow'],capital:'Hanoi',borders:3,language:'Vietnamese',climate:'hot',aliases:[]},{name:'Chile',continent:'South America',hemisphere:'S',landlocked:false,island:false,popMillions:19,areaCategory:'medium',colors:['red','white','blue'],capital:'Santiago',borders:3,language:'Spanish',climate:'temperate',aliases:[]},{name:'Norway',continent:'Europe',hemisphere:'N',landlocked:false,island:false,popMillions:5,areaCategory:'medium',colors:['red','white','blue'],capital:'Oslo',borders:3,language:'Norwegian',climate:'cold',aliases:[]}],hard:[{name:'Nepal',continent:'Asia',hemisphere:'N',landlocked:true,island:false,popMillions:30,areaCategory:'small',colors:['red','blue'],capital:'Kathmandu',borders:2,language:'Nepali',climate:'cold',aliases:[]},{name:'Bhutan',continent:'Asia',hemisphere:'N',landlocked:true,island:false,popMillions:0.8,areaCategory:'small',colors:['yellow','orange'],capital:'Thimphu',borders:2,language:'Dzongkha',climate:'cold',aliases:[]},{name:'Mongolia',continent:'Asia',hemisphere:'N',landlocked:true,island:false,popMillions:3.3,areaCategory:'medium',colors:['red','blue','yellow'],capital:'Ulaanbaatar',borders:2,language:'Mongolian',climate:'cold',aliases:[]},{name:'Kazakhstan',continent:'Asia',hemisphere:'N',landlocked:true,island:false,popMillions:19,areaCategory:'large',colors:['blue','yellow'],capital:'Astana',borders:5,language:'Kazakh',climate:'cold',aliases:[]},{name:'Paraguay',continent:'South America',hemisphere:'S',landlocked:true,island:false,popMillions:6.8,areaCategory:'medium',colors:['red','white','blue'],capital:'Asuncion',borders:2,language:'Spanish',climate:'hot',aliases:[]},{name:'Uruguay',continent:'South America',hemisphere:'S',landlocked:false,island:false,popMillions:3.4,areaCategory:'small',colors:['blue','white','yellow'],capital:'Montevideo',borders:2,language:'Spanish',climate:'temperate',aliases:[]},{name:'Laos',continent:'Asia',hemisphere:'N',landlocked:true,island:false,popMillions:7.5,areaCategory:'small',colors:['red','blue','white'],capital:'Vientiane',borders:5,language:'Lao',climate:'hot',aliases:[]},{name:'Jordan',continent:'Asia',hemisphere:'N',landlocked:false,island:false,popMillions:11,areaCategory:'small',colors:['red','white','black','green'],capital:'Amman',borders:4,language:'Arabic',climate:'hot',aliases:[]},{name:'Tunisia',continent:'Africa',hemisphere:'N',landlocked:false,island:false,popMillions:12,areaCategory:'small',colors:['red','white'],capital:'Tunis',borders:2,language:'Arabic',climate:'hot',aliases:[]},{name:'Kyrgyzstan',continent:'Asia',hemisphere:'N',landlocked:true,island:false,popMillions:6.7,areaCategory:'small',colors:['red','yellow'],capital:'Bishkek',borders:4,language:'Kyrgyz',climate:'cold',aliases:[]},{name:'Namibia',continent:'Africa',hemisphere:'S',landlocked:false,island:false,popMillions:2.6,areaCategory:'medium',colors:['blue','red','green','white','yellow'],capital:'Windhoek',borders:4,language:'English',climate:'hot',aliases:[]},{name:'Madagascar',continent:'Africa',hemisphere:'S',landlocked:false,island:true,popMillions:30,areaCategory:'medium',colors:['red','white','green'],capital:'Antananarivo',borders:0,language:'Malagasy',climate:'hot',aliases:[]}]};
 const GEO_DIFF={easy:{reward:1},medium:{reward:2},hard:{reward:4}}; const GEO_TIME_LIMIT=600;
-function answerEngine(question,c){const t=question.toLowerCase(); const continents=['europe','asia','africa','north america','south america','oceania','antarctica']; for(const cont of continents){if(t.includes(cont))return c.continent.toLowerCase()===cont?'Yes.':'No.';} if(t.includes('hemisphere')){if(t.includes('north'))return c.hemisphere==='N'?'Yes.':'No.'; if(t.includes('south'))return c.hemisphere==='S'?'Yes.':'No.';} if(t.includes('landlocked'))return c.landlocked?'Yes.':'No.'; if(t.includes('coast')||t.includes('ocean')||t.includes('sea'))return !c.landlocked?'Yes.':'No.'; if(t.includes('island'))return c.island?'Yes.':'No.'; const numMatch=t.match(/(\d+)\s*million/); if(t.includes('popul')||numMatch){if(numMatch){const n=parseInt(numMatch[1],10); if(t.includes('more')||t.includes('over')||t.includes('greater'))return c.popMillions>n?'Yes.':'No.'; if(t.includes('less')||t.includes('under')||t.includes('fewer'))return c.popMillions<n?'Yes.':'No.';} if(t.includes('large')||t.includes('populous')||t.includes('many people'))return c.popMillions>50?'Yes.':'No.'; if(t.includes('small')||t.includes('few people'))return c.popMillions<10?'Yes.':'No.';} if((t.includes('big')||t.includes('large'))&&(t.includes('country')||t.includes('area')||t.includes('size'))){return c.areaCategory==='large'?'Yes.':'No.';} if(t.includes('small')&&(t.includes('country')||t.includes('area')||t.includes('size'))){return c.areaCategory==='small'?'Yes.':'No.';} const colors=['red','blue','green','yellow','white','black','orange','purple']; for(const col of colors){if(t.includes(col))return c.colors.includes(col)?'Yes.':'No.';} const letterMatch=t.match(/start(?:s)? with(?: the letter)? ([a-z])/); if(letterMatch)return c.name.toLowerCase().startsWith(letterMatch[1])?'Yes.':'No.'; if(t.includes('capital')){const capLetter=t.match(/capital start(?:s)? with(?: the letter)? ([a-z])/); if(capLetter)return c.capital.toLowerCase().startsWith(capLetter[1])?'Yes.':'No.'; const capIs=t.match(/capital (?:is|be) ([a-z\s]+)\??/); if(capIs)return c.capital.toLowerCase().trim()===capIs[1].trim()?'Yes.':'No.';} if(t.includes('border')){const bm=t.match(/border(?:s)? more than (\d+)/); if(bm)return c.borders>parseInt(bm[1],10)?'Yes.':'No.'; if(t.includes('many'))return c.borders>=5?'Yes.':'No.'; if(t.includes('no border')||t.includes('zero border'))return c.borders===0?'Yes.':'No.';} if(t.includes('english'))return c.language.toLowerCase().includes('english')?'Yes.':'No.'; if(t.includes('spanish'))return c.language.toLowerCase().includes('spanish')?'Yes.':'No.'; if(t.includes('french'))return c.language.toLowerCase().includes('french')?'Yes.':'No.'; if(t.includes('arabic'))return c.language.toLowerCase().includes('arabic')?'Yes.':'No.'; if(t.includes('hot')||t.includes('tropical')||t.includes('warm'))return c.climate==='hot'?'Yes.':'No.'; if(t.includes('cold')||t.includes('snow'))return c.climate==='cold'?'Yes.':'No.'; return"I can only answer yes/no questions about continent, hemisphere, coastline, island status, population, size, flag colors, first letter, capital, borders, language, or climate. Try rephrasing!";}
+/* Capitals whose French name differs from the English one (only these need a
+   mapping; the rest are spelled identically in both languages). */
+const CAPITAL_FR={"Cairo":"Le Caire","Beijing":"Pékin","London":"Londres","Warsaw":"Varsovie","Athens":"Athènes","Mexico City":"Mexico","Hanoi":"Hanoï","Kathmandu":"Katmandou","Ulaanbaatar":"Oulan-Bator","Asuncion":"Asunción","Brasilia":"Brasília","Moscow":"Moscou","Lisbon":"Lisbonne","Vienna":"Vienne","Copenhagen":"Copenhague","Bucharest":"Bucarest","Algiers":"Alger"};
+function capitalLabel(cap){return state.lang==='fr'?(CAPITAL_FR[cap]||cap):cap;}
+// Whole-word match inside accent-folded text, so short French keywords like
+// "mer" (sea) don't fire on "america" or "numero".
+function frWord(f,words){return words.some(w=>new RegExp('(^|[^a-z0-9])'+w+'([^a-z0-9]|$)').test(f));}
+/* Yes/no question parser. English keywords are matched exactly as before;
+   French ones are matched against an accent-folded copy of the question, so
+   "Est-ce en Amérique du Sud ?" and "est ce en amerique du sud" both work.
+   Both languages are always accepted regardless of the UI language. */
+function answerEngine(question,c){
+  const t=String(question).toLowerCase();
+  const f=foldAccents(t).replace(/['’]/g,' ').replace(/\s+/g,' ');
+  const Y=tr('ans_yes'), N=tr('ans_no');
+  // true if the English keyword appears, or any French keyword/phrase does
+  function hit(en,frs){
+    if(en&&t.includes(en))return true;
+    return (frs||[]).some(w=>w.indexOf(' ')>=0?f.indexOf(w)!==-1:frWord(f,[w]));
+  }
+  const CONTS=[['europe',['europe']],['asia',['asie']],['africa',['afrique']],['north america',['amerique du nord']],['south america',['amerique du sud']],['oceania',['oceanie']],['antarctica',['antarctique']]];
+  for(let i=0;i<CONTS.length;i++){if(hit(CONTS[i][0],CONTS[i][1]))return c.continent.toLowerCase()===CONTS[i][0]?Y:N;}
+  if(hit('hemisphere',['hemisphere'])){
+    if(hit('north',['nord']))return c.hemisphere==='N'?Y:N;
+    if(hit('south',['sud']))return c.hemisphere==='S'?Y:N;
+  }
+  if(hit('landlocked',['enclave','enclavee','sans littoral','sans acces a la mer']))return c.landlocked?Y:N;
+  if(hit('coast',['cote','cotes','littoral','maritime'])||hit('ocean',['ocean'])||hit('sea',['mer']))return !c.landlocked?Y:N;
+  if(hit('island',['ile','iles']))return c.island?Y:N;
+  const numMatch=f.match(/(\d+)\s*millions?/);
+  if(hit('popul',['population','habitants'])||numMatch){
+    if(numMatch){
+      const n=parseInt(numMatch[1],10);
+      if(hit('more',['plus','superieur','superieure','depasse'])||t.includes('over')||t.includes('greater'))return c.popMillions>n?Y:N;
+      if(hit('less',['moins','inferieur','inferieure'])||t.includes('under')||t.includes('fewer'))return c.popMillions<n?Y:N;
+    }
+    if(hit('large',['peuple','peuplee','peuples'])||t.includes('populous')||t.includes('many people'))return c.popMillions>50?Y:N;
+    if(t.includes('small')||t.includes('few people')||f.indexOf('peu peuple')!==-1||f.indexOf('peu de monde')!==-1)return c.popMillions<10?Y:N;
+  }
+  const sizeWord=hit('country',['pays','superficie','taille','territoire'])||t.includes('area')||t.includes('size');
+  if((hit('big',['grand','grande','vaste','vastes','etendu','immense'])||t.includes('large'))&&sizeWord)return c.areaCategory==='large'?Y:N;
+  if(hit('small',['petit','petite'])&&sizeWord)return c.areaCategory==='small'?Y:N;
+  const COLORS=[['red',['rouge']],['blue',['bleu','bleue']],['green',['vert','verte']],['yellow',['jaune']],['white',['blanc','blanche']],['black',['noir','noire']],['orange',['orange']],['purple',['violet','violette','pourpre']]];
+  for(let i=0;i<COLORS.length;i++){if(hit(COLORS[i][0],COLORS[i][1]))return c.colors.includes(COLORS[i][0])?Y:N;}
+  // Capital is checked before the generic "starts with" rule so that
+  // "does the capital start with B?" is answered about the capital.
+  if(hit('capital',['capitale'])){
+    const cap=foldAccents(capitalLabel(c.capital)).toLowerCase().trim();
+    const capLetter=t.match(/capital start(?:s)? with(?: the letter)? ([a-z])/)||f.match(/capitale commence par(?: la lettre)? ([a-z])(?![a-z])/);
+    if(capLetter)return cap.startsWith(capLetter[1])?Y:N;
+    const capIs=t.match(/capital (?:is|be) ([a-z\s]+)\??/)||f.match(/capitale (?:est|c est|s appelle) ([a-z\s]+)\??/);
+    if(capIs)return cap===capIs[1].trim()?Y:N;
+  }
+  const shown=foldAccents(countryLabel(c.name)).toLowerCase();
+  const letterMatch=t.match(/start(?:s)? with(?: the letter)? ([a-z])/)||f.match(/commence par(?: la lettre)? ([a-z])(?![a-z])/);
+  if(letterMatch)return shown.startsWith(letterMatch[1])?Y:N;
+  if(hit('border',['frontiere','frontieres','voisin','voisins'])){
+    const bm=t.match(/border(?:s)? more than (\d+)/)||f.match(/plus de (\d+)/);
+    if(bm)return c.borders>parseInt(bm[1],10)?Y:N;
+    if(hit('many',['beaucoup','nombreux','nombreuses']))return c.borders>=5?Y:N;
+    if(t.includes('no border')||t.includes('zero border')||hit('',['aucune','aucun','zero']))return c.borders===0?Y:N;
+  }
+  if(hit('english',['anglais','anglaise']))return c.language.toLowerCase().includes('english')?Y:N;
+  if(hit('spanish',['espagnol','espagnole']))return c.language.toLowerCase().includes('spanish')?Y:N;
+  if(hit('french',['francais','francaise']))return c.language.toLowerCase().includes('french')?Y:N;
+  if(hit('arabic',['arabe']))return c.language.toLowerCase().includes('arabic')?Y:N;
+  if(hit('hot',['chaud','chaude'])||hit('tropical',['tropical','tropicale'])||t.includes('warm'))return c.climate==='hot'?Y:N;
+  if(hit('cold',['froid','froide'])||hit('snow',['neige']))return c.climate==='cold'?Y:N;
+  return tr('answer_fallback');
+}
 
 let geoState=null;
-function startGeoAI(diff){geoState={diff, secret:shuffle(GEO_POOLS[diff])[0], timeLeft:GEO_TIME_LIMIT, interval:null}; document.getElementById('geo-chat-log').innerHTML=''; addGeoLog('sys',"I'm thinking of a country. Ask me yes/no questions, then make your final guess!"); document.getElementById('geo-question-input').value=''; document.getElementById('geo-guess-input').value=''; showScreen('screen-geo-game'); updateGeoTimerDisplay(); clearInterval(geoState.interval); geoState.interval=setInterval(()=>{geoState.timeLeft--; updateGeoTimerDisplay(); if(geoState.timeLeft<=0){clearInterval(geoState.interval); endGeoAI(false,"Time's up!");}},1000);}
+function startGeoAI(diff){geoState={diff, secret:shuffle(GEO_POOLS[diff])[0], timeLeft:GEO_TIME_LIMIT, interval:null}; document.getElementById('geo-chat-log').innerHTML=''; addGeoLog('sys',tr('geo_intro')); document.getElementById('geo-question-input').value=''; document.getElementById('geo-guess-input').value=''; showScreen('screen-geo-game'); updateGeoTimerDisplay(); clearInterval(geoState.interval); geoState.interval=setInterval(()=>{geoState.timeLeft--; updateGeoTimerDisplay(); if(geoState.timeLeft<=0){clearInterval(geoState.interval); endGeoAI(false,tr('times_up'));}},1000);}
 function restartGeoAI(){startGeoAI(geoState.diff);}
 function updateGeoTimerDisplay(){document.getElementById('geo-timer').textContent=fmtTime(geoState.timeLeft);}
 function addGeoLog(type,text){const log=document.getElementById('geo-chat-log'); const div=document.createElement('div'); div.className='chat-line '+(type==='q'?'chat-q':type==='a'?'chat-a':'chat-sys'); div.textContent=text; log.appendChild(div); log.scrollTop=log.scrollHeight;}
 function askGeoQuestion(){if(!geoState)return; const input=document.getElementById('geo-question-input'); const q=input.value.trim(); if(!q)return; addGeoLog('q',q); const answer=answerEngine(q,geoState.secret); addGeoLog('a',answer); input.value=''; input.focus();}
-function guessGeoCountry(){if(!geoState)return; const input=document.getElementById('geo-guess-input'); const g=input.value.trim(); if(!g)return; addGeoLog('q','My guess: '+g); if(matchesCountry(g,geoState.secret)){clearInterval(geoState.interval); endGeoAI(true);}else{addGeoLog('a','Nope, keep trying!');} input.value='';}
-function endGeoAI(won,forcedMsg,forcedEmoji){if(won){const reward=GEO_DIFF[geoState.diff].reward; addCoins(reward); document.getElementById('geo-result-emoji').textContent='🏆'; document.getElementById('geo-result-msg').textContent='Correct! It was '+geoState.secret.name+'.'; document.getElementById('geo-result-sub').textContent='You earned '+reward+' coin'+(reward===1?'':'s')+'.';}else{document.getElementById('geo-result-emoji').textContent=forcedEmoji||'⏰'; document.getElementById('geo-result-msg').textContent=forcedMsg||"Time's up!"; document.getElementById('geo-result-sub').textContent='The country was '+geoState.secret.name+'.';} showScreen('screen-geo-result');}
-function giveUpGeoAI(){if(!geoState)return; clearInterval(geoState.interval); addGeoLog('sys','You gave up.'); endGeoAI(false,'You gave up!','🏳');}
-function useGeoContinentHint(){if(!geoState)return; if(state.hints.geoContinent<=0){addGeoLog('sys',"You don't own this hint. Buy it in the Store!"); return;}state.hints.geoContinent--; saveState(); renderCoins(); addGeoLog('sys','Hint: The continent is '+geoState.secret.continent+'.');}
-function useGeoLetterHint(){if(!geoState)return; if(state.hints.geoLetter<=0){addGeoLog('sys',"You don't own this hint. Buy it in the Store!"); return;}state.hints.geoLetter--; saveState(); renderCoins(); addGeoLog('sys','Hint: It starts with "'+geoState.secret.name[0].toUpperCase()+'".');}
+function guessGeoCountry(){if(!geoState)return; const input=document.getElementById('geo-guess-input'); const g=input.value.trim(); if(!g)return; addGeoLog('q',tr('my_guess',{g:g})); if(matchesCountry(g,geoState.secret)){clearInterval(geoState.interval); endGeoAI(true);}else{addGeoLog('a',tr('nope_keep_trying'));} input.value='';}
+function endGeoAI(won,forcedMsg,forcedEmoji){if(won){const reward=GEO_DIFF[geoState.diff].reward; addCoins(reward); document.getElementById('geo-result-emoji').textContent='🏆'; document.getElementById('geo-result-msg').textContent=tr('geo_correct',{name:countryLabel(geoState.secret.name)}); document.getElementById('geo-result-sub').textContent=tr('earned_coins',{n:reward,s:plural(reward)});}else{document.getElementById('geo-result-emoji').textContent=forcedEmoji||'⏰'; document.getElementById('geo-result-msg').textContent=forcedMsg||tr('times_up'); document.getElementById('geo-result-sub').textContent=tr('country_was',{name:countryLabel(geoState.secret.name)});} showScreen('screen-geo-result');}
+function giveUpGeoAI(){if(!geoState)return; clearInterval(geoState.interval); addGeoLog('sys',tr('gave_up_log')); endGeoAI(false,tr('gave_up'),'🏳');}
+function useGeoContinentHint(){if(!geoState)return; if(state.hints.geoContinent<=0){addGeoLog('sys',tr('hint_not_owned')); return;}state.hints.geoContinent--; saveState(); renderCoins(); addGeoLog('sys',tr('hint_continent_is',{c:continentLabel(geoState.secret.continent)}));}
+function useGeoLetterHint(){if(!geoState)return; if(state.hints.geoLetter<=0){addGeoLog('sys',tr('hint_not_owned')); return;}state.hints.geoLetter--; saveState(); renderCoins(); addGeoLog('sys',tr('hint_geo_starts',{L:countryLabel(geoState.secret.name)[0].toUpperCase()}));}
 
-function buyHint(key,cost){document.getElementById('store-error').textContent=''; if(state.coins<cost){document.getElementById('store-error').textContent='Not enough coins!'; return;}state.coins-=cost; state.hints[key]++; saveState(); renderCoins();}
+function buyHint(key,cost){document.getElementById('store-error').textContent=''; if(state.coins<cost){document.getElementById('store-error').textContent=tr('err_not_enough_coins'); return;}state.coins-=cost; state.hints[key]++; saveState(); renderCoins();}
 
-function doSignIn(){const u=document.getElementById('signin-username').value.trim(); const p=document.getElementById('signin-password').value; const err=document.getElementById('signin-error'); err.textContent=''; if(!u){err.textContent='Please enter a username.'; return;}if(p.length!==4){err.textContent='Password must be exactly 4 characters.'; return;}localStorage.setItem('ftg_account',JSON.stringify({username:u,password:p})); state.loggedIn=true; state.username=u; state.isOwner=(p===OWNER_PASSWORD); state.isAssistant=(p===ASSISTANT_PASSWORD); localStorage.setItem('ftg_owner',state.isOwner?'1':'0'); localStorage.setItem('ftg_assistant',state.isAssistant?'1':'0'); renderCoins(); syncUserToFirebase(); subscribeToMyUserRecord(); showScreen('screen-home');}
+function doSignIn(){const u=document.getElementById('signin-username').value.trim(); const p=document.getElementById('signin-password').value; const err=document.getElementById('signin-error'); err.textContent=''; if(!u){err.textContent=tr('err_enter_username'); return;}if(p.length!==4){err.textContent=tr('err_password_len'); return;}localStorage.setItem('ftg_account',JSON.stringify({username:u,password:p})); state.loggedIn=true; state.username=u; state.isOwner=(p===OWNER_PASSWORD); state.isAssistant=(p===ASSISTANT_PASSWORD); localStorage.setItem('ftg_owner',state.isOwner?'1':'0'); localStorage.setItem('ftg_assistant',state.isAssistant?'1':'0'); renderCoins(); syncUserToFirebase(); subscribeToMyUserRecord(); showScreen('screen-home');}
 function doSignOut(){unsubscribeFromMyUserRecord(); localStorage.removeItem('ftg_account'); localStorage.removeItem('ftg_owner'); localStorage.removeItem('ftg_assistant'); state.loggedIn=false; state.username=''; state.isOwner=false; state.isAssistant=false; document.getElementById('signin-username').value=''; document.getElementById('signin-password').value=''; renderCoins(); showScreen('screen-home');}
 
 /* -------- FIREBASE (real cross-device online play) --------
@@ -675,19 +1263,20 @@ const firebaseConfig = {
 };
 const FIREBASE_CONFIGURED = !!(firebaseConfig.apiKey && firebaseConfig.apiKey.indexOf('YOUR_')!==0);
 const fbClientId = Math.random().toString(36).slice(2)+Date.now().toString(36);
-let fbDb=null, fbReady=false, fbInitError=FIREBASE_CONFIGURED?'':'Online play needs Firebase configuration — see README.md.';
+let fbDb=null, fbReady=false, fbInitErrorKey=FIREBASE_CONFIGURED?'':'fb_needs_config', fbInitErrorDetail='';
 if(FIREBASE_CONFIGURED){
   try{
     firebase.initializeApp(firebaseConfig);
     fbDb=firebase.database();
-    firebase.auth().signInAnonymously().then(()=>{fbReady=true; updateFbStatusUI(); if(state.loggedIn){syncUserToFirebase(); subscribeToMyUserRecord();}}).catch(e=>{fbInitError='Could not connect: '+e.message; updateFbStatusUI();});
-  }catch(e){fbInitError='Could not connect: '+e.message;}
+    firebase.auth().signInAnonymously().then(()=>{fbReady=true; updateFbStatusUI(); if(state.loggedIn){syncUserToFirebase(); subscribeToMyUserRecord();}}).catch(e=>{fbInitErrorKey='fb_could_not_connect'; fbInitErrorDetail=e.message; updateFbStatusUI();});
+  }catch(e){fbInitErrorKey='fb_could_not_connect'; fbInitErrorDetail=e.message;}
 }
-function fbUnavailableMessage(){return fbInitError||'Still connecting to the online service — try again in a moment.';}
+function fbErrorText(){return fbInitErrorKey?tr(fbInitErrorKey,{msg:fbInitErrorDetail}):'';}
+function fbUnavailableMessage(){return fbErrorText()||tr('fb_still_connecting');}
 function updateFbStatusUI(){
   let text;
-  if(!fbReady){text=fbInitError||'Connecting to the online service...';}
-  else{text='🟢 Connected — ready for online play.';}
+  if(!fbReady){text=fbErrorText()||tr('fb_connecting');}
+  else{text=tr('fb_connected');}
   const geoEl=document.getElementById('online-fb-status'); if(geoEl)geoEl.textContent=text;
   const flagEl=document.getElementById('flag-online-fb-status'); if(flagEl)flagEl.textContent=text;
 }
@@ -738,10 +1327,10 @@ function subscribeToMyUserRecord(){if(!fbReady||!fbDb||!state.loggedIn||!state.u
 function unsubscribeFromMyUserRecord(){if(myUserListener){myUserRef().off('value',myUserListener); myUserListener=null;}}
 
 let ownerUsersListener=null;
-function openOwnerPanel(){if(!state.isOwner&&!state.isAssistant)return; showScreen('screen-owner-panel'); document.getElementById('owner-panel-subtitle').textContent=state.isOwner?"Every signed-in player's coins & hints, live from Firebase.":"Every signed-in player's coins & hints, live from Firebase (view-only)."; const status=document.getElementById('owner-users-status'); if(!fbReady){status.textContent=fbUnavailableMessage(); document.getElementById('owner-users-list').innerHTML=''; return;} status.textContent=''; if(ownerUsersListener)usersRef().off('value',ownerUsersListener); ownerUsersListener=usersRef().on('value',snap=>renderOwnerUserList(snap.val()||{}));}
+function openOwnerPanel(){if(!state.isOwner&&!state.isAssistant)return; showScreen('screen-owner-panel'); document.getElementById('owner-panel-subtitle').textContent=state.isOwner?tr('owner_panel_sub'):tr('owner_panel_sub_ro'); const status=document.getElementById('owner-users-status'); if(!fbReady){status.textContent=fbUnavailableMessage(); document.getElementById('owner-users-list').innerHTML=''; return;} status.textContent=''; if(ownerUsersListener)usersRef().off('value',ownerUsersListener); ownerUsersListener=usersRef().on('value',snap=>renderOwnerUserList(snap.val()||{}));}
 function closeOwnerPanel(){if(ownerUsersListener){usersRef().off('value',ownerUsersListener); ownerUsersListener=null;} showScreen('screen-home');}
 const HINT_LABELS={flagLetter:'💡Flag Letter',flagTime:'⏱+5s',geoContinent:'🌍Continent',geoLetter:'🔤Geo Letter'};
-function renderOwnerUserList(users){const container=document.getElementById('owner-users-list'); container.innerHTML=''; const names=Object.keys(users).sort((a,b)=>a.localeCompare(b)); if(names.length===0){container.innerHTML='<p style="text-align:center;color:#888;">No signed-in users yet.</p>'; return;} names.forEach(name=>{const u=users[name]||{}; const coins=u.coins||0; const hints=u.hints||{}; const row=document.createElement('div'); row.className='user-row'; const head=document.createElement('div'); head.className='user-row-head'; head.innerHTML='<strong>'+name.replace(/</g,'&lt;')+'</strong>'+(u.isOwner?' <span class="owner-badge">👑 OWNER</span>':'')+(u.isAssistant?' <span class="owner-badge">🛠 ASSISTANT</span>':''); row.appendChild(head); const chipRow=document.createElement('div'); chipRow.className='stat-chip-row'; chipRow.appendChild(makeStatChip(name,'coins','🪙',coins)); Object.keys(HINT_LABELS).forEach(key=>{chipRow.appendChild(makeStatChip(name,key,HINT_LABELS[key],hints[key]||0));}); row.appendChild(chipRow); container.appendChild(row);});}
+function renderOwnerUserList(users){const container=document.getElementById('owner-users-list'); container.innerHTML=''; const names=Object.keys(users).sort((a,b)=>a.localeCompare(b)); if(names.length===0){container.innerHTML='<p style="text-align:center;color:#888;">'+tr('no_users')+'</p>'; return;} names.forEach(name=>{const u=users[name]||{}; const coins=u.coins||0; const hints=u.hints||{}; const row=document.createElement('div'); row.className='user-row'; const head=document.createElement('div'); head.className='user-row-head'; head.innerHTML='<strong>'+name.replace(/</g,'&lt;')+'</strong>'+(u.isOwner?' <span class="owner-badge">'+tr('badge_owner')+'</span>':'')+(u.isAssistant?' <span class="owner-badge">'+tr('badge_assistant')+'</span>':''); row.appendChild(head); const chipRow=document.createElement('div'); chipRow.className='stat-chip-row'; chipRow.appendChild(makeStatChip(name,'coins','🪙',coins)); Object.keys(HINT_LABELS).forEach(key=>{chipRow.appendChild(makeStatChip(name,key,HINT_LABELS[key],hints[key]||0));}); row.appendChild(chipRow); container.appendChild(row);});}
 function makeStatChip(username,field,label,value){const chip=document.createElement('div'); chip.className='stat-chip'; const lbl=document.createElement('span'); lbl.textContent=label; const val=document.createElement('span'); val.className='val'; val.textContent=value; chip.appendChild(lbl); if(state.isOwner){const minus=document.createElement('button'); minus.type='button'; minus.textContent='−'; minus.onclick=()=>ownerAdjust(username,field,-1); chip.appendChild(minus);} chip.appendChild(val); if(state.isOwner){const plus=document.createElement('button'); plus.type='button'; plus.textContent='+'; plus.onclick=()=>ownerAdjust(username,field,1); chip.appendChild(plus);} return chip;}
 function ownerAdjust(username,field,delta){if(!state.isOwner||!fbReady)return; const ref=field==='coins'?usersRef().child(username).child('coins'):usersRef().child(username).child('hints').child(field); ref.transaction(cur=>Math.max(0,(cur||0)+delta));}
 
@@ -749,55 +1338,56 @@ let adminChatListener=null;
 function adminChatMessagesRef(){return fbDb.ref('adminChat/messages');}
 function openAdminChat(){if(!state.isOwner&&!state.isAssistant)return; showScreen('screen-admin-chat'); const status=document.getElementById('admin-chat-status'); document.getElementById('admin-chat-log').innerHTML=''; if(!fbReady){status.textContent=fbUnavailableMessage(); return;} status.textContent=''; if(adminChatListener)adminChatMessagesRef().off('child_added',adminChatListener); adminChatListener=adminChatMessagesRef().limitToLast(50).on('child_added',snap=>addAdminChatLine(snap.val()));}
 function closeAdminChat(){if(adminChatListener){adminChatMessagesRef().off('child_added',adminChatListener); adminChatListener=null;} showScreen('screen-home');}
-function addAdminChatLine(m){if(!m)return; const log=document.getElementById('admin-chat-log'); const div=document.createElement('div'); div.className='global-msg'; const text=document.createElement('div'); text.textContent=(m.fromOwner?'👑 ':'🛠 ')+(m.text||''); const meta=document.createElement('div'); meta.className='meta'; meta.textContent='— '+(m.from||'Staff'); div.appendChild(text); div.appendChild(meta); log.appendChild(div); log.scrollTop=log.scrollHeight;}
+function addAdminChatLine(m){if(!m)return; const log=document.getElementById('admin-chat-log'); const div=document.createElement('div'); div.className='global-msg'; const text=document.createElement('div'); text.textContent=(m.fromOwner?'👑 ':'🛠 ')+(m.text||''); const meta=document.createElement('div'); meta.className='meta'; meta.textContent='— '+(m.from||tr('word_staff')); div.appendChild(text); div.appendChild(meta); log.appendChild(div); log.scrollTop=log.scrollHeight;}
 function sendAdminChatMessage(){if((!state.isOwner&&!state.isAssistant)||!fbReady)return; const input=document.getElementById('admin-chat-input'); const text=input.value.trim(); if(!text)return; adminChatMessagesRef().push({text,from:state.username,fromOwner:!!state.isOwner,ts:firebase.database.ServerValue.TIMESTAMP}); input.value='';}
 
 let feedbackListener=null;
 function feedbackRef(){return fbDb.ref('feedback');}
 function openFeedback(){if(!state.isOwner&&!state.isAssistant)return; showScreen('screen-feedback'); const status=document.getElementById('feedback-status'); document.getElementById('feedback-log').innerHTML=''; if(!fbReady){status.textContent=fbUnavailableMessage(); return;} status.textContent=''; if(feedbackListener)feedbackRef().off('child_added',feedbackListener); feedbackListener=feedbackRef().limitToLast(50).on('child_added',snap=>addFeedbackLine(snap.val()));}
 function closeFeedback(){if(feedbackListener){feedbackRef().off('child_added',feedbackListener); feedbackListener=null;} showScreen('screen-home');}
-function addFeedbackLine(f){if(!f)return; const log=document.getElementById('feedback-log'); const div=document.createElement('div'); div.className='global-msg'; const text=document.createElement('div'); text.textContent=(f.type==='bug'?'🐛 ':'💡 ')+(f.text||''); const meta=document.createElement('div'); meta.className='meta'; meta.textContent='— '+(f.from||'Staff'); div.appendChild(text); div.appendChild(meta); log.appendChild(div); log.scrollTop=log.scrollHeight;}
+function addFeedbackLine(f){if(!f)return; const log=document.getElementById('feedback-log'); const div=document.createElement('div'); div.className='global-msg'; const text=document.createElement('div'); text.textContent=(f.type==='bug'?'🐛 ':'💡 ')+(f.text||''); const meta=document.createElement('div'); meta.className='meta'; meta.textContent='— '+(f.from||tr('word_staff')); div.appendChild(text); div.appendChild(meta); log.appendChild(div); log.scrollTop=log.scrollHeight;}
 function submitFeedback(){if((!state.isOwner&&!state.isAssistant)||!fbReady)return; const type=document.getElementById('feedback-type').value; const input=document.getElementById('feedback-text'); const text=input.value.trim(); if(!text)return; feedbackRef().push({type,text,from:state.username,ts:firebase.database.ServerValue.TIMESTAMP}); input.value='';}
 
 let globalChatListener=null;
 function globalMessagesRef(){return fbDb.ref('global/messages');}
-function openGlobalChat(){if(!state.loggedIn){showScreen('screen-signin'); document.getElementById('signin-error').textContent='Please sign in first to view Global Chat.'; return;} showScreen('screen-global-chat'); document.getElementById('global-chat-compose').style.display=state.isOwner?'block':'none'; const status=document.getElementById('global-chat-status'); document.getElementById('global-chat-log').innerHTML=''; if(!fbReady){status.textContent=fbUnavailableMessage(); return;} status.textContent=''; if(globalChatListener)globalMessagesRef().off('child_added',globalChatListener); globalChatListener=globalMessagesRef().limitToLast(50).on('child_added',snap=>addGlobalChatLine(snap.val()));}
+function openGlobalChat(){if(!state.loggedIn){showScreen('screen-signin'); document.getElementById('signin-error').textContent=tr('err_signin_chat'); return;} showScreen('screen-global-chat'); document.getElementById('global-chat-compose').style.display=state.isOwner?'block':'none'; const status=document.getElementById('global-chat-status'); document.getElementById('global-chat-log').innerHTML=''; if(!fbReady){status.textContent=fbUnavailableMessage(); return;} status.textContent=''; if(globalChatListener)globalMessagesRef().off('child_added',globalChatListener); globalChatListener=globalMessagesRef().limitToLast(50).on('child_added',snap=>addGlobalChatLine(snap.val()));}
 function closeGlobalChat(){if(globalChatListener){globalMessagesRef().off('child_added',globalChatListener); globalChatListener=null;} showScreen('screen-home');}
-function addGlobalChatLine(m){if(!m)return; const log=document.getElementById('global-chat-log'); const div=document.createElement('div'); div.className='global-msg'; const text=document.createElement('div'); text.textContent='📢 '+(m.text||''); const meta=document.createElement('div'); meta.className='meta'; meta.textContent='— '+(m.from||'Owner'); div.appendChild(text); div.appendChild(meta); log.appendChild(div); log.scrollTop=log.scrollHeight;}
+function addGlobalChatLine(m){if(!m)return; const log=document.getElementById('global-chat-log'); const div=document.createElement('div'); div.className='global-msg'; const text=document.createElement('div'); text.textContent='📢 '+(m.text||''); const meta=document.createElement('div'); meta.className='meta'; meta.textContent='— '+(m.from||tr('word_owner')); div.appendChild(text); div.appendChild(meta); log.appendChild(div); log.scrollTop=log.scrollHeight;}
 function sendGlobalMessage(){if(!state.isOwner||!fbReady)return; const input=document.getElementById('global-chat-input'); const text=input.value.trim(); if(!text)return; globalMessagesRef().push({text,from:state.username,ts:firebase.database.ServerValue.TIMESTAMP}); input.value='';}
 
 let room=null;
 function genCode(){const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let c=''; for(let i=0;i<5;i++)c+=chars[Math.floor(Math.random()*chars.length)]; return c;}
 function createRoom(){const errEl=document.getElementById('online-setup-error'); errEl.textContent=''; if(!fbReady){errEl.textContent=fbUnavailableMessage(); return;} const diff=document.getElementById('online-create-diff').value; const code=genCode(); room={code,role:'picker',diff,channel:createRoomChannel('rooms/'+code),secret:null,timerInterval:null,timeLeft:GEO_TIME_LIMIT,qCounter:0,friendJoined:false}; roomMetaRef('rooms/'+code).set({createdAt:firebase.database.ServerValue.TIMESTAMP,diff}); room.channel.onmessage=handleRoomMessage; document.getElementById('picker-room-code').textContent=code; document.getElementById('picker-wait-msg').style.display='block'; document.getElementById('picker-pick-area').style.display='none'; showScreen('screen-geo-picker-setup');}
-function joinRoom(){const codeInput=document.getElementById('online-join-code'); const code=codeInput.value.trim().toUpperCase(); const errEl=document.getElementById('online-setup-error'); errEl.textContent=''; if(!fbReady){errEl.textContent=fbUnavailableMessage(); return;} if(!code){errEl.textContent='Please enter a room code.'; return;}roomMetaRef('rooms/'+code).once('value').then(snap=>{if(!snap.exists()){errEl.textContent='Room not found. Check the code and try again.'; return;}room={code,role:'guesser',diff:null,channel:createRoomChannel('rooms/'+code),secret:null,timerInterval:null,timeLeft:GEO_TIME_LIMIT,qCounter:0}; room.channel.onmessage=handleRoomMessage; room.channel.postMessage({type:'join'}); document.getElementById('online-role-tag').textContent='You are the Guesser — waiting for host to start...'; document.getElementById('online-chat-log').innerHTML=''; document.getElementById('online-timer').textContent=fmtTime(GEO_TIME_LIMIT); document.getElementById('guesser-controls').style.display='none'; document.getElementById('picker-controls').style.display='none'; showScreen('screen-geo-online-play');}).catch(()=>{errEl.textContent='Could not reach the online service. Try again.';});}
-function pickerStartGame(){const sel=document.getElementById('picker-secret-select'); const name=sel.value; const pool=GEO_POOLS[room.diff]; room.secret=pool.find(c=>c.name===name); room.timeLeft=GEO_TIME_LIMIT; room.channel.postMessage({type:'start',diff:room.diff}); document.getElementById('online-role-tag').textContent='You are the Picker (secret: '+room.secret.name+')'; document.getElementById('online-chat-log').innerHTML=''; addOnlineLog('sys','Game started! Waiting for questions from your friend.'); document.getElementById('online-timer').textContent=fmtTime(GEO_TIME_LIMIT); document.getElementById('guesser-controls').style.display='none'; document.getElementById('picker-controls').style.display='block'; document.getElementById('picker-pending-list').innerHTML=''; showScreen('screen-geo-online-play'); startOnlineTimer();}
-function startOnlineTimer(){clearInterval(room.timerInterval); room.timerInterval=setInterval(()=>{room.timeLeft--; document.getElementById('online-timer').textContent=fmtTime(Math.max(room.timeLeft,0)); if(room.timeLeft<=0){clearInterval(room.timerInterval); if(room.role==='guesser'){room.channel.postMessage({type:'timeout'}); showOnlineResult(false,"Time's up!");}else{addOnlineLog('sys',"Time's up!");}}},1000);}
+function joinRoom(){const codeInput=document.getElementById('online-join-code'); const code=codeInput.value.trim().toUpperCase(); const errEl=document.getElementById('online-setup-error'); errEl.textContent=''; if(!fbReady){errEl.textContent=fbUnavailableMessage(); return;} if(!code){errEl.textContent=tr('err_enter_code'); return;}roomMetaRef('rooms/'+code).once('value').then(snap=>{if(!snap.exists()){errEl.textContent=tr('err_room_not_found'); return;}room={code,role:'guesser',diff:null,channel:createRoomChannel('rooms/'+code),secret:null,timerInterval:null,timeLeft:GEO_TIME_LIMIT,qCounter:0}; room.channel.onmessage=handleRoomMessage; room.channel.postMessage({type:'join'}); document.getElementById('online-role-tag').textContent=tr('guesser_waiting'); document.getElementById('online-chat-log').innerHTML=''; document.getElementById('online-timer').textContent=fmtTime(GEO_TIME_LIMIT); document.getElementById('guesser-controls').style.display='none'; document.getElementById('picker-controls').style.display='none'; showScreen('screen-geo-online-play');}).catch(()=>{errEl.textContent=tr('err_no_service');});}
+function populatePickerSelect(diff){const sel=document.getElementById('picker-secret-select'); sel.innerHTML=''; GEO_POOLS[diff].forEach(c=>{const opt=document.createElement('option'); opt.value=c.name; opt.textContent=countryLabel(c.name); sel.appendChild(opt);});}
+function pickerStartGame(){const sel=document.getElementById('picker-secret-select'); const name=sel.value; const pool=GEO_POOLS[room.diff]; room.secret=pool.find(c=>c.name===name); room.timeLeft=GEO_TIME_LIMIT; room.channel.postMessage({type:'start',diff:room.diff}); document.getElementById('online-role-tag').textContent=tr('picker_secret_tag',{name:countryLabel(room.secret.name)}); document.getElementById('online-chat-log').innerHTML=''; addOnlineLog('sys',tr('game_started_picker')); document.getElementById('online-timer').textContent=fmtTime(GEO_TIME_LIMIT); document.getElementById('guesser-controls').style.display='none'; document.getElementById('picker-controls').style.display='block'; document.getElementById('picker-pending-list').innerHTML=''; showScreen('screen-geo-online-play'); startOnlineTimer();}
+function startOnlineTimer(){clearInterval(room.timerInterval); room.timerInterval=setInterval(()=>{room.timeLeft--; document.getElementById('online-timer').textContent=fmtTime(Math.max(room.timeLeft,0)); if(room.timeLeft<=0){clearInterval(room.timerInterval); if(room.role==='guesser'){room.channel.postMessage({type:'timeout'}); showOnlineResult(false,tr('times_up'));}else{addOnlineLog('sys',tr('times_up'));}}},1000);}
 function addOnlineLog(type,text){const log=document.getElementById('online-chat-log'); const div=document.createElement('div'); div.className='chat-line '+(type==='q'?'chat-q':type==='a'?'chat-a':'chat-sys'); div.textContent=text; log.appendChild(div); log.scrollTop=log.scrollHeight;}
 function sendOnlineQuestion(){const input=document.getElementById('online-question-input'); const q=input.value.trim(); if(!q||!room)return; room.qCounter++; const id=room.qCounter; room.channel.postMessage({type:'question',id,text:q}); addOnlineLog('q',q); input.value='';}
-function sendOnlineGuess(){const input=document.getElementById('online-guess-input'); const g=input.value.trim(); if(!g||!room)return; room.channel.postMessage({type:'guess',text:g}); addOnlineLog('q','My guess: '+g); input.value='';}
-function handleRoomMessage(e){const msg=e.data; if(!room)return; if(msg.type==='join'&&room.role==='picker'){room.friendJoined=true; document.getElementById('picker-wait-msg').textContent='Your friend joined! Pick your secret country below.'; const sel=document.getElementById('picker-secret-select'); sel.innerHTML=''; GEO_POOLS[room.diff].forEach(c=>{const opt=document.createElement('option'); opt.value=c.name; opt.textContent=c.name; sel.appendChild(opt);}); document.getElementById('picker-pick-area').style.display='block';} if(msg.type==='start'&&room.role==='guesser'){room.diff=msg.diff; room.timeLeft=GEO_TIME_LIMIT; document.getElementById('online-role-tag').textContent='You are the Guesser'; addOnlineLog('sys','Your friend picked a secret country! Start asking yes/no questions.'); document.getElementById('guesser-controls').style.display='block'; startOnlineTimer();} if(msg.type==='question'&&room.role==='picker'){const list=document.getElementById('picker-pending-list'); const div=document.createElement('div'); div.className='pending-q'; div.innerHTML='<strong>"'+msg.text.replace(/</g,'&lt;')+'"</strong>'; const btnRow=document.createElement('div'); btnRow.className='yn-btns'; ['Yes','No',"Unsure"].forEach(ans=>{const b=document.createElement('button'); b.textContent=ans; b.className=ans==='Yes'?'yn-yes':ans==='No'?'yn-no':'yn-unsure'; b.onclick=()=>{room.channel.postMessage({type:'answer',id:msg.id,answer:ans}); div.remove();}; btnRow.appendChild(b);}); div.appendChild(btnRow); list.appendChild(div); addOnlineLog('q','Friend asked: '+msg.text);} if(msg.type==='answer'&&room.role==='guesser'){addOnlineLog('a',msg.answer);} if(msg.type==='guess'&&room.role==='picker'){const correct=matchesCountry(msg.text,room.secret); room.channel.postMessage({type:'guessResult',correct,secretName:room.secret.name}); addOnlineLog('q','Friend guessed: '+msg.text+(correct?' ✅':' ❌')); if(correct){clearInterval(room.timerInterval); showOnlineResult(true,room.secret.name,true);}} if(msg.type==='guessResult'&&room.role==='guesser'){if(msg.correct){clearInterval(room.timerInterval); showOnlineResult(true,msg.secretName);}else{addOnlineLog('a','Nope, keep trying!');}} if(msg.type==='timeout'&&room.role==='picker'){addOnlineLog('sys',"Time's up on your friend's side!");}}
-function showOnlineResult(won,secretName,isPickerSide){if(won&&!isPickerSide){const reward=GEO_DIFF[room.diff]?GEO_DIFF[room.diff].reward:2; addCoins(reward); document.getElementById('online-result-emoji').textContent='🏆'; document.getElementById('online-result-msg').textContent='Correct! It was '+secretName+'.'; document.getElementById('online-result-sub').textContent='You earned '+reward+' coin'+(reward===1?'':'s')+'.';}else if(won&&isPickerSide){document.getElementById('online-result-emoji').textContent='🎉'; document.getElementById('online-result-msg').textContent='Your friend guessed it: '+secretName+'!'; document.getElementById('online-result-sub').textContent='Nice round!';}else{document.getElementById('online-result-emoji').textContent='⏰'; document.getElementById('online-result-msg').textContent=secretName||"Time's up!"; document.getElementById('online-result-sub').textContent='Better luck in the next room!';} showScreen('screen-online-result');}
+function sendOnlineGuess(){const input=document.getElementById('online-guess-input'); const g=input.value.trim(); if(!g||!room)return; room.channel.postMessage({type:'guess',text:g}); addOnlineLog('q',tr('my_guess',{g:g})); input.value='';}
+function handleRoomMessage(e){const msg=e.data; if(!room)return; if(msg.type==='join'&&room.role==='picker'){room.friendJoined=true; document.getElementById('picker-wait-msg').textContent=tr('friend_joined_pick'); populatePickerSelect(room.diff); document.getElementById('picker-pick-area').style.display='block';} if(msg.type==='start'&&room.role==='guesser'){room.diff=msg.diff; room.timeLeft=GEO_TIME_LIMIT; document.getElementById('online-role-tag').textContent=tr('you_are_guesser'); addOnlineLog('sys',tr('friend_picked')); document.getElementById('guesser-controls').style.display='block'; startOnlineTimer();} if(msg.type==='question'&&room.role==='picker'){const list=document.getElementById('picker-pending-list'); const div=document.createElement('div'); div.className='pending-q'; div.innerHTML='<strong>"'+msg.text.replace(/</g,'&lt;')+'"</strong>'; const btnRow=document.createElement('div'); btnRow.className='yn-btns'; [['Yes','yn_yes','yn-yes'],['No','yn_no','yn-no'],['Unsure','yn_unsure','yn-unsure']].forEach(pair=>{const b=document.createElement('button'); b.textContent=tr(pair[1]); b.className=pair[2]; b.onclick=()=>{room.channel.postMessage({type:'answer',id:msg.id,answer:pair[0]}); div.remove();}; btnRow.appendChild(b);}); div.appendChild(btnRow); list.appendChild(div); addOnlineLog('q',tr('friend_asked',{q:msg.text}));} if(msg.type==='answer'&&room.role==='guesser'){addOnlineLog('a',tr(msg.answer==='Yes'?'yn_yes':msg.answer==='No'?'yn_no':'yn_unsure'));} if(msg.type==='guess'&&room.role==='picker'){const correct=matchesCountry(msg.text,room.secret); room.channel.postMessage({type:'guessResult',correct,secretName:room.secret.name}); addOnlineLog('q',tr('friend_guessed',{g:msg.text})+(correct?' ✅':' ❌')); if(correct){clearInterval(room.timerInterval); showOnlineResult(true,room.secret.name,true);}} if(msg.type==='guessResult'&&room.role==='guesser'){if(msg.correct){clearInterval(room.timerInterval); showOnlineResult(true,msg.secretName);}else{addOnlineLog('a',tr('nope_keep_trying'));}} if(msg.type==='timeout'&&room.role==='picker'){addOnlineLog('sys',tr('times_up_friend'));}}
+function showOnlineResult(won,secretName,isPickerSide){if(won&&!isPickerSide){const reward=GEO_DIFF[room.diff]?GEO_DIFF[room.diff].reward:2; addCoins(reward); document.getElementById('online-result-emoji').textContent='🏆'; document.getElementById('online-result-msg').textContent=tr('geo_correct',{name:countryLabel(secretName)}); document.getElementById('online-result-sub').textContent=tr('earned_coins',{n:reward,s:plural(reward)});}else if(won&&isPickerSide){document.getElementById('online-result-emoji').textContent='🎉'; document.getElementById('online-result-msg').textContent=tr('friend_guessed_it',{name:countryLabel(secretName)}); document.getElementById('online-result-sub').textContent=tr('nice_round');}else{document.getElementById('online-result-emoji').textContent='⏰'; document.getElementById('online-result-msg').textContent=secretName||tr('times_up'); document.getElementById('online-result-sub').textContent=tr('better_luck_room');} showScreen('screen-online-result');}
 function leaveRoomToHome(){if(room){try{room.channel.close();}catch(e){}clearInterval(room.timerInterval); room=null;} showScreen('screen-home');}
 
 let frace=null;
-function createFlagRoom(){const errEl=document.getElementById('flag-online-setup-error'); errEl.textContent=''; if(!fbReady){errEl.textContent=fbUnavailableMessage(); return;} const diff=document.getElementById('flag-online-create-diff').value; const code=genCode(); frace={code,myRole:'host',diff,channel:createRoomChannel('flagRooms/'+code),list:null,scores:{host:0,guest:0},currentIndex:0,roundDecided:false,hostTimerInterval:null,hostTimeLeft:0,displayTimerInterval:null,friendJoined:false}; roomMetaRef('flagRooms/'+code).set({createdAt:firebase.database.ServerValue.TIMESTAMP,diff}); frace.channel.onmessage=handleFlagRoomMessage; document.getElementById('flag-host-room-code').textContent=code; document.getElementById('flag-host-wait-msg').textContent='Waiting for your friend to join...'; document.getElementById('flag-host-start-btn').style.display='none'; showScreen('screen-flag-host-wait');}
-function joinFlagRoom(){const codeInput=document.getElementById('flag-online-join-code'); const code=codeInput.value.trim().toUpperCase(); const errEl=document.getElementById('flag-online-setup-error'); errEl.textContent=''; if(!fbReady){errEl.textContent=fbUnavailableMessage(); return;} if(!code){errEl.textContent='Please enter a room code.'; return;}roomMetaRef('flagRooms/'+code).once('value').then(snap=>{if(!snap.exists()){errEl.textContent='Room not found. Check the code and try again.'; return;}frace={code,myRole:'guest',diff:null,channel:createRoomChannel('flagRooms/'+code),list:null,scores:{host:0,guest:0},currentIndex:0,roundDecided:false,hostTimerInterval:null,hostTimeLeft:0,displayTimerInterval:null}; frace.channel.onmessage=handleFlagRoomMessage; frace.channel.postMessage({type:'flagJoin'}); document.getElementById('flag-race-progress').textContent='Waiting for host...'; document.getElementById('flag-race-img').src=''; document.getElementById('flag-race-timer').textContent='--'; document.getElementById('flag-race-status').textContent='Waiting for the host to start the race...'; setFlagRaceInputEnabled(false); updateFlagRaceScoreboard(); showScreen('screen-flag-online-race');}).catch(()=>{errEl.textContent='Could not reach the online service. Try again.';});}
+function createFlagRoom(){const errEl=document.getElementById('flag-online-setup-error'); errEl.textContent=''; if(!fbReady){errEl.textContent=fbUnavailableMessage(); return;} const diff=document.getElementById('flag-online-create-diff').value; const code=genCode(); frace={code,myRole:'host',diff,channel:createRoomChannel('flagRooms/'+code),list:null,scores:{host:0,guest:0},currentIndex:0,roundDecided:false,hostTimerInterval:null,hostTimeLeft:0,displayTimerInterval:null,friendJoined:false}; roomMetaRef('flagRooms/'+code).set({createdAt:firebase.database.ServerValue.TIMESTAMP,diff}); frace.channel.onmessage=handleFlagRoomMessage; document.getElementById('flag-host-room-code').textContent=code; document.getElementById('flag-host-wait-msg').textContent=tr('waiting_join'); document.getElementById('flag-host-start-btn').style.display='none'; showScreen('screen-flag-host-wait');}
+function joinFlagRoom(){const codeInput=document.getElementById('flag-online-join-code'); const code=codeInput.value.trim().toUpperCase(); const errEl=document.getElementById('flag-online-setup-error'); errEl.textContent=''; if(!fbReady){errEl.textContent=fbUnavailableMessage(); return;} if(!code){errEl.textContent=tr('err_enter_code'); return;}roomMetaRef('flagRooms/'+code).once('value').then(snap=>{if(!snap.exists()){errEl.textContent=tr('err_room_not_found'); return;}frace={code,myRole:'guest',diff:null,channel:createRoomChannel('flagRooms/'+code),list:null,scores:{host:0,guest:0},currentIndex:0,roundDecided:false,hostTimerInterval:null,hostTimeLeft:0,displayTimerInterval:null}; frace.channel.onmessage=handleFlagRoomMessage; frace.channel.postMessage({type:'flagJoin'}); document.getElementById('flag-race-progress').textContent=tr('waiting_host'); document.getElementById('flag-race-img').src=''; document.getElementById('flag-race-timer').textContent='--'; document.getElementById('flag-race-status').textContent=tr('waiting_host_start'); setFlagRaceInputEnabled(false); updateFlagRaceScoreboard(); showScreen('screen-flag-online-race');}).catch(()=>{errEl.textContent=tr('err_no_service');});}
 function hostStartFlagRace(){if(!frace||frace.myRole!=='host')return; frace.list=shuffle(FLAG_POOLS[frace.diff]).slice(0,10).map(c=>({name:c.name,code:c.code,aliases:c.aliases})); frace.scores={host:0,guest:0}; frace.channel.postMessage({type:'flagGameStart',diff:frace.diff,list:frace.list}); showScreen('screen-flag-online-race'); updateFlagRaceScoreboard(); hostStartFlagRound(0);}
 function hostStartFlagRound(idx){frace.currentIndex=idx; frace.roundDecided=false; const timeLimit=FLAG_DIFF[frace.diff].time; const startTime=Date.now(); frace.channel.postMessage({type:'flagRound',index:idx,startTime,timeLimit}); renderFlagRaceRound({index:idx,startTime,timeLimit}); clearInterval(frace.hostTimerInterval); frace.hostTimeLeft=timeLimit; frace.hostTimerInterval=setInterval(()=>{frace.hostTimeLeft--; if(frace.hostTimeLeft<=0){clearInterval(frace.hostTimerInterval); if(!frace.roundDecided)resolveFlagRound(null);}},1000);}
-function renderFlagRaceRound(msg){const c=frace.list[msg.index]; document.getElementById('flag-race-progress').textContent='Flag '+(msg.index+1)+' / 10'; const imgEl=document.getElementById('flag-race-img'); imgEl.onerror=function(){imgEl.onerror=null; imgEl.src=flagUrl(c.code,'png');}; imgEl.src=flagUrl(c.code); document.getElementById('flag-race-input').value=''; document.getElementById('flag-race-status').textContent=''; setFlagRaceInputEnabled(true); document.getElementById('flag-race-input').focus(); updateFlagRaceScoreboard(); clearInterval(frace.displayTimerInterval); const startTime=msg.startTime,timeLimit=msg.timeLimit; function tick(){const elapsed=(Date.now()-startTime)/1000; const remaining=Math.max(0,Math.ceil(timeLimit-elapsed)); document.getElementById('flag-race-timer').textContent=remaining; if(remaining<=0)clearInterval(frace.displayTimerInterval);} tick(); frace.displayTimerInterval=setInterval(tick,250);}
+function renderFlagRaceRound(msg){const c=frace.list[msg.index]; document.getElementById('flag-race-progress').textContent=tr('flag_progress',{n:msg.index+1}); const imgEl=document.getElementById('flag-race-img'); imgEl.onerror=function(){imgEl.onerror=null; imgEl.src=flagUrl(c.code,'png');}; imgEl.src=flagUrl(c.code); document.getElementById('flag-race-input').value=''; document.getElementById('flag-race-status').textContent=''; setFlagRaceInputEnabled(true); document.getElementById('flag-race-input').focus(); updateFlagRaceScoreboard(); clearInterval(frace.displayTimerInterval); const startTime=msg.startTime,timeLimit=msg.timeLimit; function tick(){const elapsed=(Date.now()-startTime)/1000; const remaining=Math.max(0,Math.ceil(timeLimit-elapsed)); document.getElementById('flag-race-timer').textContent=remaining; if(remaining<=0)clearInterval(frace.displayTimerInterval);} tick(); frace.displayTimerInterval=setInterval(tick,250);}
 function setFlagRaceInputEnabled(enabled){document.getElementById('flag-race-input').disabled=!enabled;}
 function updateFlagRaceScoreboard(){if(!frace)return; const myScore=frace.myRole==='host'?frace.scores.host:frace.scores.guest; const friendScore=frace.myRole==='host'?frace.scores.guest:frace.scores.host; document.getElementById('flag-race-my-score').textContent=myScore; document.getElementById('flag-race-friend-score').textContent=friendScore;}
 function submitFlagRaceAnswer(){if(!frace||!frace.list)return; const input=document.getElementById('flag-race-input'); const text=input.value.trim(); if(!text)return; input.value=''; if(frace.myRole==='host'){processFlagAttempt('host',text);}else{frace.channel.postMessage({type:'flagAttempt',text});}}
-function processFlagAttempt(role,text){if(!frace||frace.myRole!=='host'||frace.roundDecided)return; const c=frace.list[frace.currentIndex]; if(matchesCountry(text,c)){resolveFlagRound(role);}else if(role==='guest'){frace.channel.postMessage({type:'flagAttemptResult',correct:false});}else{flashFlagRaceStatus('Not quite, try again!');}}
+function processFlagAttempt(role,text){if(!frace||frace.myRole!=='host'||frace.roundDecided)return; const c=frace.list[frace.currentIndex]; if(matchesCountry(text,c)){resolveFlagRound(role);}else if(role==='guest'){frace.channel.postMessage({type:'flagAttemptResult',correct:false});}else{flashFlagRaceStatus(tr('not_quite'));}}
 function flashFlagRaceStatus(msg){const el=document.getElementById('flag-race-status'); el.textContent=msg; setTimeout(()=>{if(el.textContent===msg)el.textContent='';}  ,1200);}
 function resolveFlagRound(winnerRole){frace.roundDecided=true; clearInterval(frace.hostTimerInterval); if(winnerRole)frace.scores[winnerRole]++; const c=frace.list[frace.currentIndex]; const payload={winner:winnerRole,correctName:c.name,scores:{...frace.scores}}; frace.channel.postMessage({type:'flagRoundResult',index:frace.currentIndex,winner:payload.winner,correctName:payload.correctName,scores:payload.scores}); applyFlagRoundResultLocally(payload); setTimeout(()=>{if(frace.currentIndex+1<10)hostStartFlagRound(frace.currentIndex+1); else hostEndFlagRace();},1800);}
-function applyFlagRoundResultLocally(data){if(!frace)return; frace.scores=data.scores; updateFlagRaceScoreboard(); clearInterval(frace.displayTimerInterval); setFlagRaceInputEnabled(false); let msg; if(data.winner===null){msg="Time's up! Nobody got it — it was "+data.correctName+'.';}else if(data.winner===frace.myRole){msg='You got it first! 🎉 ('+data.correctName+')';}else{msg='Your friend got it first! ('+data.correctName+')';} document.getElementById('flag-race-status').textContent=msg;}
+function applyFlagRoundResultLocally(data){if(!frace)return; frace.scores=data.scores; updateFlagRaceScoreboard(); clearInterval(frace.displayTimerInterval); setFlagRaceInputEnabled(false); let msg; const cn=countryLabel(data.correctName); if(data.winner===null){msg=tr('times_up_nobody',{name:cn});}else if(data.winner===frace.myRole){msg=tr('you_got_first',{name:cn});}else{msg=tr('friend_got_first',{name:cn});} document.getElementById('flag-race-status').textContent=msg;}
 function hostEndFlagRace(){const{host,guest}=frace.scores; const winner=host>guest?'host':guest>host?'guest':'tie'; frace.channel.postMessage({type:'flagGameOver',winner,scores:frace.scores}); showFlagRaceResult(winner,frace.scores);}
-function showFlagRaceResult(winner,scores){const myScore=frace.myRole==='host'?scores.host:scores.guest; const friendScore=frace.myRole==='host'?scores.guest:scores.host; if(winner==='tie'){document.getElementById('flag-online-result-emoji').textContent='🤝'; document.getElementById('flag-online-result-msg').textContent="It's a tie!"; document.getElementById('flag-online-result-sub').textContent='You both got '+myScore+' out of 10. No coins awarded this round.';}else if(winner===frace.myRole){addCoins(2); document.getElementById('flag-online-result-emoji').textContent='🏆'; document.getElementById('flag-online-result-msg').textContent='You won the race!'; document.getElementById('flag-online-result-sub').textContent='You: '+myScore+'  ·  Friend: '+friendScore+'. You earned 2 coins!';}else{document.getElementById('flag-online-result-emoji').textContent='😅'; document.getElementById('flag-online-result-msg').textContent='Your friend won this race.'; document.getElementById('flag-online-result-sub').textContent='You: '+myScore+'  ·  Friend: '+friendScore+'. Better luck next time!';} showScreen('screen-flag-online-result');}
-function handleFlagRoomMessage(e){const msg=e.data; if(!frace)return; if(msg.type==='flagJoin'&&frace.myRole==='host'){frace.friendJoined=true; document.getElementById('flag-host-wait-msg').textContent='Your friend joined! Ready to race.'; document.getElementById('flag-host-start-btn').style.display='block';} if(msg.type==='flagGameStart'&&frace.myRole==='guest'){frace.diff=msg.diff; frace.list=msg.list; frace.scores={host:0,guest:0}; showScreen('screen-flag-online-race'); updateFlagRaceScoreboard();} if(msg.type==='flagRound'){frace.currentIndex=msg.index; frace.roundDecided=false; if(frace.myRole==='guest')renderFlagRaceRound(msg);} if(msg.type==='flagAttempt'&&frace.myRole==='host'){processFlagAttempt('guest',msg.text);} if(msg.type==='flagAttemptResult'&&frace.myRole==='guest'){if(!msg.correct)flashFlagRaceStatus('Not quite, try again!');} if(msg.type==='flagRoundResult'&&frace.myRole==='guest'){applyFlagRoundResultLocally({winner:msg.winner,correctName:msg.correctName,scores:msg.scores});} if(msg.type==='flagGameOver'&&frace.myRole==='guest'){showFlagRaceResult(msg.winner,msg.scores);}}
+function showFlagRaceResult(winner,scores){const myScore=frace.myRole==='host'?scores.host:scores.guest; const friendScore=frace.myRole==='host'?scores.guest:scores.host; if(winner==='tie'){document.getElementById('flag-online-result-emoji').textContent='🤝'; document.getElementById('flag-online-result-msg').textContent=tr('its_a_tie'); document.getElementById('flag-online-result-sub').textContent=tr('tie_sub',{n:myScore});}else if(winner===frace.myRole){addCoins(2); document.getElementById('flag-online-result-emoji').textContent='🏆'; document.getElementById('flag-online-result-msg').textContent=tr('you_won_race'); document.getElementById('flag-online-result-sub').textContent=tr('race_win_sub',{a:myScore,b:friendScore});}else{document.getElementById('flag-online-result-emoji').textContent='😅'; document.getElementById('flag-online-result-msg').textContent=tr('friend_won_race'); document.getElementById('flag-online-result-sub').textContent=tr('race_lose_sub',{a:myScore,b:friendScore});} showScreen('screen-flag-online-result');}
+function handleFlagRoomMessage(e){const msg=e.data; if(!frace)return; if(msg.type==='flagJoin'&&frace.myRole==='host'){frace.friendJoined=true; document.getElementById('flag-host-wait-msg').textContent=tr('friend_joined_ready'); document.getElementById('flag-host-start-btn').style.display='block';} if(msg.type==='flagGameStart'&&frace.myRole==='guest'){frace.diff=msg.diff; frace.list=msg.list; frace.scores={host:0,guest:0}; showScreen('screen-flag-online-race'); updateFlagRaceScoreboard();} if(msg.type==='flagRound'){frace.currentIndex=msg.index; frace.roundDecided=false; if(frace.myRole==='guest')renderFlagRaceRound(msg);} if(msg.type==='flagAttempt'&&frace.myRole==='host'){processFlagAttempt('guest',msg.text);} if(msg.type==='flagAttemptResult'&&frace.myRole==='guest'){if(!msg.correct)flashFlagRaceStatus(tr('not_quite'));} if(msg.type==='flagRoundResult'&&frace.myRole==='guest'){applyFlagRoundResultLocally({winner:msg.winner,correctName:msg.correctName,scores:msg.scores});} if(msg.type==='flagGameOver'&&frace.myRole==='guest'){showFlagRaceResult(msg.winner,msg.scores);}}
 function leaveFlagRoomToHome(){if(frace){try{frace.channel.close();}catch(e){}clearInterval(frace.hostTimerInterval); clearInterval(frace.displayTimerInterval); frace=null;} showScreen('screen-home');}
 
-loadState(); renderCoins(); showScreen('screen-home'); updateFbStatusUI();
+loadState(); applyLanguage(); showScreen('screen-home');
 </script>
 </body>
 </html>
