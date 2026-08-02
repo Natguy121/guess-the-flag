@@ -103,6 +103,12 @@ you mix the missing color yourself in a native color-picker (`<input
 type="color">`, so you get the full spectrum, not 8 presets) from memory,
 then Submit.
 
+The picker starts each round on a random color rather than a fixed gray,
+and the missing tile in the flag's own palette repaints live as you drag —
+so you're directly editing "the flag," not a separate swatch off to the
+side (`updateColorPickerPreview()` keeps the picker's own preview dot and
+the palette's `#color-missing-swatch` in sync on every `input` event).
+
 There's no right/wrong per round — each guess is scored by **closeness**,
 not an exact match: `colorCloseness()` compares the RGB you picked against
 the canonical RGB for the actual missing color (Euclidean distance in RGB
