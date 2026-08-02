@@ -63,7 +63,8 @@ error ("Online play needs Firebase configuration...") and everything else
        "users":     { ".read": "auth != null", ".write": "auth != null" },
        "global":    { ".read": "auth != null", ".write": "auth != null" },
        "adminChat": { ".read": "auth != null", ".write": "auth != null" },
-       "feedback":  { ".read": "auth != null", ".write": "auth != null" }
+       "feedback":  { ".read": "auth != null", ".write": "auth != null" },
+       "activeRooms": { ".read": "auth != null", ".write": "auth != null" }
      }
    }
    ```
@@ -107,6 +108,8 @@ Signing in unlocks two staff roles, based on the 4-character password used
     board (visible to the Owner and other Assistants).
   - Talk with the Owner in the private **🗨 Admin Chat**, separate from
     Global Chat.
+  - See every live online room, spectate one, or kick its players on the
+    **🖥 Servers** screen (below).
   - Assistants do **not** get a Global Chat compose box — only the Owner can
     broadcast there.
 
@@ -122,6 +125,24 @@ Home screen buttons for these:
   only to the Owner and Assistants, for staff coordination.
 - **🐞 Features & Bugs** — a shared feed at `feedback/` where Owner and
   Assistants log feature ideas (💡) and bug reports (🐛).
+- **🖥 Servers** — a live directory of every open online room (`activeRooms/`),
+  both the geography rooms and the flag-race rooms, showing its code,
+  difficulty, status (waiting / ready / in progress) and how long ago it
+  started. Each room has two actions:
+  - **👁 Spectate** opens a read-only live feed of that room's activity —
+    questions asked, answers given, guesses, or flag rounds and attempts —
+    without joining or affecting the game.
+  - **⛔ Kick** closes the room immediately for both players (after a
+    confirmation prompt): they each see "A staff member closed this room."
+    and are returned to the Home screen, and the room drops off the Servers
+    list right away.
+
+  `activeRooms/{geo|flag}/{code}` is a presence directory only — it's kept
+  in sync by the room's host as the room progresses (`createRoom`/
+  `createFlagRoom`, `pickerStartGame`/`hostStartFlagRace`, and cleaned up on
+  game end or when the host leaves) purely so staff can browse rooms without
+  knowing their codes. It is not the source of truth for gameplay, which
+  still lives entirely in each room's own `/events` log.
 
 Every regular player's coins/hints are mirrored to `users/{username}` in
 Firebase whenever they change (see `syncUserToFirebase()`), and each player

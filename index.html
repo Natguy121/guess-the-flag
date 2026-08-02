@@ -171,6 +171,7 @@
         <button class="btn btn-gray" id="owner-panel-home-btn" style="display:none;" onclick="openOwnerPanel()" data-i18n="btn_owner_panel">🛡 Owner Panel</button>
         <button class="btn btn-gray" id="feedback-home-btn" style="display:none;" onclick="openFeedback()" data-i18n="btn_feedback">🐞 Features &amp; Bugs</button>
         <button class="btn btn-gray" id="admin-chat-home-btn" style="display:none;" onclick="openAdminChat()" data-i18n="btn_admin_chat">🗨 Admin Chat</button>
+        <button class="btn btn-gray" id="servers-home-btn" style="display:none;" onclick="openServers()" data-i18n="btn_servers">🖥 Servers</button>
       </div>
     </section>
 
@@ -582,6 +583,32 @@
       </div>
     </section>
 
+    <!-- SERVERS (owner + assistants: live rooms, spectate, kick) -->
+    <section id="screen-servers" class="screen">
+      <a class="back-link" onclick="closeServers()" data-i18n="back_home">← Home</a>
+      <div class="card-box">
+        <h2 style="text-align:center;" data-i18n="servers_title">🖥 Servers</h2>
+        <p class="subtitle" data-i18n="servers_sub">Live online rooms. Spectate to watch, or kick to close a room.</p>
+        <p class="fb-status" id="servers-status"></p>
+        <h3 data-i18n="servers_geo_h">Geography Rooms</h3>
+        <div id="servers-geo-list"></div>
+        <h3 data-i18n="servers_flag_h">Flag Race Rooms</h3>
+        <div id="servers-flag-list"></div>
+      </div>
+    </section>
+
+    <!-- SPECTATE (owner + assistants: read-only live feed of one room) -->
+    <section id="screen-spectate" class="screen">
+      <a class="back-link" onclick="closeSpectate()" data-i18n="back_home">← Home</a>
+      <div class="card-box">
+        <h2 style="text-align:center;" data-i18n="spectate_title">👁 Spectating</h2>
+        <p class="subtitle" id="spectate-room-label"></p>
+        <p class="subtitle" data-i18n="spectate_sub">Live feed of this room's activity (read-only).</p>
+        <div class="chat-log" id="spectate-log"></div>
+        <button class="btn btn-red" id="spectate-kick-btn" onclick="kickFromSpectate()" data-i18n="btn_kick">⛔ Kick</button>
+      </div>
+    </section>
+
   </main>
 </div>
 
@@ -733,7 +760,21 @@ en:{
   fb_could_not_connect:"Could not connect: {msg}",
   fb_connecting:"Connecting to the online service...",
   fb_still_connecting:"Still connecting to the online service — try again in a moment.",
-  fb_connected:"🟢 Connected — ready for online play."
+  fb_connected:"🟢 Connected — ready for online play.",
+  btn_servers:"🖥 Servers", servers_title:"🖥 Servers",
+  servers_sub:"Live online rooms. Spectate to watch, or kick to close a room.",
+  servers_geo_h:"Geography Rooms", servers_flag_h:"Flag Race Rooms",
+  no_servers:"No active rooms right now.",
+  status_waiting:"Waiting for a friend", status_ready:"Ready to start", status_playing:"In progress",
+  started_ago:"started {t} ago",
+  btn_spectate:"👁 Spectate", btn_kick:"⛔ Kick",
+  spectate_title:"👁 Spectating", spectate_sub:"Live feed of this room's activity (read-only).",
+  spectate_empty:"Watching for activity...",
+  confirm_kick:"Kick everyone out of room {code}? This closes it for both players.",
+  kicked_msg:"A staff member closed this room.",
+  spec_ev_join:"A friend joined the room.", spec_ev_start:"The game started.",
+  spec_ev_guess:"Guess: {g}", spec_ev_correct:"Correct: {name}",
+  spec_ev_flag_start:"Flag race started.", spec_ev_flag_over:"Flag race finished."
 },
 fr:{
   doc_title:"Devine Le Drapeau", logo:"🏁 DEVINE LE DRAPEAU", app_title:"Devine Le Drapeau",
@@ -862,7 +903,21 @@ fr:{
   fb_could_not_connect:"Connexion impossible : {msg}",
   fb_connecting:"Connexion au service en ligne...",
   fb_still_connecting:"Connexion en cours — réessaie dans un instant.",
-  fb_connected:"🟢 Connecté — prêt pour le jeu en ligne."
+  fb_connected:"🟢 Connecté — prêt pour le jeu en ligne.",
+  btn_servers:"🖥 Serveurs", servers_title:"🖥 Serveurs",
+  servers_sub:"Salons en ligne en direct. Observe pour regarder, ou expulse pour fermer un salon.",
+  servers_geo_h:"Salons Géographie", servers_flag_h:"Salons Course de Drapeaux",
+  no_servers:"Aucun salon actif pour l'instant.",
+  status_waiting:"En attente d'un ami", status_ready:"Prêt à commencer", status_playing:"En cours",
+  started_ago:"démarré il y a {t}",
+  btn_spectate:"👁 Observer", btn_kick:"⛔ Expulser",
+  spectate_title:"👁 Observation", spectate_sub:"Suivi en direct de ce salon (lecture seule).",
+  spectate_empty:"En attente d'activité...",
+  confirm_kick:"Expulser tout le monde du salon {code} ? Cela ferme le salon pour les deux joueurs.",
+  kicked_msg:"Un membre du staff a fermé ce salon.",
+  spec_ev_join:"Un ami a rejoint le salon.", spec_ev_start:"La partie a commencé.",
+  spec_ev_guess:"Réponse : {g}", spec_ev_correct:"Correct : {name}",
+  spec_ev_flag_start:"La course de drapeaux a commencé.", spec_ev_flag_over:"La course de drapeaux est terminée."
 }};
 
 function tr(key,vars){
@@ -1104,7 +1159,7 @@ function saveState(){localStorage.setItem('ftg_coins',String(state.coins)); loca
 function loadState(){state.lang=localStorage.getItem('ftg_lang')||'en'; if(LANGS.indexOf(state.lang)===-1)state.lang='en'; state.coins=parseInt(localStorage.getItem('ftg_coins')||'0',10)||0; const h=localStorage.getItem('ftg_hints'); if(h){try{state.hints=JSON.parse(h);}catch(e){}}const acc=localStorage.getItem('ftg_account'); if(acc){try{const a=JSON.parse(acc); if(a&&a.username){state.loggedIn=true; state.username=a.username;}}catch(e){}}state.isOwner=state.loggedIn&&localStorage.getItem('ftg_owner')==='1'; state.isAssistant=state.loggedIn&&localStorage.getItem('ftg_assistant')==='1';}
 function addCoins(n){state.coins+=n; saveState(); renderCoins();}
 function renderCoins(){document.getElementById('coin-count').textContent=state.coins; document.getElementById('store-owned-flagLetter').textContent=state.hints.flagLetter; document.getElementById('store-owned-flagTime').textContent=state.hints.flagTime; document.getElementById('store-owned-geoContinent').textContent=state.hints.geoContinent; document.getElementById('store-owned-geoLetter').textContent=state.hints.geoLetter; document.getElementById('flag-letter-hint-count').textContent=state.hints.flagLetter; document.getElementById('flag-time-hint-count').textContent=state.hints.flagTime; document.getElementById('geo-continent-hint-count').textContent=state.hints.geoContinent; document.getElementById('geo-letter-hint-count').textContent=state.hints.geoLetter; renderSignInStatus();}
-function renderSignInStatus(){const welcome=document.getElementById('home-welcome'); const form=document.getElementById('signin-form'); const acct=document.getElementById('signin-account'); const homeBtn=document.getElementById('signin-home-btn'); const ownerBadge=document.getElementById('signed-in-owner-badge'); const assistantBadge=document.getElementById('signed-in-assistant-badge'); const ownerPanelBtn=document.getElementById('owner-panel-home-btn'); const feedbackBtn=document.getElementById('feedback-home-btn'); const adminChatBtn=document.getElementById('admin-chat-home-btn'); const isStaff=state.isOwner||state.isAssistant; if(state.loggedIn){welcome.textContent=tr('welcome_back',{name:state.username}); form.style.display='none'; acct.style.display='block'; document.getElementById('signed-in-username').textContent=state.username; homeBtn.textContent=(state.isOwner?'👑 ':state.isAssistant?'🛠 ':'👤 ')+state.username;}else{welcome.textContent=tr('home_welcome'); form.style.display='block'; acct.style.display='none'; homeBtn.textContent=tr('btn_signin');}if(ownerBadge)ownerBadge.style.display=state.isOwner?'inline-block':'none'; if(assistantBadge)assistantBadge.style.display=(state.isAssistant&&!state.isOwner)?'inline-block':'none'; if(ownerPanelBtn)ownerPanelBtn.style.display=isStaff?'block':'none'; if(feedbackBtn)feedbackBtn.style.display=isStaff?'block':'none'; if(adminChatBtn)adminChatBtn.style.display=isStaff?'block':'none'; const note=document.getElementById('geo-online-note'); if(note){note.textContent=state.loggedIn?'':tr('note_signin_online');}const flagNote=document.getElementById('flag-online-note'); if(flagNote){flagNote.textContent=state.loggedIn?'':tr('note_signin_race');}}
+function renderSignInStatus(){const welcome=document.getElementById('home-welcome'); const form=document.getElementById('signin-form'); const acct=document.getElementById('signin-account'); const homeBtn=document.getElementById('signin-home-btn'); const ownerBadge=document.getElementById('signed-in-owner-badge'); const assistantBadge=document.getElementById('signed-in-assistant-badge'); const ownerPanelBtn=document.getElementById('owner-panel-home-btn'); const feedbackBtn=document.getElementById('feedback-home-btn'); const adminChatBtn=document.getElementById('admin-chat-home-btn'); const serversBtn=document.getElementById('servers-home-btn'); const isStaff=state.isOwner||state.isAssistant; if(state.loggedIn){welcome.textContent=tr('welcome_back',{name:state.username}); form.style.display='none'; acct.style.display='block'; document.getElementById('signed-in-username').textContent=state.username; homeBtn.textContent=(state.isOwner?'👑 ':state.isAssistant?'🛠 ':'👤 ')+state.username;}else{welcome.textContent=tr('home_welcome'); form.style.display='block'; acct.style.display='none'; homeBtn.textContent=tr('btn_signin');}if(ownerBadge)ownerBadge.style.display=state.isOwner?'inline-block':'none'; if(assistantBadge)assistantBadge.style.display=(state.isAssistant&&!state.isOwner)?'inline-block':'none'; if(ownerPanelBtn)ownerPanelBtn.style.display=isStaff?'block':'none'; if(feedbackBtn)feedbackBtn.style.display=isStaff?'block':'none'; if(adminChatBtn)adminChatBtn.style.display=isStaff?'block':'none'; if(serversBtn)serversBtn.style.display=isStaff?'block':'none'; const note=document.getElementById('geo-online-note'); if(note){note.textContent=state.loggedIn?'':tr('note_signin_online');}const flagNote=document.getElementById('flag-online-note'); if(flagNote){flagNote.textContent=state.loggedIn?'':tr('note_signin_race');}}
 function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active')); document.getElementById(id).classList.add('active'); window.scrollTo(0,0);}
 function goPlay(){showScreen('screen-play');} function goGeoMode(){showScreen('screen-geo-mode');} function goGeoOnline(){if(!state.loggedIn){showScreen('screen-signin'); document.getElementById('signin-error').textContent=tr('err_signin_online'); return;}updateFbStatusUI(); showScreen('screen-geo-online-setup');}
 function goFlagMode(){showScreen('screen-flag-mode');} function goFlagOnline(){if(!state.loggedIn){showScreen('screen-signin'); document.getElementById('signin-error').textContent=tr('err_signin_race'); return;}updateFbStatusUI(); showScreen('screen-flag-online-setup');}
@@ -1244,7 +1299,8 @@ function doSignOut(){unsubscribeFromMyUserRecord(); localStorage.removeItem('ftg
           "users":     { ".read": "auth != null", ".write": "auth != null" },
           "global":    { ".read": "auth != null", ".write": "auth != null" },
           "adminChat": { ".read": "auth != null", ".write": "auth != null" },
-          "feedback":  { ".read": "auth != null", ".write": "auth != null" }
+          "feedback":  { ".read": "auth != null", ".write": "auth != null" },
+          "activeRooms": { ".read": "auth != null", ".write": "auth != null" }
         }
       }
    Until this is filled in, online play (plus the Owner Panel and Global Chat
@@ -1294,6 +1350,26 @@ function createRoomChannel(path){
 }
 function roomMetaRef(path){return fbDb.ref(path+'/meta');}
 
+/* -------- LIVE SERVERS: registry, spectate, kick (Owner + Assistant) --------
+   activeRooms/{geo|flag}/{code} is a lightweight presence record (diff,
+   createdAt, status) kept in sync by the room's host/picker as the room's
+   lifecycle progresses, so staff can list rooms without knowing their codes.
+   It is NOT the source of truth for gameplay — that's still the room's own
+   /events log — this is purely a directory for the Servers screen.
+   Spectating opens a second, send-less listener on that same /events log
+   (createRoomChannel again — Firebase supports many simultaneous listeners),
+   so a spectator sees exactly what both players see, live, without joining.
+   Kicking posts a {type:'kick'} event on the room's channel; every client
+   listening (both players) reacts to it in handleRoomMessage /
+   handleFlagRoomMessage by leaving immediately, and staff removes the
+   registry entry so the room drops off the Servers list right away. */
+function activeRoomsRef(type){return fbDb.ref('activeRooms/'+type);}
+function roomPathFor(type,code){return(type==='geo'?'rooms/':'flagRooms/')+code;}
+function isStaffMember(){return state.isOwner||state.isAssistant;}
+function statusLabel(status){return tr('status_'+(status||'waiting'));}
+function fmtAgo(ts){if(!ts)return '0s'; const s=Math.max(0,Math.floor((Date.now()-ts)/1000)); if(s<60)return s+'s'; const m=Math.floor(s/60); if(m<60)return m+'m'; return Math.floor(m/60)+'h';}
+function staffKickRoom(type,code){if(!isStaffMember()||!fbReady)return; if(!confirm(tr('confirm_kick',{code:code})))return; const ch=createRoomChannel(roomPathFor(type,code)); ch.postMessage({type:'kick',by:state.username}); setTimeout(()=>{try{ch.close();}catch(e){}},1500); activeRoomsRef(type).child(code).remove();}
+
 /* -------- OWNER / ASSISTANT / GLOBAL CHAT --------
    Signing in with the password "TOBO" (any username) flags this browser as
    Owner, unlocking the Owner Panel (see every signed-in player's coins and
@@ -1303,16 +1379,19 @@ function roomMetaRef(path){return fbDb.ref(path+'/meta');}
    Signing in with the password "ANAZ" flags this browser as an Assistant —
    a lighter staff role. Assistants can view the Owner Panel's player list
    (read-only, no +/- adjusting), submit feature requests and bug reports on
-   the Features & Bugs board, and talk with the Owner in the private Admin
-   Chat. They cannot adjust coins/hints or post to Global Chat.
+   the Features & Bugs board, talk with the Owner in the private Admin Chat,
+   and — like the Owner — see every live online room on the Servers screen,
+   spectate one (a read-only live feed of that room's questions/guesses or
+   flag rounds), and kick a room's players to close it. They cannot adjust
+   coins/hints or post to Global Chat.
 
    Security note: this is a convenience gate, not real access control. The
    "TOBO"/"ANAZ" checks run in client-side JS that anyone can read, and the
    Realtime Database rules below only require "signed in anonymously," not
    "is the real owner/assistant" — so a player who reads this file's source
-   could, in theory, write to /users, /global, /adminChat, or /feedback
-   directly too. That's an inherent limit of a static file with no server of
-   its own; real enforcement would need a backend (e.g. a Cloud Function
+   could, in theory, write to /users, /global, /adminChat, /feedback, or
+   /activeRooms directly too. That's an inherent limit of a static file with
+   no server of its own; real enforcement would need a backend (e.g. a Cloud Function
    minting a custom auth claim) to verify the password server-side. Fine for
    a friend group, not for anything sensitive.
 */
@@ -1333,6 +1412,35 @@ const HINT_LABELS={flagLetter:'💡Flag Letter',flagTime:'⏱+5s',geoContinent:'
 function renderOwnerUserList(users){const container=document.getElementById('owner-users-list'); container.innerHTML=''; const names=Object.keys(users).sort((a,b)=>a.localeCompare(b)); if(names.length===0){container.innerHTML='<p style="text-align:center;color:#888;">'+tr('no_users')+'</p>'; return;} names.forEach(name=>{const u=users[name]||{}; const coins=u.coins||0; const hints=u.hints||{}; const row=document.createElement('div'); row.className='user-row'; const head=document.createElement('div'); head.className='user-row-head'; head.innerHTML='<strong>'+name.replace(/</g,'&lt;')+'</strong>'+(u.isOwner?' <span class="owner-badge">'+tr('badge_owner')+'</span>':'')+(u.isAssistant?' <span class="owner-badge">'+tr('badge_assistant')+'</span>':''); row.appendChild(head); const chipRow=document.createElement('div'); chipRow.className='stat-chip-row'; chipRow.appendChild(makeStatChip(name,'coins','🪙',coins)); Object.keys(HINT_LABELS).forEach(key=>{chipRow.appendChild(makeStatChip(name,key,HINT_LABELS[key],hints[key]||0));}); row.appendChild(chipRow); container.appendChild(row);});}
 function makeStatChip(username,field,label,value){const chip=document.createElement('div'); chip.className='stat-chip'; const lbl=document.createElement('span'); lbl.textContent=label; const val=document.createElement('span'); val.className='val'; val.textContent=value; chip.appendChild(lbl); if(state.isOwner){const minus=document.createElement('button'); minus.type='button'; minus.textContent='−'; minus.onclick=()=>ownerAdjust(username,field,-1); chip.appendChild(minus);} chip.appendChild(val); if(state.isOwner){const plus=document.createElement('button'); plus.type='button'; plus.textContent='+'; plus.onclick=()=>ownerAdjust(username,field,1); chip.appendChild(plus);} return chip;}
 function ownerAdjust(username,field,delta){if(!state.isOwner||!fbReady)return; const ref=field==='coins'?usersRef().child(username).child('coins'):usersRef().child(username).child('hints').child(field); ref.transaction(cur=>Math.max(0,(cur||0)+delta));}
+
+let serversGeoListener=null, serversFlagListener=null, serversRoomsCache={geo:{},flag:{}};
+function openServers(){if(!isStaffMember())return; showScreen('screen-servers'); const status=document.getElementById('servers-status'); if(!fbReady){status.textContent=fbUnavailableMessage(); document.getElementById('servers-geo-list').innerHTML=''; document.getElementById('servers-flag-list').innerHTML=''; return;} status.textContent=''; if(serversGeoListener)activeRoomsRef('geo').off('value',serversGeoListener); if(serversFlagListener)activeRoomsRef('flag').off('value',serversFlagListener); serversGeoListener=activeRoomsRef('geo').on('value',snap=>{serversRoomsCache.geo=snap.val()||{}; renderServerList('geo');}); serversFlagListener=activeRoomsRef('flag').on('value',snap=>{serversRoomsCache.flag=snap.val()||{}; renderServerList('flag');});}
+function closeServers(){if(serversGeoListener){activeRoomsRef('geo').off('value',serversGeoListener); serversGeoListener=null;} if(serversFlagListener){activeRoomsRef('flag').off('value',serversFlagListener); serversFlagListener=null;} showScreen('screen-home');}
+function renderServerList(type){const rooms=serversRoomsCache[type]||{}; const container=document.getElementById(type==='geo'?'servers-geo-list':'servers-flag-list'); container.innerHTML=''; const codes=Object.keys(rooms).sort((a,b)=>(rooms[a].createdAt||0)-(rooms[b].createdAt||0)); if(codes.length===0){container.innerHTML='<p style="text-align:center;color:#888;">'+tr('no_servers')+'</p>'; return;} codes.forEach(code=>{const r=rooms[code]||{}; const row=document.createElement('div'); row.className='user-row'; const head=document.createElement('div'); head.className='user-row-head'; head.innerHTML='<strong>'+code+'</strong> — '+tr(r.diff||'easy')+' · '+statusLabel(r.status)+' · '+tr('started_ago',{t:fmtAgo(r.createdAt)}); row.appendChild(head); const btnRow=document.createElement('div'); btnRow.className='btn-row'; const specBtn=document.createElement('button'); specBtn.className='btn btn-blue btn-small'; specBtn.style.width='auto'; specBtn.textContent=tr('btn_spectate'); specBtn.onclick=()=>openSpectateRoom(type,code,r.diff); const kickBtn=document.createElement('button'); kickBtn.className='btn btn-red btn-small'; kickBtn.style.width='auto'; kickBtn.textContent=tr('btn_kick'); kickBtn.onclick=()=>staffKickRoom(type,code); btnRow.appendChild(specBtn); btnRow.appendChild(kickBtn); row.appendChild(btnRow); container.appendChild(row);});}
+
+let spectateState=null;
+function openSpectateRoom(type,code,diff){if(!isStaffMember()||!fbReady)return; closeSpectateInternal(); spectateState={type,code,diff}; spectateState.channel=createRoomChannel(roomPathFor(type,code)); document.getElementById('spectate-room-label').textContent=code+' — '+tr(diff||'easy'); document.getElementById('spectate-log').innerHTML=''; addSpectateLine(tr('spectate_empty')); spectateState.channel.onmessage=e=>renderSpectateEvent(e.data); showScreen('screen-spectate');}
+function closeSpectateInternal(){if(spectateState){try{spectateState.channel.close();}catch(e){} spectateState=null;}}
+function closeSpectate(){closeSpectateInternal(); showScreen('screen-servers');}
+function kickFromSpectate(){if(!spectateState)return; staffKickRoom(spectateState.type,spectateState.code); closeSpectate();}
+function addSpectateLine(text){const log=document.getElementById('spectate-log'); const div=document.createElement('div'); div.className='chat-line chat-sys'; div.textContent=text; log.appendChild(div); log.scrollTop=log.scrollHeight;}
+function renderSpectateEvent(msg){if(!msg||!msg.type)return; let line; switch(msg.type){
+  case 'join': line='👋 '+tr('spec_ev_join'); break;
+  case 'start': line='▶ '+tr('spec_ev_start'); break;
+  case 'question': line='❓ '+msg.text; break;
+  case 'answer': line='💬 '+tr(msg.answer==='Yes'?'yn_yes':msg.answer==='No'?'yn_no':'yn_unsure'); break;
+  case 'guess': line='🎯 '+tr('spec_ev_guess',{g:msg.text}); break;
+  case 'guessResult': line=msg.correct?'✅ '+tr('spec_ev_correct',{name:countryLabel(msg.secretName)}):'❌'; break;
+  case 'timeout': line='⏰ '+tr('times_up'); break;
+  case 'flagJoin': line='👋 '+tr('spec_ev_join'); break;
+  case 'flagGameStart': line='🚩 '+tr('spec_ev_flag_start'); break;
+  case 'flagRound': line='🚩 '+tr('flag_progress',{n:msg.index+1}); break;
+  case 'flagAttempt': line='⌨ '+msg.text; break;
+  case 'flagRoundResult': line='🏁 '+countryLabel(msg.correctName); break;
+  case 'flagGameOver': line='🏆 '+tr('spec_ev_flag_over'); break;
+  case 'kick': line='⛔ '+tr('kicked_msg'); break;
+  default: line=msg.type;
+} addSpectateLine(line);}
 
 let adminChatListener=null;
 function adminChatMessagesRef(){return fbDb.ref('adminChat/messages');}
@@ -1357,22 +1465,22 @@ function sendGlobalMessage(){if(!state.isOwner||!fbReady)return; const input=doc
 
 let room=null;
 function genCode(){const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let c=''; for(let i=0;i<5;i++)c+=chars[Math.floor(Math.random()*chars.length)]; return c;}
-function createRoom(){const errEl=document.getElementById('online-setup-error'); errEl.textContent=''; if(!fbReady){errEl.textContent=fbUnavailableMessage(); return;} const diff=document.getElementById('online-create-diff').value; const code=genCode(); room={code,role:'picker',diff,channel:createRoomChannel('rooms/'+code),secret:null,timerInterval:null,timeLeft:GEO_TIME_LIMIT,qCounter:0,friendJoined:false}; roomMetaRef('rooms/'+code).set({createdAt:firebase.database.ServerValue.TIMESTAMP,diff}); room.channel.onmessage=handleRoomMessage; document.getElementById('picker-room-code').textContent=code; document.getElementById('picker-wait-msg').style.display='block'; document.getElementById('picker-pick-area').style.display='none'; showScreen('screen-geo-picker-setup');}
+function createRoom(){const errEl=document.getElementById('online-setup-error'); errEl.textContent=''; if(!fbReady){errEl.textContent=fbUnavailableMessage(); return;} const diff=document.getElementById('online-create-diff').value; const code=genCode(); room={code,role:'picker',diff,channel:createRoomChannel('rooms/'+code),secret:null,timerInterval:null,timeLeft:GEO_TIME_LIMIT,qCounter:0,friendJoined:false}; roomMetaRef('rooms/'+code).set({createdAt:firebase.database.ServerValue.TIMESTAMP,diff}); activeRoomsRef('geo').child(code).set({diff,createdAt:firebase.database.ServerValue.TIMESTAMP,status:'waiting'}); room.channel.onmessage=handleRoomMessage; document.getElementById('picker-room-code').textContent=code; document.getElementById('picker-wait-msg').style.display='block'; document.getElementById('picker-pick-area').style.display='none'; showScreen('screen-geo-picker-setup');}
 function joinRoom(){const codeInput=document.getElementById('online-join-code'); const code=codeInput.value.trim().toUpperCase(); const errEl=document.getElementById('online-setup-error'); errEl.textContent=''; if(!fbReady){errEl.textContent=fbUnavailableMessage(); return;} if(!code){errEl.textContent=tr('err_enter_code'); return;}roomMetaRef('rooms/'+code).once('value').then(snap=>{if(!snap.exists()){errEl.textContent=tr('err_room_not_found'); return;}room={code,role:'guesser',diff:null,channel:createRoomChannel('rooms/'+code),secret:null,timerInterval:null,timeLeft:GEO_TIME_LIMIT,qCounter:0}; room.channel.onmessage=handleRoomMessage; room.channel.postMessage({type:'join'}); document.getElementById('online-role-tag').textContent=tr('guesser_waiting'); document.getElementById('online-chat-log').innerHTML=''; document.getElementById('online-timer').textContent=fmtTime(GEO_TIME_LIMIT); document.getElementById('guesser-controls').style.display='none'; document.getElementById('picker-controls').style.display='none'; showScreen('screen-geo-online-play');}).catch(()=>{errEl.textContent=tr('err_no_service');});}
 function populatePickerSelect(diff){const sel=document.getElementById('picker-secret-select'); sel.innerHTML=''; GEO_POOLS[diff].forEach(c=>{const opt=document.createElement('option'); opt.value=c.name; opt.textContent=countryLabel(c.name); sel.appendChild(opt);});}
-function pickerStartGame(){const sel=document.getElementById('picker-secret-select'); const name=sel.value; const pool=GEO_POOLS[room.diff]; room.secret=pool.find(c=>c.name===name); room.timeLeft=GEO_TIME_LIMIT; room.channel.postMessage({type:'start',diff:room.diff}); document.getElementById('online-role-tag').textContent=tr('picker_secret_tag',{name:countryLabel(room.secret.name)}); document.getElementById('online-chat-log').innerHTML=''; addOnlineLog('sys',tr('game_started_picker')); document.getElementById('online-timer').textContent=fmtTime(GEO_TIME_LIMIT); document.getElementById('guesser-controls').style.display='none'; document.getElementById('picker-controls').style.display='block'; document.getElementById('picker-pending-list').innerHTML=''; showScreen('screen-geo-online-play'); startOnlineTimer();}
+function pickerStartGame(){const sel=document.getElementById('picker-secret-select'); const name=sel.value; const pool=GEO_POOLS[room.diff]; room.secret=pool.find(c=>c.name===name); room.timeLeft=GEO_TIME_LIMIT; room.channel.postMessage({type:'start',diff:room.diff}); activeRoomsRef('geo').child(room.code).update({status:'playing'}); document.getElementById('online-role-tag').textContent=tr('picker_secret_tag',{name:countryLabel(room.secret.name)}); document.getElementById('online-chat-log').innerHTML=''; addOnlineLog('sys',tr('game_started_picker')); document.getElementById('online-timer').textContent=fmtTime(GEO_TIME_LIMIT); document.getElementById('guesser-controls').style.display='none'; document.getElementById('picker-controls').style.display='block'; document.getElementById('picker-pending-list').innerHTML=''; showScreen('screen-geo-online-play'); startOnlineTimer();}
 function startOnlineTimer(){clearInterval(room.timerInterval); room.timerInterval=setInterval(()=>{room.timeLeft--; document.getElementById('online-timer').textContent=fmtTime(Math.max(room.timeLeft,0)); if(room.timeLeft<=0){clearInterval(room.timerInterval); if(room.role==='guesser'){room.channel.postMessage({type:'timeout'}); showOnlineResult(false,tr('times_up'));}else{addOnlineLog('sys',tr('times_up'));}}},1000);}
 function addOnlineLog(type,text){const log=document.getElementById('online-chat-log'); const div=document.createElement('div'); div.className='chat-line '+(type==='q'?'chat-q':type==='a'?'chat-a':'chat-sys'); div.textContent=text; log.appendChild(div); log.scrollTop=log.scrollHeight;}
 function sendOnlineQuestion(){const input=document.getElementById('online-question-input'); const q=input.value.trim(); if(!q||!room)return; room.qCounter++; const id=room.qCounter; room.channel.postMessage({type:'question',id,text:q}); addOnlineLog('q',q); input.value='';}
 function sendOnlineGuess(){const input=document.getElementById('online-guess-input'); const g=input.value.trim(); if(!g||!room)return; room.channel.postMessage({type:'guess',text:g}); addOnlineLog('q',tr('my_guess',{g:g})); input.value='';}
-function handleRoomMessage(e){const msg=e.data; if(!room)return; if(msg.type==='join'&&room.role==='picker'){room.friendJoined=true; document.getElementById('picker-wait-msg').textContent=tr('friend_joined_pick'); populatePickerSelect(room.diff); document.getElementById('picker-pick-area').style.display='block';} if(msg.type==='start'&&room.role==='guesser'){room.diff=msg.diff; room.timeLeft=GEO_TIME_LIMIT; document.getElementById('online-role-tag').textContent=tr('you_are_guesser'); addOnlineLog('sys',tr('friend_picked')); document.getElementById('guesser-controls').style.display='block'; startOnlineTimer();} if(msg.type==='question'&&room.role==='picker'){const list=document.getElementById('picker-pending-list'); const div=document.createElement('div'); div.className='pending-q'; div.innerHTML='<strong>"'+msg.text.replace(/</g,'&lt;')+'"</strong>'; const btnRow=document.createElement('div'); btnRow.className='yn-btns'; [['Yes','yn_yes','yn-yes'],['No','yn_no','yn-no'],['Unsure','yn_unsure','yn-unsure']].forEach(pair=>{const b=document.createElement('button'); b.textContent=tr(pair[1]); b.className=pair[2]; b.onclick=()=>{room.channel.postMessage({type:'answer',id:msg.id,answer:pair[0]}); div.remove();}; btnRow.appendChild(b);}); div.appendChild(btnRow); list.appendChild(div); addOnlineLog('q',tr('friend_asked',{q:msg.text}));} if(msg.type==='answer'&&room.role==='guesser'){addOnlineLog('a',tr(msg.answer==='Yes'?'yn_yes':msg.answer==='No'?'yn_no':'yn_unsure'));} if(msg.type==='guess'&&room.role==='picker'){const correct=matchesCountry(msg.text,room.secret); room.channel.postMessage({type:'guessResult',correct,secretName:room.secret.name}); addOnlineLog('q',tr('friend_guessed',{g:msg.text})+(correct?' ✅':' ❌')); if(correct){clearInterval(room.timerInterval); showOnlineResult(true,room.secret.name,true);}} if(msg.type==='guessResult'&&room.role==='guesser'){if(msg.correct){clearInterval(room.timerInterval); showOnlineResult(true,msg.secretName);}else{addOnlineLog('a',tr('nope_keep_trying'));}} if(msg.type==='timeout'&&room.role==='picker'){addOnlineLog('sys',tr('times_up_friend'));}}
-function showOnlineResult(won,secretName,isPickerSide){if(won&&!isPickerSide){const reward=GEO_DIFF[room.diff]?GEO_DIFF[room.diff].reward:2; addCoins(reward); document.getElementById('online-result-emoji').textContent='🏆'; document.getElementById('online-result-msg').textContent=tr('geo_correct',{name:countryLabel(secretName)}); document.getElementById('online-result-sub').textContent=tr('earned_coins',{n:reward,s:plural(reward)});}else if(won&&isPickerSide){document.getElementById('online-result-emoji').textContent='🎉'; document.getElementById('online-result-msg').textContent=tr('friend_guessed_it',{name:countryLabel(secretName)}); document.getElementById('online-result-sub').textContent=tr('nice_round');}else{document.getElementById('online-result-emoji').textContent='⏰'; document.getElementById('online-result-msg').textContent=secretName||tr('times_up'); document.getElementById('online-result-sub').textContent=tr('better_luck_room');} showScreen('screen-online-result');}
-function leaveRoomToHome(){if(room){try{room.channel.close();}catch(e){}clearInterval(room.timerInterval); room=null;} showScreen('screen-home');}
+function handleRoomMessage(e){const msg=e.data; if(!room)return; if(msg.type==='kick'){alert(tr('kicked_msg')); leaveRoomToHome(); return;} if(msg.type==='join'&&room.role==='picker'){room.friendJoined=true; document.getElementById('picker-wait-msg').textContent=tr('friend_joined_pick'); populatePickerSelect(room.diff); document.getElementById('picker-pick-area').style.display='block'; activeRoomsRef('geo').child(room.code).update({status:'ready'});} if(msg.type==='start'&&room.role==='guesser'){room.diff=msg.diff; room.timeLeft=GEO_TIME_LIMIT; document.getElementById('online-role-tag').textContent=tr('you_are_guesser'); addOnlineLog('sys',tr('friend_picked')); document.getElementById('guesser-controls').style.display='block'; startOnlineTimer();} if(msg.type==='question'&&room.role==='picker'){const list=document.getElementById('picker-pending-list'); const div=document.createElement('div'); div.className='pending-q'; div.innerHTML='<strong>"'+msg.text.replace(/</g,'&lt;')+'"</strong>'; const btnRow=document.createElement('div'); btnRow.className='yn-btns'; [['Yes','yn_yes','yn-yes'],['No','yn_no','yn-no'],['Unsure','yn_unsure','yn-unsure']].forEach(pair=>{const b=document.createElement('button'); b.textContent=tr(pair[1]); b.className=pair[2]; b.onclick=()=>{room.channel.postMessage({type:'answer',id:msg.id,answer:pair[0]}); div.remove();}; btnRow.appendChild(b);}); div.appendChild(btnRow); list.appendChild(div); addOnlineLog('q',tr('friend_asked',{q:msg.text}));} if(msg.type==='answer'&&room.role==='guesser'){addOnlineLog('a',tr(msg.answer==='Yes'?'yn_yes':msg.answer==='No'?'yn_no':'yn_unsure'));} if(msg.type==='guess'&&room.role==='picker'){const correct=matchesCountry(msg.text,room.secret); room.channel.postMessage({type:'guessResult',correct,secretName:room.secret.name}); addOnlineLog('q',tr('friend_guessed',{g:msg.text})+(correct?' ✅':' ❌')); if(correct){clearInterval(room.timerInterval); showOnlineResult(true,room.secret.name,true);}} if(msg.type==='guessResult'&&room.role==='guesser'){if(msg.correct){clearInterval(room.timerInterval); showOnlineResult(true,msg.secretName);}else{addOnlineLog('a',tr('nope_keep_trying'));}} if(msg.type==='timeout'&&room.role==='picker'){addOnlineLog('sys',tr('times_up_friend'));}}
+function showOnlineResult(won,secretName,isPickerSide){if(room&&room.role==='picker'&&room.code)activeRoomsRef('geo').child(room.code).remove(); if(won&&!isPickerSide){const reward=GEO_DIFF[room.diff]?GEO_DIFF[room.diff].reward:2; addCoins(reward); document.getElementById('online-result-emoji').textContent='🏆'; document.getElementById('online-result-msg').textContent=tr('geo_correct',{name:countryLabel(secretName)}); document.getElementById('online-result-sub').textContent=tr('earned_coins',{n:reward,s:plural(reward)});}else if(won&&isPickerSide){document.getElementById('online-result-emoji').textContent='🎉'; document.getElementById('online-result-msg').textContent=tr('friend_guessed_it',{name:countryLabel(secretName)}); document.getElementById('online-result-sub').textContent=tr('nice_round');}else{document.getElementById('online-result-emoji').textContent='⏰'; document.getElementById('online-result-msg').textContent=secretName||tr('times_up'); document.getElementById('online-result-sub').textContent=tr('better_luck_room');} showScreen('screen-online-result');}
+function leaveRoomToHome(){if(room){if(room.role==='picker'&&room.code)activeRoomsRef('geo').child(room.code).remove(); try{room.channel.close();}catch(e){}clearInterval(room.timerInterval); room=null;} showScreen('screen-home');}
 
 let frace=null;
-function createFlagRoom(){const errEl=document.getElementById('flag-online-setup-error'); errEl.textContent=''; if(!fbReady){errEl.textContent=fbUnavailableMessage(); return;} const diff=document.getElementById('flag-online-create-diff').value; const code=genCode(); frace={code,myRole:'host',diff,channel:createRoomChannel('flagRooms/'+code),list:null,scores:{host:0,guest:0},currentIndex:0,roundDecided:false,hostTimerInterval:null,hostTimeLeft:0,displayTimerInterval:null,friendJoined:false}; roomMetaRef('flagRooms/'+code).set({createdAt:firebase.database.ServerValue.TIMESTAMP,diff}); frace.channel.onmessage=handleFlagRoomMessage; document.getElementById('flag-host-room-code').textContent=code; document.getElementById('flag-host-wait-msg').textContent=tr('waiting_join'); document.getElementById('flag-host-start-btn').style.display='none'; showScreen('screen-flag-host-wait');}
+function createFlagRoom(){const errEl=document.getElementById('flag-online-setup-error'); errEl.textContent=''; if(!fbReady){errEl.textContent=fbUnavailableMessage(); return;} const diff=document.getElementById('flag-online-create-diff').value; const code=genCode(); frace={code,myRole:'host',diff,channel:createRoomChannel('flagRooms/'+code),list:null,scores:{host:0,guest:0},currentIndex:0,roundDecided:false,hostTimerInterval:null,hostTimeLeft:0,displayTimerInterval:null,friendJoined:false}; roomMetaRef('flagRooms/'+code).set({createdAt:firebase.database.ServerValue.TIMESTAMP,diff}); activeRoomsRef('flag').child(code).set({diff,createdAt:firebase.database.ServerValue.TIMESTAMP,status:'waiting'}); frace.channel.onmessage=handleFlagRoomMessage; document.getElementById('flag-host-room-code').textContent=code; document.getElementById('flag-host-wait-msg').textContent=tr('waiting_join'); document.getElementById('flag-host-start-btn').style.display='none'; showScreen('screen-flag-host-wait');}
 function joinFlagRoom(){const codeInput=document.getElementById('flag-online-join-code'); const code=codeInput.value.trim().toUpperCase(); const errEl=document.getElementById('flag-online-setup-error'); errEl.textContent=''; if(!fbReady){errEl.textContent=fbUnavailableMessage(); return;} if(!code){errEl.textContent=tr('err_enter_code'); return;}roomMetaRef('flagRooms/'+code).once('value').then(snap=>{if(!snap.exists()){errEl.textContent=tr('err_room_not_found'); return;}frace={code,myRole:'guest',diff:null,channel:createRoomChannel('flagRooms/'+code),list:null,scores:{host:0,guest:0},currentIndex:0,roundDecided:false,hostTimerInterval:null,hostTimeLeft:0,displayTimerInterval:null}; frace.channel.onmessage=handleFlagRoomMessage; frace.channel.postMessage({type:'flagJoin'}); document.getElementById('flag-race-progress').textContent=tr('waiting_host'); document.getElementById('flag-race-img').src=''; document.getElementById('flag-race-timer').textContent='--'; document.getElementById('flag-race-status').textContent=tr('waiting_host_start'); setFlagRaceInputEnabled(false); updateFlagRaceScoreboard(); showScreen('screen-flag-online-race');}).catch(()=>{errEl.textContent=tr('err_no_service');});}
-function hostStartFlagRace(){if(!frace||frace.myRole!=='host')return; frace.list=shuffle(FLAG_POOLS[frace.diff]).slice(0,10).map(c=>({name:c.name,code:c.code,aliases:c.aliases})); frace.scores={host:0,guest:0}; frace.channel.postMessage({type:'flagGameStart',diff:frace.diff,list:frace.list}); showScreen('screen-flag-online-race'); updateFlagRaceScoreboard(); hostStartFlagRound(0);}
+function hostStartFlagRace(){if(!frace||frace.myRole!=='host')return; frace.list=shuffle(FLAG_POOLS[frace.diff]).slice(0,10).map(c=>({name:c.name,code:c.code,aliases:c.aliases})); frace.scores={host:0,guest:0}; frace.channel.postMessage({type:'flagGameStart',diff:frace.diff,list:frace.list}); activeRoomsRef('flag').child(frace.code).update({status:'racing'}); showScreen('screen-flag-online-race'); updateFlagRaceScoreboard(); hostStartFlagRound(0);}
 function hostStartFlagRound(idx){frace.currentIndex=idx; frace.roundDecided=false; const timeLimit=FLAG_DIFF[frace.diff].time; const startTime=Date.now(); frace.channel.postMessage({type:'flagRound',index:idx,startTime,timeLimit}); renderFlagRaceRound({index:idx,startTime,timeLimit}); clearInterval(frace.hostTimerInterval); frace.hostTimeLeft=timeLimit; frace.hostTimerInterval=setInterval(()=>{frace.hostTimeLeft--; if(frace.hostTimeLeft<=0){clearInterval(frace.hostTimerInterval); if(!frace.roundDecided)resolveFlagRound(null);}},1000);}
 function renderFlagRaceRound(msg){const c=frace.list[msg.index]; document.getElementById('flag-race-progress').textContent=tr('flag_progress',{n:msg.index+1}); const imgEl=document.getElementById('flag-race-img'); imgEl.onerror=function(){imgEl.onerror=null; imgEl.src=flagUrl(c.code,'png');}; imgEl.src=flagUrl(c.code); document.getElementById('flag-race-input').value=''; document.getElementById('flag-race-status').textContent=''; setFlagRaceInputEnabled(true); document.getElementById('flag-race-input').focus(); updateFlagRaceScoreboard(); clearInterval(frace.displayTimerInterval); const startTime=msg.startTime,timeLimit=msg.timeLimit; function tick(){const elapsed=(Date.now()-startTime)/1000; const remaining=Math.max(0,Math.ceil(timeLimit-elapsed)); document.getElementById('flag-race-timer').textContent=remaining; if(remaining<=0)clearInterval(frace.displayTimerInterval);} tick(); frace.displayTimerInterval=setInterval(tick,250);}
 function setFlagRaceInputEnabled(enabled){document.getElementById('flag-race-input').disabled=!enabled;}
@@ -1382,10 +1490,10 @@ function processFlagAttempt(role,text){if(!frace||frace.myRole!=='host'||frace.r
 function flashFlagRaceStatus(msg){const el=document.getElementById('flag-race-status'); el.textContent=msg; setTimeout(()=>{if(el.textContent===msg)el.textContent='';}  ,1200);}
 function resolveFlagRound(winnerRole){frace.roundDecided=true; clearInterval(frace.hostTimerInterval); if(winnerRole)frace.scores[winnerRole]++; const c=frace.list[frace.currentIndex]; const payload={winner:winnerRole,correctName:c.name,scores:{...frace.scores}}; frace.channel.postMessage({type:'flagRoundResult',index:frace.currentIndex,winner:payload.winner,correctName:payload.correctName,scores:payload.scores}); applyFlagRoundResultLocally(payload); setTimeout(()=>{if(frace.currentIndex+1<10)hostStartFlagRound(frace.currentIndex+1); else hostEndFlagRace();},1800);}
 function applyFlagRoundResultLocally(data){if(!frace)return; frace.scores=data.scores; updateFlagRaceScoreboard(); clearInterval(frace.displayTimerInterval); setFlagRaceInputEnabled(false); let msg; const cn=countryLabel(data.correctName); if(data.winner===null){msg=tr('times_up_nobody',{name:cn});}else if(data.winner===frace.myRole){msg=tr('you_got_first',{name:cn});}else{msg=tr('friend_got_first',{name:cn});} document.getElementById('flag-race-status').textContent=msg;}
-function hostEndFlagRace(){const{host,guest}=frace.scores; const winner=host>guest?'host':guest>host?'guest':'tie'; frace.channel.postMessage({type:'flagGameOver',winner,scores:frace.scores}); showFlagRaceResult(winner,frace.scores);}
+function hostEndFlagRace(){if(frace&&frace.code)activeRoomsRef('flag').child(frace.code).remove(); const{host,guest}=frace.scores; const winner=host>guest?'host':guest>host?'guest':'tie'; frace.channel.postMessage({type:'flagGameOver',winner,scores:frace.scores}); showFlagRaceResult(winner,frace.scores);}
 function showFlagRaceResult(winner,scores){const myScore=frace.myRole==='host'?scores.host:scores.guest; const friendScore=frace.myRole==='host'?scores.guest:scores.host; if(winner==='tie'){document.getElementById('flag-online-result-emoji').textContent='🤝'; document.getElementById('flag-online-result-msg').textContent=tr('its_a_tie'); document.getElementById('flag-online-result-sub').textContent=tr('tie_sub',{n:myScore});}else if(winner===frace.myRole){addCoins(2); document.getElementById('flag-online-result-emoji').textContent='🏆'; document.getElementById('flag-online-result-msg').textContent=tr('you_won_race'); document.getElementById('flag-online-result-sub').textContent=tr('race_win_sub',{a:myScore,b:friendScore});}else{document.getElementById('flag-online-result-emoji').textContent='😅'; document.getElementById('flag-online-result-msg').textContent=tr('friend_won_race'); document.getElementById('flag-online-result-sub').textContent=tr('race_lose_sub',{a:myScore,b:friendScore});} showScreen('screen-flag-online-result');}
-function handleFlagRoomMessage(e){const msg=e.data; if(!frace)return; if(msg.type==='flagJoin'&&frace.myRole==='host'){frace.friendJoined=true; document.getElementById('flag-host-wait-msg').textContent=tr('friend_joined_ready'); document.getElementById('flag-host-start-btn').style.display='block';} if(msg.type==='flagGameStart'&&frace.myRole==='guest'){frace.diff=msg.diff; frace.list=msg.list; frace.scores={host:0,guest:0}; showScreen('screen-flag-online-race'); updateFlagRaceScoreboard();} if(msg.type==='flagRound'){frace.currentIndex=msg.index; frace.roundDecided=false; if(frace.myRole==='guest')renderFlagRaceRound(msg);} if(msg.type==='flagAttempt'&&frace.myRole==='host'){processFlagAttempt('guest',msg.text);} if(msg.type==='flagAttemptResult'&&frace.myRole==='guest'){if(!msg.correct)flashFlagRaceStatus(tr('not_quite'));} if(msg.type==='flagRoundResult'&&frace.myRole==='guest'){applyFlagRoundResultLocally({winner:msg.winner,correctName:msg.correctName,scores:msg.scores});} if(msg.type==='flagGameOver'&&frace.myRole==='guest'){showFlagRaceResult(msg.winner,msg.scores);}}
-function leaveFlagRoomToHome(){if(frace){try{frace.channel.close();}catch(e){}clearInterval(frace.hostTimerInterval); clearInterval(frace.displayTimerInterval); frace=null;} showScreen('screen-home');}
+function handleFlagRoomMessage(e){const msg=e.data; if(!frace)return; if(msg.type==='kick'){alert(tr('kicked_msg')); leaveFlagRoomToHome(); return;} if(msg.type==='flagJoin'&&frace.myRole==='host'){frace.friendJoined=true; document.getElementById('flag-host-wait-msg').textContent=tr('friend_joined_ready'); document.getElementById('flag-host-start-btn').style.display='block'; activeRoomsRef('flag').child(frace.code).update({status:'ready'});} if(msg.type==='flagGameStart'&&frace.myRole==='guest'){frace.diff=msg.diff; frace.list=msg.list; frace.scores={host:0,guest:0}; showScreen('screen-flag-online-race'); updateFlagRaceScoreboard();} if(msg.type==='flagRound'){frace.currentIndex=msg.index; frace.roundDecided=false; if(frace.myRole==='guest')renderFlagRaceRound(msg);} if(msg.type==='flagAttempt'&&frace.myRole==='host'){processFlagAttempt('guest',msg.text);} if(msg.type==='flagAttemptResult'&&frace.myRole==='guest'){if(!msg.correct)flashFlagRaceStatus(tr('not_quite'));} if(msg.type==='flagRoundResult'&&frace.myRole==='guest'){applyFlagRoundResultLocally({winner:msg.winner,correctName:msg.correctName,scores:msg.scores});} if(msg.type==='flagGameOver'&&frace.myRole==='guest'){showFlagRaceResult(msg.winner,msg.scores);}}
+function leaveFlagRoomToHome(){if(frace){if(frace.myRole==='host'&&frace.code)activeRoomsRef('flag').child(frace.code).remove(); try{frace.channel.close();}catch(e){}clearInterval(frace.hostTimerInterval); clearInterval(frace.displayTimerInterval); frace=null;} showScreen('screen-home');}
 
 loadState(); applyLanguage(); showScreen('screen-home');
 </script>
