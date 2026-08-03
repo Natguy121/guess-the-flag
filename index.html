@@ -1347,8 +1347,21 @@ async function loadFlagIntoMiniFlag(c){
     if(!svg)throw new Error('no svg element');
     svg.removeAttribute('width'); svg.removeAttribute('height');
     svg.style.width='100%'; svg.style.height='100%'; svg.style.display='block';
+    // Emblems/coats of arms (Mexico's eagle, etc.) are usually dozens of tiny
+    // paths nested several <g> levels deep; the flag's actual field/stripes
+    // are almost always shallow — direct children of <svg> or one <g> in.
+    // Restricting to shallow elements keeps recoloring on the background
+    // only, so emblem detail is never touched/flattened.
+    // Try the shallowest match first (direct children of <svg>, where a
+    // flag's plain stripes/field almost always live) and only widen the
+    // search if nothing's found there — emblems are virtually always
+    // nested at least one <g> deeper than the background, so staying as
+    // shallow as possible is the safest way to avoid touching them.
+    let candidates=[...svg.querySelectorAll(':scope > [fill]')];
+    if(!candidates.length)candidates=[...svg.querySelectorAll(':scope > g > [fill]')];
+    if(!candidates.length)candidates=[...svg.querySelectorAll('[fill]')];
     const groups={};
-    svg.querySelectorAll('[fill]').forEach(el=>{
+    candidates.forEach(el=>{
       const fill=el.getAttribute('fill');
       if(!fill||fill[0]!=='#')return; // skip fill="none"/url(#...)/currentColor — can't classify those
       const name=nearestColorName(fill);
@@ -1356,12 +1369,16 @@ async function loadFlagIntoMiniFlag(c){
       groups[name].hexes.add(fill.toLowerCase());
     });
     const missing=groups[colorState.missingColor];
-    if(!missing||!missing.els.length)throw new Error('no matching path for '+colorState.missingColor);
+    // A real background stripe/field is at most a handful of shapes; if a
+    // color bucket picked up a big pile of elements, that's emblem detail
+    // that slipped through, not a clean background match — bail to the
+    // stripe fallback rather than mangling the flag.
+    if(!missing||!missing.els.length||missing.els.length>4)throw new Error('no clean background match for '+colorState.missingColor);
     colorState.svgMode=true; colorState.missingEls=missing.els; colorState.missingHexes=[...missing.hexes];
     updateMissingColor();
   }catch(e){
     if(!colorState||colorState.index!==round)return;
-    colorState.svgMode=false;
+    colorState.svgMode=false; colorState.missingEls=null; colorState.missingHexes=null;
     renderMiniFlagStripes(c);
   }
 }

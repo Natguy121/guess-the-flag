@@ -117,11 +117,24 @@ only fire one of those for `<input type="color">`). Scoring uses the shape's
 *exact* real hex, not the generic bucket color, so a closeness comparison is
 as accurate as possible.
 
+**Emblems and coats of arms are protected from this.** A country's field
+(Mexico's green/white/red bands, say) is almost always a small number of
+plain shapes as direct children of the SVG root, while its eagle — or any
+other flag's seal, star, sun, crest, etc. — is typically dozens of tiny
+paths nested several `<g>` levels deeper. Only recoloring the *shallowest*
+matching elements (direct children of `<svg>` first, widening one level at
+a time only if nothing's found there) keeps the color-matching on the
+background only, so emblem detail is never touched. As a second safety net,
+if a color bucket still ends up with more than a handful of elements — a
+sign some emblem detail slipped through anyway — that round falls back
+rather than risk flattening the artwork.
+
 Not every one of the 195 flags parses cleanly this way — some use gradients,
 `<defs>`/`<use>` references, or a color combination that doesn't cleanly
-separate into 8 buckets. If the fetch fails or no shape matches the missing
-color, it falls back to a simple horizontal-stripe rendering built from the
-same `colors` data instead, so the round never breaks.
+separate into 8 buckets. If the fetch fails or nothing matches the missing
+color cleanly, it falls back to a simple horizontal-stripe rendering built
+from the same `colors` data instead, so the round never breaks — you just
+get the plain-stripe version for that particular flag.
 
 There's no right/wrong per round — each guess is scored by **closeness**,
 not an exact match: `colorCloseness()` compares the RGB you picked against
