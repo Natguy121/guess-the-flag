@@ -1318,7 +1318,7 @@ function goColorMode(){showScreen('screen-color-diff');}
 function startColorGame(diff){colorState={diff, list:shuffle(COLOR_POOLS[diff]).slice(0,10), index:0, closenessSum:0, missingColor:null, missingIdx:-1}; showScreen('screen-color-game'); renderColorRound();}
 function restartColorGame(){startColorGame(colorState.diff);}
 function randomHexColor(){const n=Math.floor(Math.random()*0x1000000); return'#'+n.toString(16).padStart(6,'0');}
-function renderColorRound(){const c=colorState.list[colorState.index]; colorState.missingIdx=Math.floor(Math.random()*c.colors.length); colorState.missingColor=c.colors[colorState.missingIdx]; document.getElementById('color-progress').textContent=tr('flag_progress',{n:colorState.index+1}); document.getElementById('color-country-name').textContent=countryLabel(c.name); renderMiniFlag(c); const picker=document.getElementById('color-picker'); picker.value=randomHexColor(); updateMissingStripe(); picker.oninput=updateMissingStripe;}
+function renderColorRound(){const c=colorState.list[colorState.index]; colorState.missingIdx=Math.floor(Math.random()*c.colors.length); colorState.missingColor=c.colors[colorState.missingIdx]; document.getElementById('color-progress').textContent=tr('flag_progress',{n:colorState.index+1}); document.getElementById('color-country-name').textContent=countryLabel(c.name); renderMiniFlag(c); const picker=document.getElementById('color-picker'); picker.value=randomHexColor(); updateMissingStripe(); picker.oninput=updateMissingStripe; picker.onchange=updateMissingStripe;}
 // The flag itself is built from its actual color list as horizontal
 // stripes (real photos can't be recolored one region at a time without
 // per-flag layout data), so the missing stripe can be bound directly to
