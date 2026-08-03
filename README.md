@@ -95,77 +95,72 @@ Cloud Function if you want automatic cleanup.
 
 ## Guess The Flag Colors
 
-The third solo game mode (Home → Play → 🎨 Guess The Flag Colors): for each
-of 10 rounds you're shown the country's name and its **real flag artwork**
-(fetched live as inline SVG from flagcdn.com, not a raster photo) — except
-whichever of its shapes uses the missing color has that shape's fill blanked
-out. You mix the missing color yourself in a native color-picker (`<input
-type="color">`, the full spectrum, not presets) from memory, and **that
-exact shape on the real flag repaints live as you drag** — you're directly
-recoloring part of the actual flag, not a generic stripe or a separate
-preview box.
+The third solo game mode (Home → Play → 🎨 Guess The Flag Colors). Each round
+shows a country's name and its flag with **one region left blank**; you mix
+that missing color yourself in a native color picker (`<input type="color">`
+— the full spectrum, not a set of presets) from memory, and the blank region
+repaints live on the flag as you go. There's a countdown per round:
 
-How this works (`loadFlagIntoMiniFlag()` in `index.html`): the SVG is
-fetched and injected inline (so its `<path>`/`<rect>` elements are real DOM
-nodes), then every element with a `fill="#hex"` is classified against the
-nearest of the 8 named colors (`nearestColorName()`) — real flags use custom
-brand shades, not pure CSS red/blue, so this maps e.g. a flag's actual
-`#ce1126` crimson to the `red` bucket. Whichever shape(s) land in the
-missing-color's bucket get their `fill` bound to the picker
-(`updateMissingColor()`, on both `input` and `change` — some mobile browsers
-only fire one of those for `<input type="color">`). Scoring uses the shape's
-*exact* real hex, not the generic bucket color, so a closeness comparison is
-as accurate as possible.
+| Difficulty | Time per flag | Flags available |
+|---|---|---|
+| Easy   | 15s | 42 |
+| Medium | 20s | 30 |
+| Hard   | 25s | 23 |
 
-**Emblems, cantons, and coats of arms are protected from this by size, not
-DOM position.** Which SVG elements are safe to recolor can't be reliably
-guessed from how deeply they're nested — that varies by flag, and flags with
-a canton (Australia's Union Jack corner, for instance) put small canton
-details at the same DOM depth as the real background, which breaks a
-depth-only heuristic. What's actually reliable is that a flag's real
-background field or stripe always covers a large share of the whole flag,
-while crosses, stars, seals, and canton details never do, however they're
-nested. So each candidate's *rendered bounding-box area* is measured against
-the flag's total area (`getBBox()` vs. the SVG's `viewBox`), and anything
-covering less than ~15% of the flag is excluded outright — that's what
-keeps the Union Jack's crosses and the Southern Cross's stars from ever
-being candidates for recoloring, regardless of how the SVG groups them.
-Elements inside `<defs>`/`<clipPath>`/`<mask>`/`<symbol>`/`<pattern>` are
-excluded too, since those are non-visible definitions, not paintable shapes.
-As a second safety net, if a color bucket still ends up matching more than a
-handful of elements, that's treated as a sign something slipped through
-anyway, and the round falls back rather than risk mangled artwork.
+When the clock hits zero the round auto-submits whatever color is currently
+picked and moves on. Nothing is confirmed as you play — only the final
+average, so there's no feedback to learn from mid-game.
 
-Not every one of the 195 flags parses cleanly this way — some use gradients,
-`<defs>`/`<use>` references, or a color combination that doesn't cleanly
-separate into 8 buckets. If the fetch fails or nothing matches the missing
-color cleanly, it falls back to a simple horizontal-stripe rendering built
-from the same `colors` data instead, so the round never breaks — you just
-get the plain-stripe version for that particular flag.
+Each guess is scored by **closeness**, not exact match: RGB distance from
+your color to the region's true color, normalized to 0-1
+(`colorDistanceHex` / `closenessFromDistance`), so a near miss still earns
+partial credit. Your average across all 10 rounds sets the reward:
 
-There's no right/wrong per round — each guess is scored by **closeness**,
-not an exact match: `colorCloseness()` compares the RGB you picked against
-the canonical RGB for the actual missing color (Euclidean distance in RGB
-space, normalized to 0–1) as a percentage, so picking a near-miss shade
-still earns partial credit instead of nothing. Nothing is shown as you go;
-only your **average closeness across all 10 rounds**, shown as a percentage
-at the end, and that's what sets your coin reward:
+| Accuracy | Reward |
+|---|---|
+| Below 30% | 0 coins |
+| 30% – 49% | 1 coin |
+| 50% – 69% | 2 coins |
+| 70% – 100% | 3 coins |
 
-| Accuracy    | Reward   |
-|-------------|----------|
-| Below 30%   | 0 coins  |
-| 30% – 49%   | 1 coin   |
-| 50% – 69%   | 2 coins  |
-| 70% – 100%  | 3 coins  |
+### How the flags are drawn
 
-`COLOR_POOLS` (in `index.html`) doesn't duplicate flag-color data: it's
-built at load time from `GEO_POOLS`' existing `colors` arrays, matched up
-with each country's flagcdn code from `FLAG_POOLS` by name — so all three
-games share the same underlying data instead of maintaining it three times.
-`COLOR_RGB` maps each of the 8 named colors to the same RGB values CSS
-itself resolves those keywords to, so the "known" palette swatches (which
-still use CSS color names for their backgrounds) and the closeness scoring
-are always measuring against the same reference.
+Flag geometry is **authored in `index.html`, not fetched**. `FLAG_SHAPES`
+maps each ISO-2 code to `[templateId, ...partColors]`, and `renderFlagSVG()`
+turns that into an SVG whose regions each carry a `data-part` index — so the
+game knows exactly which region is which and can repaint precisely one of
+them. Template ids may carry parameters after a colon (`'h:1,2,1'` for
+Spain's uneven bands, `'stripesCanton:11'` for Liberia's stripe count).
+Colors are raw hex, or a `FLAG_PALETTE` name for common cases.
+
+Templates cover the geometric families: horizontal/vertical bands (even and
+uneven), Nordic and centered crosses, discs, hoist triangles, diagonals,
+saltires, crescents, stars, hoist bars, stripes-with-canton, the Union Jack,
+and the US star grid. Adding a flag is usually one line; adding a new *shape*
+family means one new entry in `FLAG_TEMPLATES`.
+
+This replaced an earlier approach that downloaded each real flag SVG and
+guessed which shapes were safe to recolor from their bounding-box area. That
+guess repeatedly picked wrong: it flattened Mexico's eagle into a single
+block of color, and repainted Australia's Union Jack canton so the flag read
+as France. Worse, it could never be checked — flagcdn.com isn't reachable
+from the dev sandbox, so every fix was made blind. Authoring the geometry
+makes the mode fully offline and lets **every flag be rendered and asserted
+locally** (`scratchpad/contact_sheet.js` renders all of them into one grid
+image for review).
+
+### Coverage
+
+95 of the 195 flags are included. A flag is in if it stays unambiguous from
+geometry and color alone, and out if its identity depends on an intricate
+emblem, crest, animal, map or script that can't be drawn faithfully — so
+Mexico (without the eagle it is identical to Italy), Canada, Cyprus, Saudi
+Arabia, Sri Lanka and similar are deliberately absent from this mode only;
+they still appear in the other two games. Flags that would collide with
+another once simplified are dropped for the same reason (Syria would be
+indistinguishable from Yemen, China from Vietnam). Flags with a small
+emblem over otherwise-correct geometry *are* included with the emblem
+omitted (Spain, Portugal, Argentina's sun, Philippines' sun).
 
 ## Global Ranking
 

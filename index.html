@@ -86,26 +86,16 @@
   .diff-medium{ background:linear-gradient(135deg,#fb8500,#ffb703); color:#3a2900; }
   .diff-hard{ background:linear-gradient(135deg,#e63946,#a4133c); }
 
-  .color-toggle-row{ display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin:14px 0 20px; }
-  .color-opt{ display:flex; align-items:center; gap:8px; padding:10px 16px; border-radius:12px; border:2px solid #ccc;
-    background:white; cursor:pointer; font-weight:bold; color:#333; }
-  .color-opt .swatch{ width:16px; height:16px; border-radius:50%; border:1px solid rgba(0,0,0,0.25); display:inline-block; }
-  .color-opt.selected{ background:var(--blue); color:white; border-color:var(--blue); }
-  .color-opt.selected .swatch{ border-color:rgba(255,255,255,0.6); }
   .color-picker-row{ display:flex; align-items:center; gap:14px; justify-content:center; margin:14px 0 20px; }
   .color-picker-row input[type=color]{ width:70px; height:56px; border:2px solid #ccc; border-radius:12px; padding:2px; cursor:pointer; background:white; }
-  .mini-flag{ display:flex; flex-direction:column; width:100%; max-width:320px; aspect-ratio:3/2; margin:0 auto;
+  .mini-flag{ width:100%; max-width:320px; aspect-ratio:3/2; margin:0 auto;
     border-radius:12px; overflow:hidden; border:6px solid white; box-shadow:0 10px 26px rgba(0,0,0,0.35); background:#eee; }
-  .mini-flag svg{ width:100%; height:100%; display:block; object-fit:cover; }
-  .mini-flag .stripe{ flex:1; position:relative; }
-  .mini-flag .stripe.missing::after{ content:'?'; position:absolute; inset:0; display:flex; align-items:center;
-    justify-content:center; font-weight:bold; font-size:1.6em; color:rgba(0,0,0,0.32); text-shadow:0 1px 0 rgba(255,255,255,0.4); }
-  .color-opt.revealed{ cursor:default; }
-  .color-opt.missing{ cursor:default; background:repeating-linear-gradient(45deg,#f4f4f4,#f4f4f4 6px,#e8e8e8 6px,#e8e8e8 12px); border-style:dashed; color:#999; }
-  .color-opt.missing .swatch{ background:transparent; display:flex; align-items:center; justify-content:center; font-weight:bold; color:#999; border-style:dashed; }
+  .mini-flag svg{ width:100%; height:100%; display:block; }
+  /* The part left blank for the player is outlined so it reads as the gap to fill. */
+  .mini-flag [data-missing]{ stroke:rgba(0,0,0,0.55); stroke-width:0.7; stroke-dasharray:2 1.6; }
 
   .progress-text{ text-align:center; font-weight:bold; color:#333; margin-bottom:6px; }
-  #flag-timer, #geo-timer, #flag-race-timer{ text-align:center; font-size:1.6em; font-weight:bold; margin:6px 0 16px; color:var(--red); }
+  #flag-timer, #geo-timer, #flag-race-timer, #color-timer{ text-align:center; font-size:1.6em; font-weight:bold; margin:6px 0 16px; color:var(--red); }
   .score-box{ flex:1; text-align:center; background:#f0f0f0; border-radius:10px; padding:8px 10px; }
   .score-box strong{ display:block; font-size:.85em; color:#555; }
   .score-box span{ font-size:1.6em; font-weight:bold; color:var(--blue); }
@@ -361,8 +351,8 @@
     <section id="screen-color-game" class="screen">
       <div class="card-box">
         <div class="progress-text" id="color-progress">Flag 1 / 10</div>
+        <div id="color-timer">15</div>
         <h3 style="text-align:center;" id="color-country-name"></h3>
-        <label data-i18n="colors_palette_label">This flag's colors — one is missing:</label>
         <div class="flag-wrap"><div class="mini-flag" id="color-mini-flag"></div></div>
         <label data-i18n="choose_colors_label">Pick the missing color as closely as you can:</label>
         <div class="color-picker-row">
@@ -863,10 +853,10 @@ en:{
   no_ranking:"No players yet.", points_label:"pts",
   err_signin_ranking:"Please sign in first to view the Global Ranking.",
   game_colors:"🎨 Guess The Flag Colors", colors_mode_title:"🎨 Guess The Flag Colors",
-  colors_mode_sub:"You'll see the flag and its colors listed as a palette — but one is missing. Mix it yourself in the color picker, as close as you can from memory. Nothing is confirmed until the end — then your average closeness over 10 rounds decides your coins.",
-  colors_easy_desc:"Well-known flags", colors_medium_desc:"Moderately known flags", colors_hard_desc:"Tricky, lesser-known flags",
+  colors_mode_sub:"Each flag is drawn with one part left blank. Mix that missing color yourself in the picker, from memory, before the clock runs out. Nothing is confirmed until the end — then your average closeness over 10 rounds decides your coins.",
+  colors_easy_desc:"Well-known flags · 15 seconds per flag", colors_medium_desc:"Moderately known flags · 20 seconds per flag", colors_hard_desc:"Tricky, lesser-known flags · 25 seconds per flag",
   colors_reward_note:"Reward: 1-3 coins based on your accuracy over all 10",
-  choose_colors_label:"Pick the missing color as closely as you can:", colors_palette_label:"This flag's colors — one is missing:",
+  choose_colors_label:"Fill in the missing color as closely as you can:",
   accuracy_label:"Accuracy: {p}%", no_coins_msg:"Keep practicing — no coins this round.",
   color_red:"Red", color_blue:"Blue", color_green:"Green", color_yellow:"Yellow",
   color_white:"White", color_black:"Black", color_orange:"Orange", color_purple:"Purple"
@@ -1018,10 +1008,10 @@ fr:{
   no_ranking:"Aucun joueur pour l'instant.", points_label:"pts",
   err_signin_ranking:"Connecte-toi d'abord pour voir le Classement Mondial.",
   game_colors:"🎨 Devine les Couleurs du Drapeau", colors_mode_title:"🎨 Devine les Couleurs du Drapeau",
-  colors_mode_sub:"Tu verras le drapeau et ses couleurs sous forme de palette — mais une couleur manque. Compose-la toi-même dans le sélecteur de couleur, au plus proche de mémoire. Rien n'est confirmé avant la fin — ta proximité moyenne sur 10 manches détermine ensuite tes pièces.",
-  colors_easy_desc:"Drapeaux bien connus", colors_medium_desc:"Drapeaux moyennement connus", colors_hard_desc:"Drapeaux difficiles et peu connus",
+  colors_mode_sub:"Chaque drapeau est dessiné avec une partie laissée vide. Compose toi-même la couleur manquante dans le sélecteur, de mémoire, avant la fin du chrono. Rien n'est confirmé avant la fin — ta proximité moyenne sur 10 manches détermine ensuite tes pièces.",
+  colors_easy_desc:"Drapeaux bien connus · 15 secondes par drapeau", colors_medium_desc:"Drapeaux moyennement connus · 20 secondes par drapeau", colors_hard_desc:"Drapeaux difficiles et peu connus · 25 secondes par drapeau",
   colors_reward_note:"Récompense : 1 à 3 pièces selon ta précision sur les 10",
-  choose_colors_label:"Choisis la couleur manquante d'aussi près que possible :", colors_palette_label:"Les couleurs de ce drapeau — une manque :",
+  choose_colors_label:"Complète la couleur manquante d'aussi près que possible :",
   accuracy_label:"Précision : {p} %", no_coins_msg:"Continue à t'entraîner — aucune pièce cette manche.",
   color_red:"Rouge", color_blue:"Bleu", color_green:"Vert", color_yellow:"Jaune",
   color_white:"Blanc", color_black:"Noir", color_orange:"Orange", color_purple:"Violet"
@@ -1299,104 +1289,276 @@ const GEO_POOLS={easy:[{name:'United States',continent:'North America',hemispher
 const GEO_DIFF={easy:{reward:1},medium:{reward:2},hard:{reward:4}}; const GEO_TIME_LIMIT=600;
 
 /* -------- GUESS THE FLAG COLORS --------
-   Reuses GEO_POOLS' curated `colors` arrays (rather than re-typing color data
-   for all 195 flags) and looks each country's flagcdn code up from
-   FLAG_POOLS by name, so this game shares data with the other two instead
-   of duplicating it. No feedback is shown per round — right or wrong only
-   surfaces as the final accuracy percentage, which sets the coin reward. */
-const FLAG_CODE_BY_NAME={}; [...FLAG_POOLS.easy,...FLAG_POOLS.medium,...FLAG_POOLS.hard].forEach(c=>{FLAG_CODE_BY_NAME[c.name]=c.code;});
-const COLOR_POOLS={}; ['easy','medium','hard'].forEach(diff=>{COLOR_POOLS[diff]=GEO_POOLS[diff].map(c=>({name:c.name,code:FLAG_CODE_BY_NAME[c.name],colors:c.colors})).filter(c=>c.code);});
-const COLOR_OPTIONS=['red','blue','green','yellow','white','black','orange','purple'];
-/* Canonical RGB for each named flag color (the same values CSS itself
-   resolves those keywords to), used only to score how close the color the
-   player mixes in the picker is to the actual missing color. */
-const COLOR_RGB={red:[255,0,0],blue:[0,0,255],green:[0,128,0],yellow:[255,255,0],white:[255,255,255],black:[0,0,0],orange:[255,165,0],purple:[128,0,128]};
+   Each flag's geometry is authored here rather than fetched, so the game knows
+   exactly which region is which and can recolor precisely one of them. The old
+   approach downloaded the real flag SVG and guessed which shapes were safe to
+   repaint from their bounding-box area; that guess flattened Mexico's eagle and
+   repainted Australia's Union Jack canton, and could never be verified offline.
+
+   A flag is [templateId, ...partColors]. The template decides the geometry and
+   how many parts there are; the colors fill those parts in order. Template ids
+   may carry band ratios after a colon, e.g. 'h:1,2,1' for Spain. Colors are raw
+   hex (a flag's real shade) or a FLAG_PALETTE name for the common cases. */
+const FLAG_W=60, FLAG_H=40;
+const FLAG_PALETTE={red:'#d21034',blue:'#003580',green:'#009639',yellow:'#fcd116',white:'#ffffff',black:'#000000',orange:'#ff8200',lightblue:'#4189dd'};
+function flagColor(c){return (typeof c==='string'&&c[0]==='#')?c:(FLAG_PALETTE[c]||c);}
+
+/* Scoring: straight RGB distance from the picked color to the part's real
+   authored hex, normalized so 0 = opposite corners of the color cube and
+   1 = exact. Because the target hex is authored rather than sniffed out of
+   remote artwork, this compares against the true shade every time. */
 const MAX_COLOR_DIST=Math.sqrt(3*255*255);
-function hexToRgb(hex){const n=parseInt(hex.replace('#',''),16); return[(n>>16)&255,(n>>8)&255,n&255];}
-function colorDistanceHex(hexA,hexB){const[r1,g1,b1]=hexToRgb(hexA); const[r2,g2,b2]=hexToRgb(hexB); return Math.sqrt((r1-r2)**2+(g1-g2)**2+(b1-b2)**2);}
+function hexToRgb(hex){const h=hex.replace('#',''); const n=parseInt(h.length===3?h.split('').map(x=>x+x).join(''):h,16); return[(n>>16)&255,(n>>8)&255,n&255];}
+function colorDistanceHex(a,b){const[r1,g1,b1]=hexToRgb(a),[r2,g2,b2]=hexToRgb(b); return Math.sqrt((r1-r2)**2+(g1-g2)**2+(b1-b2)**2);}
 function closenessFromDistance(dist){return Math.max(0,1-dist/MAX_COLOR_DIST);}
-function colorCloseness(hex,colorName){const[r,g,b]=COLOR_RGB[colorName]; const targetHex='#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join(''); return closenessFromDistance(colorDistanceHex(hex,targetHex));}
-// Classifies an arbitrary hex (e.g. a real flag's exact brand-color shade)
-// into whichever of the 8 named colors it's closest to, so a country's
-// actual SVG fill can be matched up with the GEO_POOLS-curated colors list.
-function nearestColorName(hex){let best=null,bestDist=Infinity; COLOR_OPTIONS.forEach(name=>{const d=colorDistanceHex(hex,'#'+COLOR_RGB[name].map(x=>x.toString(16).padStart(2,'0')).join('')); if(d<bestDist){bestDist=d; best=name;}}); return best;}
+
+// --- geometry helpers (all in the 60x40 viewBox) ---
+function fRect(x,y,w,h,part){return{t:'rect',a:{x,y,width:w,height:h},part};}
+function fCircle(cx,cy,r,part){return{t:'circle',a:{cx,cy,r},part};}
+function fPath(d,part){return{t:'path',a:{d},part};}
+function fStroke(d,w,part){return{t:'path',a:{d,'stroke-width':w,'stroke-linecap':'butt'},part,stroke:true};}
+function starPts(cx,cy,r,n,rot){let d=''; for(let i=0;i<n*2;i++){const rr=i%2?r*0.382:r; const a=(Math.PI/n)*i-Math.PI/2+(rot||0); d+=(i?' L':'M')+(cx+rr*Math.cos(a)).toFixed(2)+' '+(cy+rr*Math.sin(a)).toFixed(2);} return d+' Z';}
+function fStar(cx,cy,r,part,n,rot){return fPath(starPts(cx,cy,r,n||5,rot),part);}
+// Bands: `dir` 'h' or 'v', optional ratio list, one part per color.
+function fBands(cols,ratios,dir){
+  const n=cols.length, rs=ratios&&ratios.length===n?ratios:new Array(n).fill(1);
+  const total=rs.reduce((a,b)=>a+b,0), span=dir==='h'?FLAG_H:FLAG_W;
+  const out=[]; let pos=0;
+  for(let i=0;i<n;i++){const size=span*rs[i]/total;
+    out.push(dir==='h'?fRect(0,+pos.toFixed(3),FLAG_W,+size.toFixed(3),i):fRect(+pos.toFixed(3),0,+size.toFixed(3),FLAG_H,i));
+    pos+=size;}
+  return out;
+}
+
+/* Every template returns an ordered list of shapes. `part` indexes the flag's
+   color array; a part of -1 is fixed decoration that is never recolored and
+   never picked as the answer. */
+const FLAG_TEMPLATES={
+  h:(c,r)=>fBands(c,r,'h'),
+  v:(c,r)=>fBands(c,r,'v'),
+  // Off-centre Nordic cross: field + cross.
+  nordic:c=>[fRect(0,0,FLAG_W,FLAG_H,0),fPath('M0 16.5H16.5V0H24.5V16.5H60V23.5H24.5V40H16.5V23.5H0Z',1)],
+  // Nordic cross with an outline (Norway, Iceland): field + outer + inner.
+  nordic3:c=>[fRect(0,0,FLAG_W,FLAG_H,0),fPath('M0 15H15V0H26V15H60V25H26V40H15V25H0Z',1),fPath('M0 17.5H17.5V0H23.5V17.5H60V22.5H23.5V40H17.5V22.5H0Z',2)],
+  // Centred cross (Switzerland-style square-ish cross, Tonga canton cross).
+  crossC:c=>[fRect(0,0,FLAG_W,FLAG_H,0),fPath('M26 8H34V16.5H45V23.5H34V32H26V23.5H15V16.5H26Z',1)],
+  disc:c=>[fRect(0,0,FLAG_W,FLAG_H,0),fCircle(30,20,11,1)],
+  discOff:c=>[fRect(0,0,FLAG_W,FLAG_H,0),fCircle(25,20,10,1)],
+  // Horizontal bands with a centred disc on top (Niger, India-style).
+  bandsDisc:c=>[...fBands(c.slice(0,-1),null,'h'),fCircle(30,20,7,c.length-1)],
+  // Horizontal bands with a centred star (Ghana, Myanmar, Burkina Faso).
+  bandsStar:c=>[...fBands(c.slice(0,-1),null,'h'),fStar(30,20,7,c.length-1)],
+  // Horizontal bands with a solid bar down the hoist (UAE-style).
+  vbar:c=>[...fBands(c.slice(0,-1),null,'h'),fRect(0,0,15,FLAG_H,c.length-1)],
+  // Vertical band at the hoist, two horizontal bands filling the rest (Benin).
+  hoistBar:c=>[fRect(0,0,22,FLAG_H,0),fRect(22,0,38,20,1),fRect(22,20,38,20,2)],
+  // N alternating stripes + a canton with one star (Liberia, Togo). Stripe
+  // count rides on the template id, e.g. 'stripesCanton:11'.
+  stripesCanton:(c,r)=>{const n=(r&&r[0])||11,out=[],h=FLAG_H/n;
+    for(let i=0;i<n;i++)out.push(fRect(0,+(i*h).toFixed(3),FLAG_W,+h.toFixed(3),i%2));
+    const ch=Math.ceil(n/2)*h; out.push(fRect(0,0,24,+ch.toFixed(3),2)); out.push(fStar(12,ch/2,ch*0.34,3)); return out;},
+  // 13 stripes + canton + a grid of stars, so the US canton doesn't read as Liberia's.
+  usFlag:c=>{const out=[],h=FLAG_H/13;
+    for(let i=0;i<13;i++)out.push(fRect(0,+(i*h).toFixed(3),FLAG_W,+h.toFixed(3),i%2));
+    const cw=24,ch=h*7; out.push(fRect(0,0,cw,+ch.toFixed(3),2));
+    for(let r2=0;r2<5;r2++)for(let k=0;k<6;k++)out.push(fStar(cw/6*(k+0.5),ch/5*(r2+0.5),1.35,3));
+    return out;},
+  // Union Jack: field, then white and red saltires and crosses over it.
+  ukjack:c=>[fRect(0,0,FLAG_W,FLAG_H,0),
+    fStroke('M0 0L60 40M60 0L0 40',9,1),fStroke('M0 0L60 40M60 0L0 40',3.4,2),
+    fStroke('M30 0V40M0 20H60',12,1),fStroke('M30 0V40M0 20H60',6.6,2)],
+  // Stripes with a solid canton carrying a cross (Greece).
+  greece:c=>{const out=[],h=FLAG_H/9;
+    for(let i=0;i<9;i++)out.push(fRect(0,+(i*h).toFixed(3),FLAG_W,+h.toFixed(3),i%2?1:0));
+    const s=h*5; out.push(fRect(0,0,s,s,0));
+    out.push(fStroke('M'+(s/2)+' 0V'+s+'M0 '+(s/2)+'H'+s,h,1)); return out;},
+  // Horizontal bands with a triangle at the hoist (Czechia, Sudan, Bahamas...).
+  hoistTri:c=>[...fBands(c.slice(0,-1),null,'h'),fPath('M0 0L26 20L0 40Z',c.length-1)],
+  // Diagonal split, hoist-bottom to fly-top.
+  diag2:c=>[fRect(0,0,FLAG_W,FLAG_H,0),fPath('M0 40L60 0V40Z',1)],
+  // Two triangles with a diagonal band between them.
+  diag3:c=>[fPath('M0 0H60L0 40Z',0),fPath('M60 0V40H0Z',1),fPath('M0 40L60 0H48L0 34Z',2)],
+  // Saltire dividing the field into four triangles (Jamaica).
+  saltire4:c=>[fPath('M0 0H60L30 20Z',0),fPath('M0 40H60L30 20Z',0),fPath('M0 0V40L30 20Z',1),fPath('M60 0V40L30 20Z',1),fPath('M0 0L60 40V36L6 0ZM60 0L0 40H6L60 4Z',2)],
+  // Field + crescent + star (Turkey, Pakistan-style).
+  crescent:c=>[fRect(0,0,FLAG_W,FLAG_H,0),fPath('M28 20A9 9 0 1 1 22.5 11.7A7.2 7.2 0 1 0 22.5 28.3A9 9 0 0 1 28 20Z',1),fStar(32,20,4.5,2)],
+  // Field + one centred star.
+  star1:c=>[fRect(0,0,FLAG_W,FLAG_H,0),fStar(30,20,9,1)],
+  // Field + a star at the hoist third (Vietnam/Morocco style share 'star1').
+  vbandsStar:c=>[...fBands(c.slice(0,-1),null,'v'),fStar(30,20,8,c.length-1)],
+};
+
+function flagShapeParts(shape){
+  const id=String(shape[0]), colors=shape.slice(1);
+  const [name,ratioStr]=id.split(':');
+  const ratios=ratioStr?ratioStr.split(',').map(Number):null;
+  const fn=FLAG_TEMPLATES[name];
+  if(!fn)throw new Error('unknown flag template: '+name);
+  return {colors, shapes:fn(colors,ratios)};
+}
+// Builds the <svg> markup for a flag. `missingIdx` (optional) is the part left
+// for the player to fill: it is drawn in `missingHex` and outlined so it reads
+// as the blank to solve.
+function renderFlagSVG(shape,missingIdx,missingHex){
+  const {colors,shapes}=flagShapeParts(shape);
+  const body=shapes.map(s=>{
+    const isMissing=s.part>=0&&s.part===missingIdx;
+    const fill=s.part<0?'#ffffff':(isMissing?(missingHex||'#cccccc'):flagColor(colors[s.part]));
+    const attrs=Object.keys(s.a).map(k=>k+'="'+s.a[k]+'"').join(' ');
+    const paint=s.stroke?('fill="none" stroke="'+fill+'"'):('fill="'+fill+'"');
+    return '<'+s.t+' '+attrs+' '+paint+' data-part="'+s.part+'"'+(isMissing?' data-missing="1"':'')+'/>';
+  }).join('');
+  return '<svg viewBox="0 0 '+FLAG_W+' '+FLAG_H+'" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">'+body+'</svg>';
+}
+// Which parts a round may blank out: real colored regions only, never fixed
+// decoration, and never the same part twice.
+function guessableParts(shape){const {colors,shapes}=flagShapeParts(shape); const seen=new Set(); shapes.forEach(s=>{if(s.part>=0&&s.part<colors.length)seen.add(s.part);}); return [...seen];}
+/* Authored flag geometry, keyed by the same ISO-2 code FLAG_POOLS uses. Only
+   flags that stay recognisable from geometry + color alone are listed; ones
+   whose identity depends on an intricate emblem, crest, animal, map or script
+   (Mexico's eagle, Canada's maple leaf, Saudi script, Sri Lanka's lion...) are
+   deliberately absent and simply never appear in this mode. */
+const FLAG_SHAPES={
+// --- plain horizontal bands ---
+de:['h','#000000','#dd0000','#ffce00'], ru:['h','#ffffff','#0039a6','#d52b1e'],
+nl:['h','#ae1c28','#ffffff','#21468b'], at:['h','#ed2939','#ffffff','#ed2939'],
+hu:['h','#cd2a3e','#ffffff','#436f4d'], pl:['h','#ffffff','#dc143c'],
+id:['h','#ce1126','#ffffff'],           ua:['h','#0057b7','#ffd700'],
+ve:['h','#ffcc00','#00247d','#cf142b'], ee:['h','#0072ce','#000000','#ffffff'],
+bg:['h','#ffffff','#00966e','#d62612'], lt:['h','#fdb913','#006a44','#c1272d'],
+am:['h','#d90012','#0033a0','#f2a800'], ye:['h','#ce1126','#ffffff','#000000'],
+lu:['h','#ed2939','#ffffff','#00a1de'], mc:['h','#ce1126','#ffffff'],
+hn:['h','#0073cf','#ffffff','#0073cf'], mu:['h','#ea2839','#1a206d','#ffd500','#00a551'],
+ga:['h','#009e60','#fcd116','#3a75c4'], sl:['h','#1eb53a','#ffffff','#0072c6'],
+li:['h','#002b7f','#ce1126'],
+es:['h:1,2,1','#aa151b','#f1bf00','#aa151b'],
+lv:['h:2,1,2','#9e3039','#ffffff','#9e3039'],
+co:['h:2,1,1','#fcd116','#003893','#ce1126'],
+rw:['h:2,1,1','#00a1de','#fad201','#20603d'],
+th:['h:1,1,2,1,1','#a51931','#f4f5f8','#2d2a4a','#f4f5f8','#a51931'],
+cr:['h:1,1,2,1,1','#002b7f','#ffffff','#ce1126','#ffffff','#002b7f'],
+bw:['h:9,1,4,1,9','#75aadb','#ffffff','#000000','#ffffff','#75aadb'],
+gm:['h:6,1,4,1,6','#ce1126','#ffffff','#0c1c8c','#ffffff','#3a7728'],
+// --- plain vertical bands ---
+fr:['v','#002654','#ffffff','#ce1126'], it:['v','#009246','#ffffff','#ce2b37'],
+ie:['v','#169b62','#ffffff','#ff883e'], be:['v','#000000','#fae042','#ed2939'],
+ro:['v','#002b7f','#fcd116','#ce1126'], ng:['v','#008751','#ffffff','#008751'],
+pe:['v','#d91023','#ffffff','#d91023'], ml:['v','#14b53a','#fcd116','#ce1126'],
+td:['v','#002664','#fecb00','#c60c30'], ci:['v','#f77f00','#ffffff','#009e60'],
+gn:['v','#ce1126','#fcd116','#009460'], mt:['v','#ffffff','#cf142b'],
+pt:['v:2,3','#046a38','#da291c'],
+// --- Nordic and centred crosses ---
+se:['nordic','#006aa7','#fecc00'],  dk:['nordic','#c8102e','#ffffff'],
+fi:['nordic','#ffffff','#003580'],
+no:['nordic3','#ba0c2f','#ffffff','#00205b'], is:['nordic3','#02529c','#ffffff','#dc1e35'],
+ch:['crossC','#d52b1e','#ffffff'],
+// --- discs ---
+jp:['disc','#ffffff','#bc002d'],
+bd:['discOff','#006a4e','#f42a41'], pw:['discOff','#4aadd6','#ffde00'],
+in:['bandsDisc','#ff9933','#ffffff','#138808','#000080'],
+ar:['bandsDisc','#74acdf','#ffffff','#74acdf','#f6b40e'],
+ne:['bandsDisc','#e05206','#ffffff','#0db02b','#e05206'],
+et:['bandsDisc','#009a44','#fedd00','#ef3340','#0f47af'],
+mw:['bandsDisc','#000000','#ce1126','#339e35','#ce1126'],
+// --- hoist triangle ---
+cz:['hoistTri','#ffffff','#d7141a','#11457e'],
+sd:['hoistTri','#d21034','#ffffff','#000000','#007229'],
+ps:['hoistTri','#000000','#ffffff','#007a3d','#ce1126'],
+bs:['hoistTri','#00abc9','#fae042','#00abc9','#000000'],
+// --- diagonals ---
+tt:['diag2','#ce1126','#000000'],
+cg:['diag3','#009543','#dc241f','#fbde4a'],
+tz:['diag3','#1eb53a','#00a3dd','#000000'],
+jm:['saltire4','#009b3a','#000000','#fed100'],
+// --- crescents and stars ---
+tr:['crescent','#e30a17','#ffffff','#ffffff'],
+ma:['star1','#c1272d','#006233'], vn:['star1','#da251d','#ffff00'],
+so:['star1','#4189dd','#ffffff'],
+gh:['bandsStar','#ce1126','#fcd116','#006b3f','#000000'],
+mm:['bandsStar','#fecb00','#34b233','#ea2839','#ffffff'],
+bf:['bandsStar','#ef2b2d','#009e49','#fcd116'],
+sn:['vbandsStar','#00853f','#fdef42','#e31b23','#00853f'],
+cm:['vbandsStar','#007a5e','#ce1126','#fcd116','#fcd116'],
+ae:['vbar','#00732f','#ffffff','#000000','#ff0000'],
+// --- batch 2: cantons, stripes-with-canton, hoist bars ---
+us:['usFlag','#b22234','#ffffff','#3c3b6e','#ffffff'],
+gb:['ukjack','#012169','#ffffff','#c8102e'],
+gr:['greece','#0d5eaf','#ffffff'],
+lr:['stripesCanton:11','#bf0a30','#ffffff','#002868','#ffffff'],
+tg:['stripesCanton:5','#006a4e','#ffce00','#d21034','#ffffff'],
+bj:['hoistBar','#008751','#fcd116','#e8112d'],
+gw:['hoistBar','#ce1126','#fcd116','#009e49'],
+// --- batch 2: more horizontal / vertical bands ---
+ao:['h','#ce1126','#000000'],
+sr:['h:2,1,4,1,2','#377e3f','#ffffff','#b40a2d','#ffffff','#377e3f'],
+vc:['v:1,2,1','#0058aa','#fcd116','#00954d'],
+nr:['h:9,1,10','#002b7f','#ffc61e','#002b7f'],
+// --- batch 2: triangles, diagonals, discs, stars ---
+st:['hoistTri','#12ad2b','#ffce00','#12ad2b','#d21034'],
+km:['hoistTri','#ffff00','#ffffff','#ce1126','#3a75c4','#009639'],
+dj:['hoistTri','#6ab2e7','#12ad2b','#ffffff'],
+ph:['hoistTri','#0038a8','#ce1126','#ffffff'],
+kn:['diag3','#009e49','#ce1126','#000000'],
+sb:['diag3','#0051ba','#215b33','#ffffff'],
+cd:['diag3','#007fff','#007fff','#f7d618'],
+la:['bandsDisc','#ce1126','#002868','#ce1126','#ffffff'],
+pk:['crescent','#01411c','#ffffff','#ffffff'],
+mr:['crescent','#006233','#ffc400','#ffc400'],
+};
+
+/* Difficulty reuses FLAG_POOLS' existing easy/medium/hard tiers, so the tiering
+   matches the rest of the game; flags without authored geometry drop out. */
+const COLOR_POOLS={}; ['easy','medium','hard'].forEach(d=>{COLOR_POOLS[d]=FLAG_POOLS[d].filter(c=>FLAG_SHAPES[c.code]).map(c=>({name:c.name,code:c.code,shape:FLAG_SHAPES[c.code]}));});
+const COLOR_DIFF={easy:{time:15},medium:{time:20},hard:{time:25}};
+
 let colorState=null;
 function goColorMode(){showScreen('screen-color-diff');}
-function startColorGame(diff){colorState={diff, list:shuffle(COLOR_POOLS[diff]).slice(0,10), index:0, closenessSum:0, missingColor:null, missingIdx:-1}; showScreen('screen-color-game'); renderColorRound();}
-function restartColorGame(){startColorGame(colorState.diff);}
 function randomHexColor(){const n=Math.floor(Math.random()*0x1000000); return'#'+n.toString(16).padStart(6,'0');}
-function renderColorRound(){const c=colorState.list[colorState.index]; colorState.missingIdx=Math.floor(Math.random()*c.colors.length); colorState.missingColor=c.colors[colorState.missingIdx]; colorState.svgMode=false; colorState.missingEls=null; colorState.missingHexes=null; document.getElementById('color-progress').textContent=tr('flag_progress',{n:colorState.index+1}); document.getElementById('color-country-name').textContent=countryLabel(c.name); const picker=document.getElementById('color-picker'); picker.value=randomHexColor(); picker.oninput=updateMissingColor; picker.onchange=updateMissingColor; loadFlagIntoMiniFlag(c);}
-const svgFlagCache={};
-/* Loads the country's REAL flag artwork as inline SVG (so the actual shapes
-   stay intact) and finds which path(s) use the missing color, so the color
-   picker can repaint those exact paths live instead of a generic stripe.
-   Falls back to a simple stripe rendering if the SVG can't be fetched or
-   doesn't have a clean match for the missing color (some flags use gradients,
-   <use>/<defs> references, or CSS classes instead of a plain fill="#hex" —
-   this can't cover every one of the 195 flags perfectly). */
-async function loadFlagIntoMiniFlag(c){
-  const round=colorState.index;
-  const flagEl=document.getElementById('color-mini-flag');
-  flagEl.innerHTML='';
-  try{
-    let svgText=svgFlagCache[c.code];
-    if(!svgText){const res=await fetch('https://flagcdn.com/'+c.code+'.svg'); if(!res.ok)throw new Error('fetch failed'); svgText=await res.text(); svgFlagCache[c.code]=svgText;}
-    if(!colorState||colorState.index!==round)return; // user already moved on
-    flagEl.innerHTML=svgText;
-    const svg=flagEl.querySelector('svg');
-    if(!svg)throw new Error('no svg element');
-    svg.removeAttribute('width'); svg.removeAttribute('height');
-    svg.style.width='100%'; svg.style.height='100%'; svg.style.display='block';
-    // Which shapes are safe to recolor can't be reliably guessed from DOM
-    // nesting alone — different flags (and a canton like the UK's inside
-    // Australia/NZ) structure their SVGs differently. What's actually
-    // reliable is SIZE: a flag's real background field or stripe always
-    // covers a large share of the whole flag, while crosses, stars, seals,
-    // and canton details never do, no matter how they're nested. So filter
-    // candidates by rendered bounding-box area instead of DOM depth.
-    let totalArea=0;
-    try{const vb=svg.viewBox&&svg.viewBox.baseVal; totalArea=(vb&&vb.width&&vb.height)?vb.width*vb.height:0;}catch(e){}
-    if(!totalArea){try{const bb=svg.getBBox(); totalArea=bb.width*bb.height;}catch(e){}}
-    const MIN_AREA_FRACTION=0.15;
-    const groups={};
-    svg.querySelectorAll('[fill]').forEach(el=>{
-      const fill=el.getAttribute('fill');
-      if(!fill||fill[0]!=='#')return; // skip fill="none"/url(#...)/currentColor — can't classify those
-      if(el.closest('defs, clipPath, mask, symbol, pattern'))return; // definitions, not visible shapes
-      if(totalArea){
-        let area=0;
-        try{const bb=el.getBBox(); area=bb.width*bb.height;}catch(e){return;}
-        if(area<totalArea*MIN_AREA_FRACTION)return; // too small to be a background field/stripe
-      }
-      const name=nearestColorName(fill);
-      (groups[name]=groups[name]||{els:[],hexes:new Set()}).els.push(el);
-      groups[name].hexes.add(fill.toLowerCase());
-    });
-    const missing=groups[colorState.missingColor];
-    // A real background stripe/field is at most a handful of shapes; if a
-    // color bucket picked up a big pile of elements, that's emblem detail
-    // that slipped through, not a clean background match — bail to the
-    // stripe fallback rather than mangling the flag.
-    if(!missing||!missing.els.length||missing.els.length>4)throw new Error('no clean background match for '+colorState.missingColor);
-    colorState.svgMode=true; colorState.missingEls=missing.els; colorState.missingHexes=[...missing.hexes];
-    updateMissingColor();
-  }catch(e){
-    if(!colorState||colorState.index!==round)return;
-    colorState.svgMode=false; colorState.missingEls=null; colorState.missingHexes=null;
-    renderMiniFlagStripes(c);
-  }
+function clearColorTimer(){if(colorState&&colorState.interval){clearInterval(colorState.interval); colorState.interval=null;}}
+function startColorGame(diff){
+  clearColorTimer(); // clear the OLD timer before replacing the state it lives on
+  colorState={diff, list:shuffle(COLOR_POOLS[diff]).slice(0,10), index:0, closenessSum:0, missingIdx:-1, targetHex:null, timeLeft:0, interval:null};
+  showScreen('screen-color-game'); renderColorRound();
 }
-// Fallback used when the real SVG can't be fetched/matched for this flag.
-// The flag itself is built from its actual color list as horizontal
-// stripes (real photos can't be recolored one region at a time without
-// per-flag layout data), so the missing stripe can be bound directly to
-// the picker: dragging it repaints the flag itself, not a separate swatch.
-function renderMiniFlagStripes(c){const flagEl=document.getElementById('color-mini-flag'); flagEl.innerHTML=''; c.colors.forEach((col,i)=>{const stripe=document.createElement('div'); const isMissing=i===colorState.missingIdx; stripe.className='stripe'+(isMissing?' missing':''); if(isMissing)stripe.id='color-missing-stripe'; else stripe.style.background=col; flagEl.appendChild(stripe);}); updateMissingColor();}
-// Repaints whichever element(s) represent the missing color — the real
-// flag's actual SVG path(s) when available, otherwise the fallback stripe.
-function updateMissingColor(){if(!colorState)return; const hex=document.getElementById('color-picker').value; if(colorState.svgMode&&colorState.missingEls){colorState.missingEls.forEach(el=>el.setAttribute('fill',hex)); return;} const stripe=document.getElementById('color-missing-stripe'); if(stripe)stripe.style.background=hex;}
-function submitColorAnswer(){if(!colorState)return; const hex=document.getElementById('color-picker').value; let closeness; if(colorState.svgMode&&colorState.missingHexes&&colorState.missingHexes.length){closeness=Math.max(...colorState.missingHexes.map(h=>closenessFromDistance(colorDistanceHex(hex,h))));}else{closeness=colorCloseness(hex,colorState.missingColor);} colorState.closenessSum+=closeness; colorState.index++; if(colorState.index>=10){endColorGame();}else{renderColorRound();}}
-function endColorGame(){const pct=Math.round((colorState.closenessSum/10)*100); let reward=0; if(pct>=70)reward=3; else if(pct>=50)reward=2; else if(pct>=30)reward=1; if(reward>0)addCoins(reward); document.getElementById('color-result-msg').textContent=tr('accuracy_label',{p:pct}); document.getElementById('color-result-sub').textContent=reward>0?tr('earned_coins',{n:reward,s:plural(reward)}):tr('no_coins_msg'); showScreen('screen-color-result');}
+function restartColorGame(){startColorGame(colorState.diff);}
+function updateColorTimerDisplay(){document.getElementById('color-timer').textContent=colorState.timeLeft;}
+function renderColorRound(){
+  const c=colorState.list[colorState.index];
+  const parts=guessableParts(c.shape);
+  colorState.missingIdx=parts[Math.floor(Math.random()*parts.length)];
+  colorState.targetHex=flagColor(c.shape[1+colorState.missingIdx]);
+  document.getElementById('color-progress').textContent=tr('flag_progress',{n:colorState.index+1});
+  document.getElementById('color-country-name').textContent=countryLabel(c.name);
+  const picker=document.getElementById('color-picker');
+  picker.value=randomHexColor(); picker.oninput=updateMissingColor; picker.onchange=updateMissingColor;
+  document.getElementById('color-mini-flag').innerHTML=renderFlagSVG(c.shape,colorState.missingIdx,picker.value);
+  clearColorTimer();
+  colorState.timeLeft=COLOR_DIFF[colorState.diff].time; updateColorTimerDisplay();
+  colorState.interval=setInterval(()=>{
+    colorState.timeLeft--; updateColorTimerDisplay();
+    if(colorState.timeLeft<=0)submitColorAnswer(); // auto-submit whatever is picked
+  },1000);
+}
+// Repaints every shape belonging to the blank part (some templates draw one
+// part as several shapes, e.g. the saltire's opposing triangles).
+function updateMissingColor(){if(!colorState)return; const hex=document.getElementById('color-picker').value; document.querySelectorAll('#color-mini-flag [data-missing]').forEach(el=>el.setAttribute('fill',hex));}
+function submitColorAnswer(){
+  if(!colorState)return;
+  clearColorTimer();
+  const hex=document.getElementById('color-picker').value;
+  colorState.closenessSum+=closenessFromDistance(colorDistanceHex(hex,colorState.targetHex));
+  colorState.index++;
+  if(colorState.index>=10){endColorGame();}else{renderColorRound();}
+}
+function endColorGame(){
+  clearColorTimer();
+  const pct=Math.round((colorState.closenessSum/10)*100);
+  let reward=0; if(pct>=70)reward=3; else if(pct>=50)reward=2; else if(pct>=30)reward=1;
+  if(reward>0)addCoins(reward);
+  document.getElementById('color-result-msg').textContent=tr('accuracy_label',{p:pct});
+  document.getElementById('color-result-sub').textContent=reward>0?tr('earned_coins',{n:reward,s:plural(reward)}):tr('no_coins_msg');
+  showScreen('screen-color-result');
+}
 /* Capitals whose French name differs from the English one (only these need a
    mapping; the rest are spelled identically in both languages). */
 const CAPITAL_FR={"Cairo":"Le Caire","Beijing":"Pékin","London":"Londres","Warsaw":"Varsovie","Athens":"Athènes","Mexico City":"Mexico","Hanoi":"Hanoï","Kathmandu":"Katmandou","Ulaanbaatar":"Oulan-Bator","Asuncion":"Asunción","Brasilia":"Brasília","Moscow":"Moscou","Lisbon":"Lisbonne","Vienna":"Vienne","Copenhagen":"Copenhague","Bucharest":"Bucarest","Algiers":"Alger"};
