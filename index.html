@@ -95,7 +95,8 @@
   .color-picker-row{ display:flex; align-items:center; gap:14px; justify-content:center; margin:14px 0 20px; }
   .color-picker-row input[type=color]{ width:70px; height:56px; border:2px solid #ccc; border-radius:12px; padding:2px; cursor:pointer; background:white; }
   .mini-flag{ display:flex; flex-direction:column; width:100%; max-width:320px; aspect-ratio:3/2; margin:0 auto;
-    border-radius:12px; overflow:hidden; border:6px solid white; box-shadow:0 10px 26px rgba(0,0,0,0.35); }
+    border-radius:12px; overflow:hidden; border:6px solid white; box-shadow:0 10px 26px rgba(0,0,0,0.35); background:#eee; }
+  .mini-flag svg{ width:100%; height:100%; display:block; object-fit:cover; }
   .mini-flag .stripe{ flex:1; position:relative; }
   .mini-flag .stripe.missing::after{ content:'?'; position:absolute; inset:0; display:flex; align-items:center;
     justify-content:center; font-weight:bold; font-size:1.6em; color:rgba(0,0,0,0.32); text-shadow:0 1px 0 rgba(255,255,255,0.4); }
@@ -1312,20 +1313,68 @@ const COLOR_OPTIONS=['red','blue','green','yellow','white','black','orange','pur
 const COLOR_RGB={red:[255,0,0],blue:[0,0,255],green:[0,128,0],yellow:[255,255,0],white:[255,255,255],black:[0,0,0],orange:[255,165,0],purple:[128,0,128]};
 const MAX_COLOR_DIST=Math.sqrt(3*255*255);
 function hexToRgb(hex){const n=parseInt(hex.replace('#',''),16); return[(n>>16)&255,(n>>8)&255,n&255];}
-function colorCloseness(hex,colorName){const[r1,g1,b1]=hexToRgb(hex); const[r2,g2,b2]=COLOR_RGB[colorName]; const dist=Math.sqrt((r1-r2)**2+(g1-g2)**2+(b1-b2)**2); return Math.max(0,1-dist/MAX_COLOR_DIST);}
+function colorDistanceHex(hexA,hexB){const[r1,g1,b1]=hexToRgb(hexA); const[r2,g2,b2]=hexToRgb(hexB); return Math.sqrt((r1-r2)**2+(g1-g2)**2+(b1-b2)**2);}
+function closenessFromDistance(dist){return Math.max(0,1-dist/MAX_COLOR_DIST);}
+function colorCloseness(hex,colorName){const[r,g,b]=COLOR_RGB[colorName]; const targetHex='#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join(''); return closenessFromDistance(colorDistanceHex(hex,targetHex));}
+// Classifies an arbitrary hex (e.g. a real flag's exact brand-color shade)
+// into whichever of the 8 named colors it's closest to, so a country's
+// actual SVG fill can be matched up with the GEO_POOLS-curated colors list.
+function nearestColorName(hex){let best=null,bestDist=Infinity; COLOR_OPTIONS.forEach(name=>{const d=colorDistanceHex(hex,'#'+COLOR_RGB[name].map(x=>x.toString(16).padStart(2,'0')).join('')); if(d<bestDist){bestDist=d; best=name;}}); return best;}
 let colorState=null;
 function goColorMode(){showScreen('screen-color-diff');}
 function startColorGame(diff){colorState={diff, list:shuffle(COLOR_POOLS[diff]).slice(0,10), index:0, closenessSum:0, missingColor:null, missingIdx:-1}; showScreen('screen-color-game'); renderColorRound();}
 function restartColorGame(){startColorGame(colorState.diff);}
 function randomHexColor(){const n=Math.floor(Math.random()*0x1000000); return'#'+n.toString(16).padStart(6,'0');}
-function renderColorRound(){const c=colorState.list[colorState.index]; colorState.missingIdx=Math.floor(Math.random()*c.colors.length); colorState.missingColor=c.colors[colorState.missingIdx]; document.getElementById('color-progress').textContent=tr('flag_progress',{n:colorState.index+1}); document.getElementById('color-country-name').textContent=countryLabel(c.name); renderMiniFlag(c); const picker=document.getElementById('color-picker'); picker.value=randomHexColor(); updateMissingStripe(); picker.oninput=updateMissingStripe; picker.onchange=updateMissingStripe;}
+function renderColorRound(){const c=colorState.list[colorState.index]; colorState.missingIdx=Math.floor(Math.random()*c.colors.length); colorState.missingColor=c.colors[colorState.missingIdx]; colorState.svgMode=false; colorState.missingEls=null; colorState.missingHexes=null; document.getElementById('color-progress').textContent=tr('flag_progress',{n:colorState.index+1}); document.getElementById('color-country-name').textContent=countryLabel(c.name); const picker=document.getElementById('color-picker'); picker.value=randomHexColor(); picker.oninput=updateMissingColor; picker.onchange=updateMissingColor; loadFlagIntoMiniFlag(c);}
+const svgFlagCache={};
+/* Loads the country's REAL flag artwork as inline SVG (so the actual shapes
+   stay intact) and finds which path(s) use the missing color, so the color
+   picker can repaint those exact paths live instead of a generic stripe.
+   Falls back to a simple stripe rendering if the SVG can't be fetched or
+   doesn't have a clean match for the missing color (some flags use gradients,
+   <use>/<defs> references, or CSS classes instead of a plain fill="#hex" —
+   this can't cover every one of the 195 flags perfectly). */
+async function loadFlagIntoMiniFlag(c){
+  const round=colorState.index;
+  const flagEl=document.getElementById('color-mini-flag');
+  flagEl.innerHTML='';
+  try{
+    let svgText=svgFlagCache[c.code];
+    if(!svgText){const res=await fetch('https://flagcdn.com/'+c.code+'.svg'); if(!res.ok)throw new Error('fetch failed'); svgText=await res.text(); svgFlagCache[c.code]=svgText;}
+    if(!colorState||colorState.index!==round)return; // user already moved on
+    flagEl.innerHTML=svgText;
+    const svg=flagEl.querySelector('svg');
+    if(!svg)throw new Error('no svg element');
+    svg.removeAttribute('width'); svg.removeAttribute('height');
+    svg.style.width='100%'; svg.style.height='100%'; svg.style.display='block';
+    const groups={};
+    svg.querySelectorAll('[fill]').forEach(el=>{
+      const fill=el.getAttribute('fill');
+      if(!fill||fill[0]!=='#')return; // skip fill="none"/url(#...)/currentColor — can't classify those
+      const name=nearestColorName(fill);
+      (groups[name]=groups[name]||{els:[],hexes:new Set()}).els.push(el);
+      groups[name].hexes.add(fill.toLowerCase());
+    });
+    const missing=groups[colorState.missingColor];
+    if(!missing||!missing.els.length)throw new Error('no matching path for '+colorState.missingColor);
+    colorState.svgMode=true; colorState.missingEls=missing.els; colorState.missingHexes=[...missing.hexes];
+    updateMissingColor();
+  }catch(e){
+    if(!colorState||colorState.index!==round)return;
+    colorState.svgMode=false;
+    renderMiniFlagStripes(c);
+  }
+}
+// Fallback used when the real SVG can't be fetched/matched for this flag.
 // The flag itself is built from its actual color list as horizontal
 // stripes (real photos can't be recolored one region at a time without
 // per-flag layout data), so the missing stripe can be bound directly to
 // the picker: dragging it repaints the flag itself, not a separate swatch.
-function renderMiniFlag(c){const flagEl=document.getElementById('color-mini-flag'); flagEl.innerHTML=''; c.colors.forEach((col,i)=>{const stripe=document.createElement('div'); const isMissing=i===colorState.missingIdx; stripe.className='stripe'+(isMissing?' missing':''); if(isMissing)stripe.id='color-missing-stripe'; else stripe.style.background=col; flagEl.appendChild(stripe);});}
-function updateMissingStripe(){const stripe=document.getElementById('color-missing-stripe'); if(stripe)stripe.style.background=document.getElementById('color-picker').value;}
-function submitColorAnswer(){if(!colorState)return; const hex=document.getElementById('color-picker').value; colorState.closenessSum+=colorCloseness(hex,colorState.missingColor); colorState.index++; if(colorState.index>=10){endColorGame();}else{renderColorRound();}}
+function renderMiniFlagStripes(c){const flagEl=document.getElementById('color-mini-flag'); flagEl.innerHTML=''; c.colors.forEach((col,i)=>{const stripe=document.createElement('div'); const isMissing=i===colorState.missingIdx; stripe.className='stripe'+(isMissing?' missing':''); if(isMissing)stripe.id='color-missing-stripe'; else stripe.style.background=col; flagEl.appendChild(stripe);}); updateMissingColor();}
+// Repaints whichever element(s) represent the missing color — the real
+// flag's actual SVG path(s) when available, otherwise the fallback stripe.
+function updateMissingColor(){if(!colorState)return; const hex=document.getElementById('color-picker').value; if(colorState.svgMode&&colorState.missingEls){colorState.missingEls.forEach(el=>el.setAttribute('fill',hex)); return;} const stripe=document.getElementById('color-missing-stripe'); if(stripe)stripe.style.background=hex;}
+function submitColorAnswer(){if(!colorState)return; const hex=document.getElementById('color-picker').value; let closeness; if(colorState.svgMode&&colorState.missingHexes&&colorState.missingHexes.length){closeness=Math.max(...colorState.missingHexes.map(h=>closenessFromDistance(colorDistanceHex(hex,h))));}else{closeness=colorCloseness(hex,colorState.missingColor);} colorState.closenessSum+=closeness; colorState.index++; if(colorState.index>=10){endColorGame();}else{renderColorRound();}}
 function endColorGame(){const pct=Math.round((colorState.closenessSum/10)*100); let reward=0; if(pct>=70)reward=3; else if(pct>=50)reward=2; else if(pct>=30)reward=1; if(reward>0)addCoins(reward); document.getElementById('color-result-msg').textContent=tr('accuracy_label',{p:pct}); document.getElementById('color-result-sub').textContent=reward>0?tr('earned_coins',{n:reward,s:plural(reward)}):tr('no_coins_msg'); showScreen('screen-color-result');}
 /* Capitals whose French name differs from the English one (only these need a
    mapping; the rest are spelled identically in both languages). */

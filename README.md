@@ -96,20 +96,32 @@ Cloud Function if you want automatic cleanup.
 ## Guess The Flag Colors
 
 The third solo game mode (Home → Play → 🎨 Guess The Flag Colors): for each
-of 10 rounds you're shown the country's name and its flag — rendered as
-horizontal stripes built directly from that country's actual `colors` list,
-one stripe per color — except one stripe is blanked out (a "?" mark). Real
-flag photos can't be recolored one region at a time without per-flag layout
-data, so `renderMiniFlag()` draws the flag itself out of the same color data
-the game already tracks, which makes the missing stripe directly bindable
-to the picker.
+of 10 rounds you're shown the country's name and its **real flag artwork**
+(fetched live as inline SVG from flagcdn.com, not a raster photo) — except
+whichever of its shapes uses the missing color has that shape's fill blanked
+out. You mix the missing color yourself in a native color-picker (`<input
+type="color">`, the full spectrum, not presets) from memory, and **that
+exact shape on the real flag repaints live as you drag** — you're directly
+recoloring part of the actual flag, not a generic stripe or a separate
+preview box.
 
-Instead of picking from a fixed set of swatches, you mix the missing color
-yourself in a native color-picker (`<input type="color">`, the full
-spectrum, not presets) from memory. The picker starts each round on a
-random color, and **the missing stripe on the flag itself repaints live as
-you drag** (`updateMissingStripe()` runs on every `input` event) — you're
-directly recoloring the flag, not watching a separate preview box.
+How this works (`loadFlagIntoMiniFlag()` in `index.html`): the SVG is
+fetched and injected inline (so its `<path>`/`<rect>` elements are real DOM
+nodes), then every element with a `fill="#hex"` is classified against the
+nearest of the 8 named colors (`nearestColorName()`) — real flags use custom
+brand shades, not pure CSS red/blue, so this maps e.g. a flag's actual
+`#ce1126` crimson to the `red` bucket. Whichever shape(s) land in the
+missing-color's bucket get their `fill` bound to the picker
+(`updateMissingColor()`, on both `input` and `change` — some mobile browsers
+only fire one of those for `<input type="color">`). Scoring uses the shape's
+*exact* real hex, not the generic bucket color, so a closeness comparison is
+as accurate as possible.
+
+Not every one of the 195 flags parses cleanly this way — some use gradients,
+`<defs>`/`<use>` references, or a color combination that doesn't cleanly
+separate into 8 buckets. If the fetch fails or no shape matches the missing
+color, it falls back to a simple horizontal-stripe rendering built from the
+same `colors` data instead, so the round never breaks.
 
 There's no right/wrong per round — each guess is scored by **closeness**,
 not an exact match: `colorCloseness()` compares the RGB you picked against
