@@ -1347,23 +1347,27 @@ async function loadFlagIntoMiniFlag(c){
     if(!svg)throw new Error('no svg element');
     svg.removeAttribute('width'); svg.removeAttribute('height');
     svg.style.width='100%'; svg.style.height='100%'; svg.style.display='block';
-    // Emblems/coats of arms (Mexico's eagle, etc.) are usually dozens of tiny
-    // paths nested several <g> levels deep; the flag's actual field/stripes
-    // are almost always shallow — direct children of <svg> or one <g> in.
-    // Restricting to shallow elements keeps recoloring on the background
-    // only, so emblem detail is never touched/flattened.
-    // Try the shallowest match first (direct children of <svg>, where a
-    // flag's plain stripes/field almost always live) and only widen the
-    // search if nothing's found there — emblems are virtually always
-    // nested at least one <g> deeper than the background, so staying as
-    // shallow as possible is the safest way to avoid touching them.
-    let candidates=[...svg.querySelectorAll(':scope > [fill]')];
-    if(!candidates.length)candidates=[...svg.querySelectorAll(':scope > g > [fill]')];
-    if(!candidates.length)candidates=[...svg.querySelectorAll('[fill]')];
+    // Which shapes are safe to recolor can't be reliably guessed from DOM
+    // nesting alone — different flags (and a canton like the UK's inside
+    // Australia/NZ) structure their SVGs differently. What's actually
+    // reliable is SIZE: a flag's real background field or stripe always
+    // covers a large share of the whole flag, while crosses, stars, seals,
+    // and canton details never do, no matter how they're nested. So filter
+    // candidates by rendered bounding-box area instead of DOM depth.
+    let totalArea=0;
+    try{const vb=svg.viewBox&&svg.viewBox.baseVal; totalArea=(vb&&vb.width&&vb.height)?vb.width*vb.height:0;}catch(e){}
+    if(!totalArea){try{const bb=svg.getBBox(); totalArea=bb.width*bb.height;}catch(e){}}
+    const MIN_AREA_FRACTION=0.15;
     const groups={};
-    candidates.forEach(el=>{
+    svg.querySelectorAll('[fill]').forEach(el=>{
       const fill=el.getAttribute('fill');
       if(!fill||fill[0]!=='#')return; // skip fill="none"/url(#...)/currentColor — can't classify those
+      if(el.closest('defs, clipPath, mask, symbol, pattern'))return; // definitions, not visible shapes
+      if(totalArea){
+        let area=0;
+        try{const bb=el.getBBox(); area=bb.width*bb.height;}catch(e){return;}
+        if(area<totalArea*MIN_AREA_FRACTION)return; // too small to be a background field/stripe
+      }
       const name=nearestColorName(fill);
       (groups[name]=groups[name]||{els:[],hexes:new Set()}).els.push(el);
       groups[name].hexes.add(fill.toLowerCase());

@@ -117,17 +117,24 @@ only fire one of those for `<input type="color">`). Scoring uses the shape's
 *exact* real hex, not the generic bucket color, so a closeness comparison is
 as accurate as possible.
 
-**Emblems and coats of arms are protected from this.** A country's field
-(Mexico's green/white/red bands, say) is almost always a small number of
-plain shapes as direct children of the SVG root, while its eagle — or any
-other flag's seal, star, sun, crest, etc. — is typically dozens of tiny
-paths nested several `<g>` levels deeper. Only recoloring the *shallowest*
-matching elements (direct children of `<svg>` first, widening one level at
-a time only if nothing's found there) keeps the color-matching on the
-background only, so emblem detail is never touched. As a second safety net,
-if a color bucket still ends up with more than a handful of elements — a
-sign some emblem detail slipped through anyway — that round falls back
-rather than risk flattening the artwork.
+**Emblems, cantons, and coats of arms are protected from this by size, not
+DOM position.** Which SVG elements are safe to recolor can't be reliably
+guessed from how deeply they're nested — that varies by flag, and flags with
+a canton (Australia's Union Jack corner, for instance) put small canton
+details at the same DOM depth as the real background, which breaks a
+depth-only heuristic. What's actually reliable is that a flag's real
+background field or stripe always covers a large share of the whole flag,
+while crosses, stars, seals, and canton details never do, however they're
+nested. So each candidate's *rendered bounding-box area* is measured against
+the flag's total area (`getBBox()` vs. the SVG's `viewBox`), and anything
+covering less than ~15% of the flag is excluded outright — that's what
+keeps the Union Jack's crosses and the Southern Cross's stars from ever
+being candidates for recoloring, regardless of how the SVG groups them.
+Elements inside `<defs>`/`<clipPath>`/`<mask>`/`<symbol>`/`<pattern>` are
+excluded too, since those are non-visible definitions, not paintable shapes.
+As a second safety net, if a color bucket still ends up matching more than a
+handful of elements, that's treated as a sign something slipped through
+anyway, and the round falls back rather than risk mangled artwork.
 
 Not every one of the 195 flags parses cleanly this way — some use gradients,
 `<defs>`/`<use>` references, or a color combination that doesn't cleanly
